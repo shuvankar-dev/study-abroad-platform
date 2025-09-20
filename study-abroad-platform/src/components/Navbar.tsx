@@ -9,8 +9,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
+          <a href="/" className="flex items-center space-x-3 group">
+            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg group-hover:scale-105 transition-transform">
               <GlobeIcon className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -19,7 +19,7 @@ const Navbar = () => {
               </span>
               <div className="text-xs text-blue-400 -mt-1">Platform</div>
             </div>
-          </div>
+          </a>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
