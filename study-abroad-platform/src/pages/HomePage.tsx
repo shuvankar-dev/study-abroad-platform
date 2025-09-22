@@ -27,7 +27,7 @@ const HomePage = () => {
             </div>
             <div className="flex justify-center">
               <div className="w-80 h-80 rounded-2xl shadow-2xl bg-white/60 overflow-hidden flex items-center justify-center">
-                <img src="/public/whyUs.png" alt="Study Abroad" className="w-full h-full object-cover" />
+                <img src="/whyUs.png" alt="Study Abroad" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>

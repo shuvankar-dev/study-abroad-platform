@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { BookOpenIcon, MapPinIcon, ClockIcon, DollarSignIcon, ArrowLeftIcon, AlertCircleIcon, RefreshCwIcon, DatabaseIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import Navbar from '../components/Navbar'
+import SearchWithinResults from '../components/SearchWithinResults'
 
 interface Course {
   id: number
@@ -49,15 +50,40 @@ const SearchResults = () => {
   const [error, setError] = useState<string | null>(null)
   const [pagination, setPagination] = useState<Pagination | null>(null)
   
-  // Search parameters - CHANGED: Default to 30 courses per page
+  // NEW: State for search within results
+  const [allCourses, setAllCourses] = useState<Course[]>([]) // Store all courses for search
+  const [withinPageSearch, setWithinPageSearch] = useState('')
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([])
+  const [isSearchingWithin, setIsSearchingWithin] = useState(false)
+  
+  // Search parameters - 30 courses per page
   const courseQuery = searchParams.get('course') || ''
   const countryQuery = searchParams.get('country') || ''
   const currentPage = parseInt(searchParams.get('page') || '1')
-  const limitPerPage = parseInt(searchParams.get('limit') || '30') // CHANGED: Default to 30 courses
+  const limitPerPage = parseInt(searchParams.get('limit') || '30')
 
   useEffect(() => {
     fetchCourses()
   }, [courseQuery, countryQuery, currentPage, limitPerPage])
+
+  // NEW: Filter courses when within-page search changes
+  useEffect(() => {
+    if (!withinPageSearch) {
+      setFilteredCourses(courses)
+      setIsSearchingWithin(false)
+    } else {
+      // Search across ALL courses, not just current page
+      const searchResults = allCourses.filter(course =>
+        course.title.toLowerCase().includes(withinPageSearch.toLowerCase()) ||
+        course.university_name.toLowerCase().includes(withinPageSearch.toLowerCase()) ||
+        course.description.toLowerCase().includes(withinPageSearch.toLowerCase()) ||
+        course.field_of_study.toLowerCase().includes(withinPageSearch.toLowerCase()) ||
+        course.course_level.toLowerCase().includes(withinPageSearch.toLowerCase())
+      )
+      setFilteredCourses(searchResults)
+      setIsSearchingWithin(true)
+    }
+  }, [courses, allCourses, withinPageSearch])
 
   const fetchCourses = async () => {
     setLoading(true)
@@ -77,7 +103,8 @@ const SearchResults = () => {
       }
       
       const countryId = countryMap[countryQuery] || ''
-      
+    
+      // Fetch current page
       const params = new URLSearchParams({
         field_of_study: courseQuery,
         country_id: countryId,
@@ -85,21 +112,39 @@ const SearchResults = () => {
         limit: limitPerPage.toString()
       })
       
-      // Use the smart search API
-      const response = await fetch(`http://localhost/studyabroadplatform-api/api/search_smart.php?${params}`)
+      // Also fetch ALL courses for the search functionality
+      const allParams = new URLSearchParams({
+        field_of_study: courseQuery,
+        country_id: countryId,
+        page: '1',
+        limit: '1000' // Get all courses
+      })
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      // Make both API calls
+      const [currentResponse, allResponse] = await Promise.all([
+        fetch(`http://localhost/studyabroadplatform-api/api/search_smart.php?${params}`),
+        fetch(`http://localhost/studyabroadplatform-api/api/search_smart.php?${allParams}`)
+      ])
+      
+      if (!currentResponse.ok || !allResponse.ok) {
+        throw new Error(`HTTP error! status: ${currentResponse.status}`)
       }
       
-      const data: ApiResponse = await response.json()
+      const [currentData, allData] = await Promise.all([
+        currentResponse.json(),
+        allResponse.json()
+      ])
       
-      if (data.success) {
-        setCourses(data.data || [])
-        setPagination(data.pagination)
+      if (currentData.success && allData.success) {
+        setCourses(currentData.data || [])
+        setAllCourses(allData.data || []) // Store all courses for search
+        setFilteredCourses(currentData.data || [])
+        setPagination(currentData.pagination)
       } else {
         setError('No courses found matching your criteria')
         setCourses([])
+        setAllCourses([])
+        setFilteredCourses([])
         setPagination(null)
       }
       
@@ -107,9 +152,16 @@ const SearchResults = () => {
       console.error('Error fetching courses:', error)
       setError('Failed to connect to the API. Make sure your PHP server is running.')
       setCourses([])
+      setAllCourses([])
+      setFilteredCourses([])
       setPagination(null)
     }
     setLoading(false)
+  }
+
+  // NEW: Handle within-page search
+  const handleWithinPageSearch = (query: string) => {
+    setWithinPageSearch(query)
   }
 
   const handleRetry = () => {
@@ -272,7 +324,7 @@ const SearchResults = () => {
           {/* Enhanced API Status */}
           {pagination && (
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              {/* <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-blue-800">
                     <strong>Search completed successfully!</strong>
@@ -287,10 +339,20 @@ const SearchResults = () => {
                     ✨ Showing {limitPerPage} courses per page!
                   </div>
                 )}
-              </div> */}
+              </div>
             </div>
           )}
         </div>
+
+        {/* NEW: Search within results */}
+        {!loading && !error && pagination && allCourses.length > 0 && (
+          <SearchWithinResults
+            onSearch={handleWithinPageSearch}
+            totalCourses={pagination.total_courses}
+            currentResultsCount={filteredCourses.length}
+            placeholder={`Search within ${pagination.total_courses} ${courseQuery} courses...`}
+          />
+        )}
 
         {/* Results */}
         {loading ? (
@@ -327,24 +389,31 @@ const SearchResults = () => {
               Try Again
             </button>
           </div>
-        ) : courses.length > 0 ? (
+        ) : filteredCourses.length > 0 ? (
           <div className="space-y-6">
-            {/* Results summary */}
+            {/* Results summary - UPDATED to show filtered results */}
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600">
-                  {pagination && (
+                  {isSearchingWithin ? (
+                    <>
+                      Showing <strong>{filteredCourses.length}</strong> matches for "{withinPageSearch}"
+                      <span className="text-sm text-gray-500 ml-2">
+                        (out of {pagination?.total_courses} total courses)
+                      </span>
+                    </>
+                  ) : pagination ? (
                     <>
                       Showing <strong>{pagination.showing_from}-{pagination.showing_to}</strong> of <strong>{pagination.total_courses}</strong> courses
                     </>
-                  )}
+                  ) : null}
                 </p>
               </div>
             </div>
             
-            {/* Course grid - OPTIMIZED: Better responsive layout */}
+            {/* Course grid - UPDATED to use filteredCourses */}
             <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-              {courses.map((course) => (
+              {filteredCourses.map((course) => (
                 <div key={course.id} className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow p-6 h-full flex flex-col">
                   <div className="mb-4 flex-grow">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">
@@ -406,8 +475,24 @@ const SearchResults = () => {
               ))}
             </div>
 
-            {/* Pagination controls */}
-            <PaginationControls />
+            {/* Pagination controls - Hide when searching within results */}
+            {!isSearchingWithin && <PaginationControls />}
+            
+            {/* Show message when searching but no results */}
+            {isSearchingWithin && filteredCourses.length === 0 && (
+              <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
+                <DatabaseIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No matches found
+                </h3>
+                <p className="text-gray-500 mb-4">
+                  No courses match "{withinPageSearch}". 
+                </p>
+                <p className="text-sm text-gray-400">
+                  Try searching for different keywords like university names, course types, or program levels.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-12">
