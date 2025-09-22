@@ -1,18 +1,11 @@
 // ============================================================================
-// SearchResults Component - Simplified with 2-Search-Bar Functionality
-// ============================================================================
-// Features:
-// ✅ 2 Search Bars + Button in ONE LINE (Course, Country, Search Button)
-// ✅ REMOVED: Course Level functionality completely
-// ✅ Real-time search within results
-// ✅ Advanced pagination with smart page numbers
-// ✅ Responsive design for mobile/desktop
-// ✅ Professional loading states and error handling
+// SearchResults Component - With WhatsApp Integration (CORRECTED)
 // ============================================================================
 
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { BookOpenIcon, MapPinIcon, ClockIcon, DollarSignIcon, ArrowLeftIcon, AlertCircleIcon, RefreshCwIcon, DatabaseIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, GlobeIcon } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa' // WhatsApp icon
 import Navbar from '../components/Navbar'
 
 // ============================================================================
@@ -54,7 +47,6 @@ interface ApiResponse {
   filters_applied: {
     field_of_study: string
     country_id: string
-    // REMOVED: course_level from interface
   }
 }
 
@@ -85,16 +77,15 @@ const SearchResults = () => {
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([])
   const [isSearchingWithin, setIsSearchingWithin] = useState(false)
   
-  // Local search state for the inline search bars (REMOVED course level)
+  // Local search state for the inline search bars
   const [localCourse, setLocalCourse] = useState('')
   const [localCountry, setLocalCountry] = useState('')
   
   // -------------------------------------------------------------------------
-  // URL Parameters (REMOVED course level)
+  // URL Parameters
   // -------------------------------------------------------------------------
   const courseQuery = searchParams.get('course') || ''
   const countryQuery = searchParams.get('country') || ''
-  // REMOVED: courseLevelQuery
   const currentPage = parseInt(searchParams.get('page') || '1')
   const limitPerPage = parseInt(searchParams.get('limit') || '30')
 
@@ -102,19 +93,15 @@ const SearchResults = () => {
   // Effects
   // -------------------------------------------------------------------------
 
-  // Initialize local search state from URL parameters (REMOVED course level)
   useEffect(() => {
     setLocalCourse(courseQuery)
     setLocalCountry(countryQuery)
-    // REMOVED: setLocalCourseLevel(courseLevelQuery)
-  }, [courseQuery, countryQuery]) // REMOVED courseLevelQuery from dependency
+  }, [courseQuery, countryQuery])
 
-  // Fetch courses when search parameters change (REMOVED course level)
   useEffect(() => {
     fetchCourses()
-  }, [courseQuery, countryQuery, currentPage, limitPerPage]) // REMOVED courseLevelQuery
+  }, [courseQuery, countryQuery, currentPage, limitPerPage])
 
-  // Handle within-page search filtering
   useEffect(() => {
     if (!withinPageSearch) {
       setFilteredCourses(courses)
@@ -133,7 +120,7 @@ const SearchResults = () => {
   }, [courses, allCourses, withinPageSearch])
 
   // -------------------------------------------------------------------------
-  // Data Arrays (REMOVED course levels)
+  // Data Arrays
   // -------------------------------------------------------------------------
 
   const countries = [
@@ -148,10 +135,8 @@ const SearchResults = () => {
     { value: 'Switzerland', label: 'Switzerland 🇨🇭' }
   ]
 
-  // REMOVED: courseLevels array
-
   // -------------------------------------------------------------------------
-  // API Functions (REMOVED course level filtering)
+  // API Functions
   // -------------------------------------------------------------------------
 
   const fetchCourses = async () => {
@@ -172,11 +157,9 @@ const SearchResults = () => {
       
       const countryId = countryMap[countryQuery] || ''
     
-      // REMOVED course_level from API parameters
       const params = new URLSearchParams({
         field_of_study: courseQuery,
         country_id: countryId,
-        // REMOVED: course_level: courseLevelQuery,
         page: currentPage.toString(),
         limit: limitPerPage.toString()
       })
@@ -184,7 +167,6 @@ const SearchResults = () => {
       const allParams = new URLSearchParams({
         field_of_study: courseQuery,
         country_id: countryId,
-        // REMOVED: course_level: courseLevelQuery,
         page: '1',
         limit: '1000'
       })
@@ -228,7 +210,7 @@ const SearchResults = () => {
   }
 
   // -------------------------------------------------------------------------
-  // Event Handlers (REMOVED course level)
+  // Event Handlers
   // -------------------------------------------------------------------------
 
   const handleSearch = () => {
@@ -236,7 +218,6 @@ const SearchResults = () => {
     
     if (localCourse.trim()) newParams.set('course', localCourse.trim())
     if (localCountry) newParams.set('country', localCountry)
-    // REMOVED: if (localCourseLevel) newParams.set('courseLevel', localCourseLevel)
     newParams.set('page', '1')
     newParams.set('limit', limitPerPage.toString())
     
@@ -252,7 +233,6 @@ const SearchResults = () => {
   const clearAllFilters = () => {
     setLocalCourse('')
     setLocalCountry('')
-    // REMOVED: setLocalCourseLevel('')
     navigate('/search-results')
   }
 
@@ -293,7 +273,67 @@ const SearchResults = () => {
   }
 
   // -------------------------------------------------------------------------
-  // Components
+  // WhatsApp Configuration & Event Handlers (MOVED TO CORRECT LOCATION)
+  // -------------------------------------------------------------------------
+
+  /**
+   * WhatsApp Business Configuration
+   */
+  const whatsappConfig = {
+    businessNumber: '918274806946', // WhatsApp Business number
+    messageTemplate: (course: Course) => `Hi! I want more information about this course:
+
+          Course: ${course.title}
+          University: ${course.university_name}
+          Location: ${course.university_city ? `${course.university_city}, ` : ''}${course.country_name}
+          Duration: ${course.duration || 'Not specified'}
+          Level: ${course.course_level}
+
+          Please provide me with more details about:
+          • Tuition fees
+          • Admission requirements
+          • Application process  
+          • Scholarship opportunities
+          • Campus facilities
+
+          Thank you!`
+        }
+
+  /**
+   * Handle Learn More button click
+   */
+  const handleLearnMore = (course: Course) => {
+    console.log('Learn More clicked for:', course.title)
+    
+    if (course.university_website) {
+      window.open(course.university_website, '_blank')
+    } else {
+      // Fallback: search for university
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(course.university_name + ' ' + course.country_name)}`, '_blank')
+    }
+  }
+
+  /**
+   * Handle Get More Info button click - Opens WhatsApp Business Chat
+   */
+  const handleGetMoreInfo = (course: Course) => {
+    // Generate auto message with course details
+    const message = whatsappConfig.messageTemplate(course)
+    
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message)
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${whatsappConfig.businessNumber}?text=${encodedMessage}`
+    
+    // Open WhatsApp in new tab/window
+    window.open(whatsappUrl, '_blank')
+    
+    console.log('WhatsApp opened for:', course.title, 'at', course.university_name)
+  }
+
+  // -------------------------------------------------------------------------
+  // Components (CORRECTED STRUCTURE)
   // -------------------------------------------------------------------------
 
   const PaginationControls = () => {
@@ -385,7 +425,7 @@ const SearchResults = () => {
         </div>
       </div>
     )
-  }
+  } // PROPERLY CLOSED PaginationControls
 
   // -------------------------------------------------------------------------
   // Main Render
@@ -396,9 +436,7 @@ const SearchResults = () => {
       <Navbar />
       
       <div className="container mx-auto px-4 py-8">
-        {/* ================================================================= */}
-        {/* Header Section (UPDATED: Removed course level from description) */}
-        {/* ================================================================= */}
+        {/* Header Section */}
         <div className="mb-8">
           <Link 
             to="/" 
@@ -412,7 +450,6 @@ const SearchResults = () => {
             Search Results
           </h1>
           
-          {/* UPDATED: Removed course level from dynamic header */}
           <p className="text-gray-600">
             {courseQuery || countryQuery ? (
               <>
@@ -420,7 +457,6 @@ const SearchResults = () => {
                 {courseQuery && <span className="font-semibold">"{courseQuery}"</span>}
                 {courseQuery && countryQuery && ' in '}
                 {countryQuery && <span className="font-semibold">{countryQuery}</span>}
-                {/* REMOVED: Course level display */}
               </>
             ) : (
               'Browse all available courses'
@@ -428,15 +464,12 @@ const SearchResults = () => {
           </p>
         </div>
 
-        {/* ================================================================= */}
-        {/* SIMPLIFIED Search Interface - 2 Bars + Button + Search Within */}
-        {/* ================================================================= */}
+        {/* Search Interface */}
         {!loading && !error && (
           <div className="space-y-6 mb-6">
             
             {/* Main Search & Filter Section */}
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-              {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
@@ -450,7 +483,6 @@ const SearchResults = () => {
                   </p>
                 </div>
                 
-                {/* Clear All Filters (UPDATED: Removed course level condition) */}
                 {(localCourse || localCountry) && (
                   <button
                     onClick={clearAllFilters}
@@ -461,7 +493,7 @@ const SearchResults = () => {
                 )}
               </div>
 
-              {/* SIMPLIFIED: 2 Search Bars + Button (3 items in one row) */}
+              {/* 2 Search Bars + Button */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
                 
                 {/* Course Search Bar */}
@@ -497,9 +529,7 @@ const SearchResults = () => {
                   </select>
                 </div>
 
-                {/* REMOVED: Course Level Dropdown */}
-
-                {/* Search Button - Now in 3rd position instead of 4th */}
+                {/* Search Button */}
                 <button
                   onClick={handleSearch}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
@@ -509,7 +539,7 @@ const SearchResults = () => {
                 </button>
               </div>
 
-              {/* Active Filters Display (UPDATED: Removed course level) */}
+              {/* Active Filters Display */}
               {(courseQuery || countryQuery) && (
                 <div className="pt-4 border-t border-gray-200">
                   <p className="text-sm text-gray-600 mb-3 font-medium">Active Filters:</p>
@@ -524,7 +554,6 @@ const SearchResults = () => {
                         Country: {countryQuery}
                       </span>
                     )}
-                    {/* REMOVED: Course Level filter tag */}
                   </div>
                 </div>
               )}
@@ -571,9 +600,7 @@ const SearchResults = () => {
           </div>
         )}
 
-        {/* ================================================================= */}
-        {/* Results Display Section (UNCHANGED) */}
-        {/* ================================================================= */}
+        {/* Results Display Section */}
         
         {loading ? (
           <div className="space-y-4">
@@ -633,7 +660,7 @@ const SearchResults = () => {
               </div>
             </div>
             
-            {/* Course Grid */}
+            {/* Course Grid with FUNCTIONAL WHATSAPP BUTTONS */}
             <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
               {filteredCourses.map((course) => (
                 <div key={course.id} className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow p-6 h-full flex flex-col">
@@ -691,9 +718,26 @@ const SearchResults = () => {
                     )}
                   </div>
                   
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors font-medium text-sm mt-auto">
-                    Learn More
-                  </button>
+                  {/* ✅ FUNCTIONAL BUTTONS WITH WHATSAPP INTEGRATION */}
+                  <div className="flex gap-2 mt-auto">
+                    <button 
+                      onClick={() => handleLearnMore(course)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors font-medium text-sm inline-flex items-center justify-center"
+                      title="Learn more about this course"
+                    >
+                      <BookOpenIcon className="h-4 w-4 mr-1" />
+                      Learn More
+                    </button>
+                    <button 
+                      onClick={() => handleGetMoreInfo(course)}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors font-medium text-sm inline-flex items-center justify-center shadow-sm hover:shadow-md"
+                      title="Get more info via WhatsApp"
+                    >
+                      <FaWhatsapp className="h-4 w-4 mr-1" />
+                      Get More Info
+                    </button>
+                  </div>
+
                 </div>
               ))}
             </div>
