@@ -1,8 +1,23 @@
+// ============================================================================
+// SearchResults Component - Simplified with 2-Search-Bar Functionality
+// ============================================================================
+// Features:
+// ✅ 2 Search Bars + Button in ONE LINE (Course, Country, Search Button)
+// ✅ REMOVED: Course Level functionality completely
+// ✅ Real-time search within results
+// ✅ Advanced pagination with smart page numbers
+// ✅ Responsive design for mobile/desktop
+// ✅ Professional loading states and error handling
+// ============================================================================
+
 import React, { useState, useEffect } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
-import { BookOpenIcon, MapPinIcon, ClockIcon, DollarSignIcon, ArrowLeftIcon, AlertCircleIcon, RefreshCwIcon, DatabaseIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { useSearchParams, Link, useNavigate } from 'react-router-dom'
+import { BookOpenIcon, MapPinIcon, ClockIcon, DollarSignIcon, ArrowLeftIcon, AlertCircleIcon, RefreshCwIcon, DatabaseIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, GlobeIcon } from 'lucide-react'
 import Navbar from '../components/Navbar'
-import SearchWithinResults from '../components/SearchWithinResults'
+
+// ============================================================================
+// TypeScript Interfaces
+// ============================================================================
 
 interface Course {
   id: number
@@ -39,40 +54,72 @@ interface ApiResponse {
   filters_applied: {
     field_of_study: string
     country_id: string
-    course_level: string
+    // REMOVED: course_level from interface
   }
 }
 
+// ============================================================================
+// Main SearchResults Component
+// ============================================================================
+
 const SearchResults = () => {
+  // -------------------------------------------------------------------------
+  // Router Hooks
+  // -------------------------------------------------------------------------
   const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
+
+  // -------------------------------------------------------------------------
+  // State Management
+  // -------------------------------------------------------------------------
+  
+  // Core course data
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [pagination, setPagination] = useState<Pagination | null>(null)
   
-  // NEW: State for search within results
-  const [allCourses, setAllCourses] = useState<Course[]>([]) // Store all courses for search
+  // Enhanced search functionality
+  const [allCourses, setAllCourses] = useState<Course[]>([])
   const [withinPageSearch, setWithinPageSearch] = useState('')
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([])
   const [isSearchingWithin, setIsSearchingWithin] = useState(false)
   
-  // Search parameters - 30 courses per page
+  // Local search state for the inline search bars (REMOVED course level)
+  const [localCourse, setLocalCourse] = useState('')
+  const [localCountry, setLocalCountry] = useState('')
+  
+  // -------------------------------------------------------------------------
+  // URL Parameters (REMOVED course level)
+  // -------------------------------------------------------------------------
   const courseQuery = searchParams.get('course') || ''
   const countryQuery = searchParams.get('country') || ''
+  // REMOVED: courseLevelQuery
   const currentPage = parseInt(searchParams.get('page') || '1')
   const limitPerPage = parseInt(searchParams.get('limit') || '30')
 
+  // -------------------------------------------------------------------------
+  // Effects
+  // -------------------------------------------------------------------------
+
+  // Initialize local search state from URL parameters (REMOVED course level)
+  useEffect(() => {
+    setLocalCourse(courseQuery)
+    setLocalCountry(countryQuery)
+    // REMOVED: setLocalCourseLevel(courseLevelQuery)
+  }, [courseQuery, countryQuery]) // REMOVED courseLevelQuery from dependency
+
+  // Fetch courses when search parameters change (REMOVED course level)
   useEffect(() => {
     fetchCourses()
-  }, [courseQuery, countryQuery, currentPage, limitPerPage])
+  }, [courseQuery, countryQuery, currentPage, limitPerPage]) // REMOVED courseLevelQuery
 
-  // NEW: Filter courses when within-page search changes
+  // Handle within-page search filtering
   useEffect(() => {
     if (!withinPageSearch) {
       setFilteredCourses(courses)
       setIsSearchingWithin(false)
     } else {
-      // Search across ALL courses, not just current page
       const searchResults = allCourses.filter(course =>
         course.title.toLowerCase().includes(withinPageSearch.toLowerCase()) ||
         course.university_name.toLowerCase().includes(withinPageSearch.toLowerCase()) ||
@@ -85,12 +132,33 @@ const SearchResults = () => {
     }
   }, [courses, allCourses, withinPageSearch])
 
+  // -------------------------------------------------------------------------
+  // Data Arrays (REMOVED course levels)
+  // -------------------------------------------------------------------------
+
+  const countries = [
+    { value: '', label: 'All Countries' },
+    { value: 'United States', label: 'United States 🇺🇸' },
+    { value: 'United Kingdom', label: 'United Kingdom 🇬🇧' },
+    { value: 'Canada', label: 'Canada 🇨🇦' },
+    { value: 'Australia', label: 'Australia 🇦🇺' },
+    { value: 'Germany', label: 'Germany 🇩🇪' },
+    { value: 'France', label: 'France 🇫🇷' },
+    { value: 'Netherlands', label: 'Netherlands 🇳🇱' },
+    { value: 'Switzerland', label: 'Switzerland 🇨🇭' }
+  ]
+
+  // REMOVED: courseLevels array
+
+  // -------------------------------------------------------------------------
+  // API Functions (REMOVED course level filtering)
+  // -------------------------------------------------------------------------
+
   const fetchCourses = async () => {
     setLoading(true)
     setError(null)
     
     try {
-      // Map country names to country IDs
       const countryMap: { [key: string]: string } = {
         'United States': '6',
         'United Kingdom': '5', 
@@ -104,23 +172,23 @@ const SearchResults = () => {
       
       const countryId = countryMap[countryQuery] || ''
     
-      // Fetch current page
+      // REMOVED course_level from API parameters
       const params = new URLSearchParams({
         field_of_study: courseQuery,
         country_id: countryId,
+        // REMOVED: course_level: courseLevelQuery,
         page: currentPage.toString(),
         limit: limitPerPage.toString()
       })
       
-      // Also fetch ALL courses for the search functionality
       const allParams = new URLSearchParams({
         field_of_study: courseQuery,
         country_id: countryId,
+        // REMOVED: course_level: courseLevelQuery,
         page: '1',
-        limit: '1000' // Get all courses
+        limit: '1000'
       })
       
-      // Make both API calls
       const [currentResponse, allResponse] = await Promise.all([
         fetch(`http://localhost/studyabroadplatform-api/api/search_smart.php?${params}`),
         fetch(`http://localhost/studyabroadplatform-api/api/search_smart.php?${allParams}`)
@@ -137,7 +205,7 @@ const SearchResults = () => {
       
       if (currentData.success && allData.success) {
         setCourses(currentData.data || [])
-        setAllCourses(allData.data || []) // Store all courses for search
+        setAllCourses(allData.data || [])
         setFilteredCourses(currentData.data || [])
         setPagination(currentData.pagination)
       } else {
@@ -159,7 +227,35 @@ const SearchResults = () => {
     setLoading(false)
   }
 
-  // NEW: Handle within-page search
+  // -------------------------------------------------------------------------
+  // Event Handlers (REMOVED course level)
+  // -------------------------------------------------------------------------
+
+  const handleSearch = () => {
+    const newParams = new URLSearchParams()
+    
+    if (localCourse.trim()) newParams.set('course', localCourse.trim())
+    if (localCountry) newParams.set('country', localCountry)
+    // REMOVED: if (localCourseLevel) newParams.set('courseLevel', localCourseLevel)
+    newParams.set('page', '1')
+    newParams.set('limit', limitPerPage.toString())
+    
+    navigate(`/search-results?${newParams.toString()}`)
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
+  const clearAllFilters = () => {
+    setLocalCourse('')
+    setLocalCountry('')
+    // REMOVED: setLocalCourseLevel('')
+    navigate('/search-results')
+  }
+
   const handleWithinPageSearch = (query: string) => {
     setWithinPageSearch(query)
   }
@@ -177,53 +273,48 @@ const SearchResults = () => {
   const handleLimitChange = (newLimit: number) => {
     const newParams = new URLSearchParams(searchParams)
     newParams.set('limit', newLimit.toString())
-    newParams.set('page', '1') // Reset to first page when changing limit
+    newParams.set('page', '1')
     setSearchParams(newParams)
   }
+
+  // -------------------------------------------------------------------------
+  // Utility Functions
+  // -------------------------------------------------------------------------
 
   const formatCurrency = (amount: string, currency: string) => {
     if (!amount || amount === '0') return 'Contact University'
     
     const currencySymbols: { [key: string]: string } = {
-      'USD': '$',
-      'GBP': '£',
-      'EUR': '€',
-      'CAD': 'C$',
-      'AUD': 'A$',
-      'CHF': 'CHF'
+      'USD': '$', 'GBP': '£', 'EUR': '€', 'CAD': 'C$', 'AUD': 'A$', 'CHF': 'CHF'
     }
     
     const symbol = currencySymbols[currency] || currency
     return `${symbol}${parseFloat(amount).toLocaleString()}`
   }
 
-  // UPDATED: Pagination component with better page navigation
+  // -------------------------------------------------------------------------
+  // Components
+  // -------------------------------------------------------------------------
+
   const PaginationControls = () => {
     if (!pagination || pagination.total_pages <= 1) return null
 
-    // Generate page numbers to show
     const generatePageNumbers = () => {
       const current = pagination.current_page
       const total = pagination.total_pages
       const pages = []
 
       if (total <= 7) {
-        // Show all pages if 7 or fewer
         for (let i = 1; i <= total; i++) {
           pages.push(i)
         }
       } else {
-        // Show first, last, current, and nearby pages
         pages.push(1)
-        
         if (current > 3) pages.push('...')
-        
         for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
           pages.push(i)
         }
-        
         if (current < total - 2) pages.push('...')
-        
         if (total > 1) pages.push(total)
       }
       
@@ -232,7 +323,6 @@ const SearchResults = () => {
 
     return (
       <div className="bg-white px-6 py-4 rounded-lg border border-gray-200 mt-6">
-        {/* Results info and per-page selector */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
           <div className="text-sm text-gray-700 mb-2 sm:mb-0">
             Showing <span className="font-medium">{pagination.showing_from}</span> to{' '}
@@ -253,7 +343,6 @@ const SearchResults = () => {
           </select>
         </div>
 
-        {/* Page navigation */}
         <div className="flex items-center justify-between">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -264,7 +353,6 @@ const SearchResults = () => {
             Previous
           </button>
 
-          {/* Page numbers */}
           <div className="flex items-center space-x-1">
             {generatePageNumbers().map((page, index) => (
               <React.Fragment key={index}>
@@ -299,12 +387,18 @@ const SearchResults = () => {
     )
   }
 
+  // -------------------------------------------------------------------------
+  // Main Render
+  // -------------------------------------------------------------------------
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* ================================================================= */}
+        {/* Header Section (UPDATED: Removed course level from description) */}
+        {/* ================================================================= */}
         <div className="mb-8">
           <Link 
             to="/" 
@@ -317,51 +411,177 @@ const SearchResults = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Search Results
           </h1>
-          <p className="text-gray-600">
-            Showing courses for <span className="font-semibold">"{courseQuery}"</span> in <span className="font-semibold">{countryQuery}</span>
-          </p>
           
-          {/* Enhanced API Status */}
-          {pagination && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-blue-800">
-                    <strong>Search completed successfully!</strong>
-                  </p>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Found {pagination.total_courses} course{pagination.total_courses !== 1 ? 's' : ''} 
-                    {pagination.total_courses > limitPerPage && ` (showing ${limitPerPage} per page)`}
-                  </p>
-                </div>
-                {pagination.total_courses > 20 && (
-                  <div className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                    ✨ Showing {limitPerPage} courses per page!
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          {/* UPDATED: Removed course level from dynamic header */}
+          <p className="text-gray-600">
+            {courseQuery || countryQuery ? (
+              <>
+                Showing courses for{' '}
+                {courseQuery && <span className="font-semibold">"{courseQuery}"</span>}
+                {courseQuery && countryQuery && ' in '}
+                {countryQuery && <span className="font-semibold">{countryQuery}</span>}
+                {/* REMOVED: Course level display */}
+              </>
+            ) : (
+              'Browse all available courses'
+            )}
+          </p>
         </div>
 
-        {/* NEW: Search within results */}
-        {!loading && !error && pagination && allCourses.length > 0 && (
-          <SearchWithinResults
-            onSearch={handleWithinPageSearch}
-            totalCourses={pagination.total_courses}
-            currentResultsCount={filteredCourses.length}
-            placeholder={`Search within ${pagination.total_courses} ${courseQuery} courses...`}
-          />
+        {/* ================================================================= */}
+        {/* SIMPLIFIED Search Interface - 2 Bars + Button + Search Within */}
+        {/* ================================================================= */}
+        {!loading && !error && (
+          <div className="space-y-6 mb-6">
+            
+            {/* Main Search & Filter Section */}
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    🔍 Search & Filter Courses
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {isSearchingWithin 
+                      ? <>Showing <strong>{filteredCourses.length}</strong> matches</>
+                      : <>Showing <strong>{pagination?.showing_from || 0}-{pagination?.showing_to || 0}</strong> of <strong>{pagination?.total_courses || 0}</strong> courses</>
+                    }
+                  </p>
+                </div>
+                
+                {/* Clear All Filters (UPDATED: Removed course level condition) */}
+                {(localCourse || localCountry) && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded-md border border-blue-200 hover:bg-blue-50 transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
+              </div>
+
+              {/* SIMPLIFIED: 2 Search Bars + Button (3 items in one row) */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                
+                {/* Course Search Bar */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <SearchIcon className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search courses..."
+                    value={localCourse}
+                    onChange={(e) => setLocalCourse(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                </div>
+
+                {/* Country Dropdown */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <GlobeIcon className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <select
+                    value={localCountry}
+                    onChange={(e) => setLocalCountry(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm appearance-none bg-white"
+                  >
+                    {countries.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* REMOVED: Course Level Dropdown */}
+
+                {/* Search Button - Now in 3rd position instead of 4th */}
+                <button
+                  onClick={handleSearch}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
+                >
+                  <SearchIcon className="h-4 w-4 mr-2" />
+                  Search Courses
+                </button>
+              </div>
+
+              {/* Active Filters Display (UPDATED: Removed course level) */}
+              {(courseQuery || countryQuery) && (
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-600 mb-3 font-medium">Active Filters:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {courseQuery && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Course: {courseQuery}
+                      </span>
+                    )}
+                    {countryQuery && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Country: {countryQuery}
+                      </span>
+                    )}
+                    {/* REMOVED: Course Level filter tag */}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Search Within Results Section */}
+            {pagination && allCourses.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-medium text-gray-900">
+                    Search within {pagination.total_courses} courses
+                  </h4>
+                  {withinPageSearch && (
+                    <span className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                      {filteredCourses.length} matches found
+                    </span>
+                  )}
+                </div>
+                
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <SearchIcon className="h-5 w-5 text-gray-400" />
+                  </div>
+                  
+                  <input
+                    type="text"
+                    value={withinPageSearch}
+                    onChange={(e) => handleWithinPageSearch(e.target.value)}
+                    placeholder={`Search within ${pagination.total_courses} courses...`}
+                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                  
+                  {withinPageSearch && (
+                    <button
+                      onClick={() => handleWithinPageSearch('')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600"
+                    >
+                      <span className="text-gray-400 text-lg">×</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Results */}
+        {/* ================================================================= */}
+        {/* Results Display Section (UNCHANGED) */}
+        {/* ================================================================= */}
+        
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center justify-center py-8">
               <RefreshCwIcon className="animate-spin h-8 w-8 text-blue-600 mr-3" />
               <span className="text-lg text-gray-600">Searching courses...</span>
             </div>
-            {/* UPDATED: Show 30 loading placeholders instead of 6 */}
+            
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({length: 30}, (_, i) => (
                 <div key={i} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 animate-pulse">
@@ -376,6 +596,7 @@ const SearchResults = () => {
               ))}
             </div>
           </div>
+
         ) : error ? (
           <div className="text-center py-12">
             <AlertCircleIcon className="h-16 w-16 text-red-400 mx-auto mb-4" />
@@ -389,9 +610,10 @@ const SearchResults = () => {
               Try Again
             </button>
           </div>
+
         ) : filteredCourses.length > 0 ? (
           <div className="space-y-6">
-            {/* Results summary - UPDATED to show filtered results */}
+            {/* Results summary */}
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600">
@@ -411,10 +633,11 @@ const SearchResults = () => {
               </div>
             </div>
             
-            {/* Course grid - UPDATED to use filteredCourses */}
+            {/* Course Grid */}
             <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
               {filteredCourses.map((course) => (
                 <div key={course.id} className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow p-6 h-full flex flex-col">
+                  
                   <div className="mb-4 flex-grow">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">
                       {course.title}
@@ -475,10 +698,8 @@ const SearchResults = () => {
               ))}
             </div>
 
-            {/* Pagination controls - Hide when searching within results */}
             {!isSearchingWithin && <PaginationControls />}
             
-            {/* Show message when searching but no results */}
             {isSearchingWithin && filteredCourses.length === 0 && (
               <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
                 <DatabaseIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -494,6 +715,7 @@ const SearchResults = () => {
               </div>
             )}
           </div>
+
         ) : (
           <div className="text-center py-12">
             <DatabaseIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
