@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { GlobeIcon, MenuIcon, XIcon } from 'lucide-react'
 
 const Navbar = () => {

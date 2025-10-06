@@ -1,4 +1,3 @@
-import React from 'react'
 import type { ReactNode } from 'react'   // type-only import
 import { Routes, Route, Navigate } from 'react-router-dom'
 

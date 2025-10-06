@@ -263,7 +263,7 @@ const SearchResults = () => {
 
   // WhatsApp
   const whatsappConfig = {
-    businessNumber: '918274806946', // ensure: country code + number, no + or spaces
+    businessNumber: '918777841275', //  country code + number, no + or spaces
     messageTemplate: (course: Course) =>
       `Hi! I want more information about this course:\n\n` +
       `🎓 Course: ${course.title}\n` +

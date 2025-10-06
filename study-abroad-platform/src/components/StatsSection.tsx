@@ -1,4 +1,3 @@
-import React from 'react';
 import { GraduationCap, Globe, Landmark, Flag, Users } from 'lucide-react';
 
 const stats = [
