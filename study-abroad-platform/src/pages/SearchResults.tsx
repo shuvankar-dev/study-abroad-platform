@@ -58,6 +58,12 @@ interface ApiResponse {
   success: boolean
   data: Course[]
   pagination: Pagination
+}
+
+interface ApiResponse {
+  success: boolean
+  data: Course[]
+  pagination: Pagination
   filters_applied: {
     field_of_study: string
     country_id: string
@@ -173,10 +179,21 @@ const SearchResults = () => {
         limit: '1000'
       })
 
+      // API base URL - Updated for your Hostinger setup  
+      const API_BASE_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost/studyabroadplatform-api/api' 
+        : '/studyabroadplatform-api/api'
+
+      console.log('Current hostname:', window.location.hostname)
+      console.log('API Base URL:', API_BASE_URL)
+
       const [currentResponse, allResponse] = await Promise.all([
-        fetch(`http://localhost/studyabroadplatform-api/api/search_smart.php?${params}`),
-        fetch(`http://localhost/studyabroadplatform-api/api/search_smart.php?${allParams}`)
+        fetch(`${API_BASE_URL}/search_smart.php?${params}`),
+        fetch(`${API_BASE_URL}/search_smart.php?${allParams}`)
       ])
+
+      console.log('API URL called:', `${API_BASE_URL}/search_smart.php?${params}`)
+      console.log('Response status:', currentResponse.status)
 
       if (!currentResponse.ok || !allResponse.ok) {
         throw new Error(`HTTP error! status: ${currentResponse.status}`)
@@ -186,6 +203,13 @@ const SearchResults = () => {
         currentResponse.json(),
         allResponse.json()
       ])
+
+      console.log('API Response received:', currentData)
+      console.log('Response structure:', {
+        success: currentData.success,
+        dataLength: currentData.data?.length,
+        pagination: currentData.pagination
+      })
 
       if (currentData.success && allData.success) {
         setCourses(currentData.data || [])
