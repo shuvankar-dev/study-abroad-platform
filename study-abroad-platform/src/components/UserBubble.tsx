@@ -15,6 +15,14 @@ const UserBubble: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [open])
 
+  const handleScheduleCall = () => {
+    const message = 'shedule a call for me i wnat more information abou you study abord facility'
+    const phone = '918777841275'
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
+    window.open(url, '_blank')
+    setOpen(false)
+  }
+
   return (
     <>
       {/* Floating bubble */}
@@ -34,7 +42,7 @@ const UserBubble: React.FC = () => {
               </div>
 
               <div className="mt-4">
-                <button className="w-full bg-gradient-to-r from-primary to-accent text-white py-2 rounded-lg font-semibold shadow-md">Schedule Call with Expert</button>
+                <button onClick={handleScheduleCall} className="w-full bg-gradient-to-r from-primary to-accent text-white py-2 rounded-lg font-semibold shadow-md">Schedule Call with Expert</button>
               </div>
               <div className="mt-3 text-xs text-gray-400 text-center">2,30,502 students booked and succeeded</div>
             </div>
