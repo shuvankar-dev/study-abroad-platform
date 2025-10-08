@@ -5,13 +5,23 @@ import HeroSection from '../components/HeroSection';
 import StatsSection from '../components/StatsSection';
 import Footer from '../components/Footer';
 import UserBubble from '../components/UserBubble';
+import RegistrationModal from '../components/RegistrationModal';
+import React, { useState } from 'react';
 
 const HomePage = () => {
+  const [isRegOpen, setIsRegOpen] = useState(false)
+  const [regSource, setRegSource] = useState<'hero'|'bubble'|'other'>('hero')
+
+  const openRegistration = (source: 'hero'|'bubble'|'other' = 'hero') => {
+    setRegSource(source)
+    setIsRegOpen(true)
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <Navbar />
       <main className="flex-1">
-    <HeroSection />
+    <HeroSection onOpenRegistration={() => openRegistration('hero')} />
     <StatsSection />
         {/* Main content section */}
         <section className="container mx-auto px-4 py-20">
@@ -58,7 +68,8 @@ const HomePage = () => {
           </div>
         </section>
       </main>
-      <UserBubble />
+      <UserBubble onOpenRegistration={() => openRegistration('bubble')} />
+      <RegistrationModal isOpen={isRegOpen} onClose={() => setIsRegOpen(false)} source={regSource} />
       <Footer />
     </div>
   );

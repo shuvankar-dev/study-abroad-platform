@@ -9,7 +9,11 @@ import s4 from '../assets/Herosection/s4.png';
 import s5 from '../assets/Herosection/s5.png';
 import s6 from '../assets/Herosection/s6.png';
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  onOpenRegistration?: () => void
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
   const [course, setCourse] = useState('')
   const [selectedCountry, setSelectedCountry] = useState('')
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false)
@@ -71,7 +75,7 @@ const HeroSection = () => {
                 <span className="text-base md:text-lg font-semibold text-primary-700">Fast-track your dreams with premium guidance & exclusive scholarships!</span>
               </div>
             </div>
-            <button className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white font-semibold px-8 py-3 rounded-lg shadow-xl transition mb-4 mt-2 w-fit">Register Now</button>
+            <button onClick={() => onOpenRegistration && onOpenRegistration()} className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white font-semibold px-8 py-3 rounded-lg shadow-xl transition mb-4 mt-2 w-fit">Register Now</button>
             {/* Search bar moved here */}
             <div className="w-full max-w-6xl bg-gradient-to-r from-primary-100 via-white to-primary-50 border border-primary-200 rounded-2xl p-6 shadow-2xl mt-6 scale-105">
               <div className="mb-6 text-center">
