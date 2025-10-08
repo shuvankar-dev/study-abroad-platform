@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const API_BASE = 'http://localhost/studyabroadplatform-api'
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost/studyabroadplatform-api'
+  : '/studyabroadplatform-api'
 
 type Lead = {
   id: number

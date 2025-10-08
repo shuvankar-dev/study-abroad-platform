@@ -104,7 +104,11 @@ const LeadRegistrationModal: React.FC<LeadRegistrationModalProps> = ({
         lead_source: 'learn_more_button'
       }
       
-      const response = await fetch('http://localhost/studyabroadplatform-api/api/leads/create.php', {
+      const API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost/studyabroadplatform-api'
+        : '/studyabroadplatform-api'
+      
+      const response = await fetch(`${API_BASE}/api/leads/create.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

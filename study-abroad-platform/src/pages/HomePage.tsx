@@ -6,7 +6,7 @@ import StatsSection from '../components/StatsSection';
 import Footer from '../components/Footer';
 import UserBubble from '../components/UserBubble';
 import RegistrationModal from '../components/RegistrationModal';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const HomePage = () => {
   const [isRegOpen, setIsRegOpen] = useState(false)

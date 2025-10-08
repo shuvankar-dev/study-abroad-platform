@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
-const API_BASE = 'http://localhost/studyabroadplatform-api'
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost/studyabroadplatform-api'
+  : '/studyabroadplatform-api'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
