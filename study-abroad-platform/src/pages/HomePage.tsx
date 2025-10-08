@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import StatsSection from '../components/StatsSection';
 import Footer from '../components/Footer';
+import UserBubble from '../components/UserBubble';
 
 const HomePage = () => {
   return (
@@ -57,6 +58,7 @@ const HomePage = () => {
           </div>
         </section>
       </main>
+      <UserBubble />
       <Footer />
     </div>
   );
