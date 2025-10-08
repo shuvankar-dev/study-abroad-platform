@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import HomePage from './pages/HomePage'
 import SearchResults from './pages/SearchResults'
+import About from './pages/About'
 import AdminLogin from './admin/AdminLogin'
 import AdminRegister from './admin/AdminRegister'
 import AdminLeads from './admin/AdminLeads'
@@ -17,6 +18,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-50">
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<About />} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
