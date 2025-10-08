@@ -77,48 +77,48 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
             </div>
             <button onClick={() => onOpenRegistration && onOpenRegistration()} className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white font-semibold px-8 py-3 rounded-lg shadow-xl transition mb-4 mt-2 w-fit">Register Now</button>
             {/* Search bar moved here */}
-            <div className="w-full max-w-6xl bg-gradient-to-r from-primary-100 via-white to-primary-50 border border-primary-200 rounded-2xl p-6 shadow-2xl mt-6 scale-105">
+            <div className="w-full max-w-6xl bg-blue-50 border border-blue-100 rounded-2xl p-6 shadow-2xl mt-6 scale-105">
               <div className="mb-6 text-center">
-                <span className="block text-2xl md:text-3xl font-bold text-primary-700 tracking-tight">
-                  Join <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">thousands</span> of students finding their path
+                <span className="block text-2xl md:text-3xl font-bold text-blue-700 tracking-tight">
+                  Join <span className="bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">thousands</span> of students finding their path
                 </span>
               </div>
               <form onSubmit={handleSearch}>
                 <div className="grid gap-8 md:grid-cols-3">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-primary-700">What do you want to study?</label>
+                    <label className="text-sm font-semibold text-blue-700">What do you want to study?</label>
                     <div className="relative">
-                      <BookOpenIcon className="absolute left-3 top-3 h-5 w-5 text-primary-400" />
+                      <BookOpenIcon className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
                       <input 
                         type="text" 
                         placeholder="e.g., Computer Science, MBA"
                         value={course}
                         onChange={(e) => setCourse(e.target.value)}
-                        className="w-full rounded-lg border border-primary-200 bg-white/80 py-3 pl-10 pr-4 text-gray-900 placeholder-primary-400 focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-400/20 transition"
+                        className="w-full rounded-lg border border-blue-100 bg-white py-3 pl-10 pr-4 text-gray-900 placeholder-blue-300 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
                         required
                       />
                     </div>
                   </div>
                   <div className="space-y-2" ref={dropdownRef}>
-                    <label className="text-sm font-semibold text-primary-700">Where do you want to study?</label>
+                    <label className="text-sm font-semibold text-blue-700">Where do you want to study?</label>
                     <div className="relative">
-                      <MapPinIcon className="absolute left-3 top-3 h-5 w-5 text-primary-400 z-10" />
+                      <MapPinIcon className="absolute left-3 top-3 h-5 w-5 text-blue-500 z-10" />
                       <button
                         type="button"
                         onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                        className="w-full rounded-lg border border-primary-200 bg-white/80 py-3 pl-10 pr-10 text-left text-gray-900 focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-400/20 transition"
+                        className="w-full rounded-lg border border-blue-100 bg-white py-3 pl-10 pr-10 text-left text-gray-900 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
                       >
                         {selectedCountry || "Select a country"}
                       </button>
                       <ChevronDownIcon 
-                        className={`absolute right-3 top-3 h-5 w-5 text-primary-400 transition-transform duration-200 ${
+                        className={`absolute right-3 top-3 h-5 w-5 text-blue-400 transition-transform duration-200 ${
                           isCountryDropdownOpen ? 'rotate-180' : ''
                         }`} 
                       />
                       {isCountryDropdownOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-primary-200 rounded-lg shadow-2xl max-h-60 overflow-y-auto z-[9999]">
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-blue-100 rounded-lg shadow-2xl max-h-60 overflow-y-auto z-[9999]">
                           <div className="p-2">
-                            <div className="text-xs font-semibold text-primary-600 px-3 py-2 border-b border-primary-100">
+                            <div className="text-xs font-semibold text-blue-600 px-3 py-2 border-b border-blue-50">
                               Search by Destination Country
                             </div>
                             {countries.map((country) => (
@@ -129,7 +129,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
                                   setSelectedCountry(country.name)
                                   setIsCountryDropdownOpen(false)
                                 }}
-                                className="flex items-center space-x-3 w-full px-3 py-3 text-left hover:bg-primary-50 rounded-md transition-colors duration-150"
+                                className="flex items-center space-x-3 w-full px-3 py-3 text-left hover:bg-blue-50 rounded-md transition-colors duration-150"
                               >
                                 <span className="text-xl">{country.flag}</span>
                                 <span className="text-gray-900 font-medium">{country.name}</span>
@@ -144,7 +144,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
                     <button
                       type="submit"
                       disabled={!course || !selectedCountry}
-                      className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent focus:ring-2 focus:ring-accent py-3 text-lg font-bold text-white rounded-lg shadow-2xl transition-all flex items-center justify-center hover:scale-105 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed"
+                      className="w-full bg-gray-600 hover:bg-gray-700 focus:ring-2 focus:ring-gray-300 py-3 text-lg font-bold text-white rounded-lg shadow-md transition-all flex items-center justify-center hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <SearchIcon className="mr-2 h-5 w-5" />
                       Search Courses
