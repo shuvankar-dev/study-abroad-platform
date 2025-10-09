@@ -82,9 +82,6 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="text-gray-700 hover:text-gray-900 px-4 py-2 text-base font-medium transition-colors">
-              Sign In
-            </button>
             <button className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white px-6 py-2 rounded-lg text-base font-medium transition-all">
               Get Started
             </button>
@@ -131,9 +128,6 @@ const Navbar = () => {
                 About
               </a>
               <div className="border-t border-gray-100 pt-3">
-                <button className="w-full text-left text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">
-                  Sign In
-                </button>
                 <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-2 rounded-lg text-base font-medium mt-2">
                   Get Started
                 </button>
