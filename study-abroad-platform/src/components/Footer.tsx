@@ -10,10 +10,16 @@ const Footer = () => {
             {/* Contact & logo */}
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
-                <img src={logo} alt="Codescholar Overseas" className="h-10 mr-3" />
+                {/* translucent rounded background for logo to increase contrast */}
+                <div className="rounded-md p-2 mr-3 bg-white/20 backdrop-blur-sm ring-1 ring-white/10">
+                  <img src={logo} alt="Codescholar Overseas" className="h-10 w-auto" />
+                </div>
+                <div>
+                  <div className="text-sm text-white font-semibold">Codescholar Overseas</div>
+                  <div className="text-sm text-white/90">Helping students move from ambition to acceptance.</div>
+                </div>
               </div>
-              <p className="text-sm text-white/90 mb-4">Codescholar Overseas<br/>Helping students move from ambition to acceptance.</p>
-              <div className="text-sm text-white/80">
+              <div className="text-sm text-white/95">
                 <div>123 Scholar Lane</div>
                 <div>City, State ZIP</div>
                 <div className="mt-2">Email: <a href="mailto:hello@codescholar.com" className="underline">hello@codescholar.com</a></div>
@@ -35,25 +41,48 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Students */}
+            {/* Test Prep (new) */}
             <div className="md:pl-6 md:border-l md:border-white/6">
-              <h4 className="font-semibold text-white mb-3">Students</h4>
+              <h4 className="font-semibold text-white mb-3">Test Prep</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><a href="#" className="hover:underline">Find Programs</a></li>
-                <li><a href="#" className="hover:underline">How it works</a></li>
-                <li><a href="#" className="hover:underline">Apply Now</a></li>
+                <li><a href="#" className="hover:underline">TOEFL</a></li>
+                <li><a href="#" className="hover:underline">PTE</a></li>
+                <li><a href="#" className="hover:underline">IELTS</a></li>
+                <li><a href="#" className="hover:underline">GMAT</a></li>
+                <li><a href="#" className="hover:underline">GRE</a></li>
+                <li><a href="#" className="hover:underline">SAT</a></li>
+                <li><a href="#" className="hover:underline">CAEL</a></li>
+                <li><a href="#" className="hover:underline">CELPIP</a></li>
+                <li><a href="#" className="hover:underline">Duolingo</a></li>
+                <li><a href="#" className="hover:underline">ACT</a></li>
               </ul>
             </div>
 
-            {/* Destinations */}
+            {/* Study Destinations (only countries present on site) */}
             <div className="md:pl-6 md:border-l md:border-white/6">
-              <h4 className="font-semibold text-white mb-3">Destinations</h4>
+              <h4 className="font-semibold text-white mb-3">Study Destinations</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><a href="#" className="hover:underline">Australia</a></li>
-                <li><a href="#" className="hover:underline">Canada</a></li>
-                <li><a href="#" className="hover:underline">Germany</a></li>
-                <li><a href="#" className="hover:underline">United Kingdom</a></li>
                 <li><a href="#" className="hover:underline">United States</a></li>
+                <li><a href="#" className="hover:underline">United Kingdom</a></li>
+                <li><a href="#" className="hover:underline">Canada</a></li>
+                <li><a href="#" className="hover:underline">Australia</a></li>
+                <li><a href="#" className="hover:underline">Germany</a></li>
+                <li><a href="#" className="hover:underline">Ireland</a></li>
+              </ul>
+            </div>
+
+            {/* Student Services (new) */}
+            <div className="md:pl-6 md:border-l md:border-white/6">
+              <h4 className="font-semibold text-white mb-3">Student Services</h4>
+              <ul className="space-y-2 text-sm text-white/90">
+                <li><a href="#" className="hover:underline">Visa Guidance</a></li>
+                <li><a href="#" className="hover:underline">Admission Guidance</a></li>
+                <li><a href="#" className="hover:underline">Career Counseling</a></li>
+                <li><a href="#" className="hover:underline">Finance Assistance</a></li>
+                <li><a href="#" className="hover:underline">Travel Assistance</a></li>
+                <li><a href="#" className="hover:underline">Forex Assistance</a></li>
+                <li><a href="#" className="hover:underline">Scholarship</a></li>
+                <li><a href="#" className="hover:underline">Study Abroad</a></li>
               </ul>
             </div>
 

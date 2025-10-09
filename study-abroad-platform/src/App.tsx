@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import SearchResults from './pages/SearchResults'
 import About from './pages/About'
 import Explore from './pages/Explore'
+import Services from './pages/Services'
 import AdminLogin from './admin/AdminLogin'
 import AdminRegister from './admin/AdminRegister'
 import AdminLeads from './admin/AdminLeads'
@@ -20,6 +21,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />
+  <Route path="/services" element={<Services />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/admin/login" element={<AdminLogin />} />

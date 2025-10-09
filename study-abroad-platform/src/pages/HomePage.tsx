@@ -148,6 +148,13 @@ const HomePage = () => {
               </div>
 
               <div className="bg-white p-6 md:p-10">
+                {/* Right column header: consultation call-to-action */}
+                <div className="mb-6">
+                  <div className="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold mb-2">Need Help?</div>
+                  <h3 className="text-2xl font-bold text-gray-900">Get Accommodation Consultation</h3>
+                  <p className="text-sm text-gray-600 mt-1">Talk to our housing experts to find verified, budget-friendly options near your campus.</p>
+                </div>
+
                 <div className="grid grid-cols-1 gap-6">
                   <div className="relative">
                       <div className="h-44 rounded-lg bg-gray-100 overflow-hidden shadow-md">
