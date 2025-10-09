@@ -253,6 +253,8 @@ const Explore = () => {
       </section>
 
       {/* CTA Section */}
+    
+
       <section className="bg-gradient-to-r from-blue-600 to-indigo-700 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
