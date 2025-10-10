@@ -8,6 +8,127 @@ import UserBubble from '../components/UserBubble';
 import RegistrationModal from '../components/RegistrationModal';
 import { useState, useEffect } from 'react';
 
+// Premium testimonial carousel: 2-row layout (3x2 cards per slide), ultra-smooth movement
+const TestimonialCarousel = () => {
+  const testimonials = [
+    { name: 'Richard Doe', role: 'Designer', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'Gordon Doe', role: 'Developer', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'John Doe', role: 'CEO & Founder', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'John Doe', role: 'CEO & Founder', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'Jane Doe', role: 'CTO', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'John Smith', role: 'COO', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    // Second set for smooth looping
+    { name: 'Jane Smith', role: 'Tech Lead', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'Alice Johnson', role: 'Product Manager', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'Bob Wilson', role: 'Marketing Lead', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'Sarah Davis', role: 'UX Designer', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'Mike Chen', role: 'Software Engineer', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' },
+    { name: 'Lisa Brown', role: 'Data Analyst', text: 'Lorem ipsum dolor sit, amet Odio, incidunt. Ratione, ullam? Iusto id ut omnis repellat.' }
+  ];
+
+  // 6 cards per slide (3x2 grid)
+  const cardsPerSlide = 6;
+  const slides: any[] = [];
+  for (let i = 0; i < testimonials.length; i += cardsPerSlide) {
+    slides.push(testimonials.slice(i, i + cardsPerSlide));
+  }
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isPaused, slides.length]);
+
+  const goToSlide = (index: number) => setCurrentSlide(index);
+
+  return (
+    <div 
+      className="relative group"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="overflow-hidden">
+        <div
+          className="flex"
+          style={{
+            transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
+            transition: 'transform 1000ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            willChange: 'transform'
+          }}
+        >
+          {slides.map((slideCards, slideIndex) => (
+            <div key={slideIndex} className="w-full flex-shrink-0 px-4">
+              {/* 2-row grid: 3 cards per row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                {/* Top row - first 3 cards */}
+                {slideCards.slice(0, 3).map(
+                  (
+                    testimonial: { name: string; role: string; text: string },
+                    cardIndex: number
+                  ) => (
+                  <div key={`top-${cardIndex}`} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-lg font-semibold text-gray-700">{testimonial.name.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
+                        <p className="text-sm text-gray-500">{testimonial.role}</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-700 leading-relaxed">{testimonial.text}</p>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Bottom row - next 3 cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {slideCards.slice(3, 6).map(
+                  (
+                    testimonial: { name: string; role: string; text: string },
+                    cardIndex: number
+                  ) => (
+                  <div key={`bottom-${cardIndex}`} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-lg font-semibold text-gray-700">{testimonial.name.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
+                        <p className="text-sm text-gray-500">{testimonial.role}</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-700 leading-relaxed">{testimonial.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Navigation dots */}
+      <div className="flex justify-center mt-8 gap-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-3 h-3 rounded-full transition-colors ${
+              index === currentSlide ? 'bg-gray-900' : 'bg-gray-300 hover:bg-gray-400'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // Resolve accommodation images added by the user (Vite-friendly)
 const accom1 = new URL('../assets/Accomodation/S1.png', import.meta.url).href;
 const accom2 = new URL('../assets/Accomodation/S2.png', import.meta.url).href;
@@ -17,6 +138,7 @@ const HomePage = () => {
   const [isRegOpen, setIsRegOpen] = useState(false)
   const [regSource, setRegSource] = useState<'hero'|'bubble'|'other'>('hero')
   const [ready, setReady] = useState(false) 
+  const [activeFaq, setActiveFaq] = useState<number | null>(0)
 
   const openRegistration = (source: 'hero'|'bubble'|'other' = 'hero') => {
     setRegSource(source)
@@ -92,6 +214,25 @@ const HomePage = () => {
           </div>
         </section>
 
+        {/* Testimonial Carousel (auto-rotating) */}
+        <section className="container mx-auto px-4 py-16">
+          <div className="max-w-7xl mx-auto text-center">
+            {/* Header */}
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Meet our happy clients</h2>
+            <p className="text-gray-600 mb-8">All of our 1000+ clients are happy</p>
+            <button 
+              onClick={() => setIsRegOpen(true)}
+              className="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold mb-12 hover:bg-gray-800 transition-colors"
+            >
+              Get started for free
+            </button>
+
+            <div className="relative">
+              {/* Carousel inner - implemented with local state below */}
+              <TestimonialCarousel />
+            </div>
+          </div>
+        </section>
         {/* Accommodation Section (moved from Explore) */}
         <section className="container mx-auto px-4 py-12">
           <div className="max-w-7xl mx-auto rounded-2xl overflow-hidden shadow-lg">
@@ -203,6 +344,47 @@ const HomePage = () => {
       </main>
       <UserBubble onOpenRegistration={() => openRegistration('bubble')} />
       <RegistrationModal isOpen={isRegOpen} onClose={() => setIsRegOpen(false)} source={regSource} />
+
+         {/* FAQ Section - premium styled accordion */}
+        <section className="container mx-auto px-4 py-12">
+          <div className="max-w-7xl mx-auto bg-gradient-to-br from-white to-blue-50 rounded-2xl p-8 shadow-lg">
+            <div className="grid md:grid-cols-1 gap-8 items-start">
+              <div className="px-4">
+                <div className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-semibold mb-4">Frequently Asked</div>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Frequently Asked Questions</h2>
+                <p className="text-gray-700 max-w-xl">Answers to common queries about applications, visas, accommodation and post-arrival support. Still have a question? Use the button to talk to an expert.</p>
+                
+                <div className="p-2">
+                {/* Accordion */}
+                {[
+                  { q: 'How do I start an application through CodeScholar?', a: 'Begin with a free counselling session where we assess your profile, goals and preferred destinations. We then build a personalised application plan including timelines, document checklist and university shortlist.' },
+                  { q: 'What visa support do you provide?', a: 'We assist with visa document preparation, application filing, interview coaching and follow-up until the visa decision. We also provide pre-departure briefings on rules and local regulations.' },
+                  { q: 'Can you help me find accommodation before I arrive?', a: 'Yes — we partner with verified housing providers to offer shortlists based on your university, budget and preferences. You can book with support for contracts and payments.' },
+                  { q: 'Do you provide test preparation?', a: 'We offer guidance for IELTS, TOEFL, GRE, GMAT and other tests including coaching partners and study plans tailored to your target score.' },
+                  { q: 'What are the fees and refund policies?', a: 'Our service fees vary by case and are discussed during counselling. Refund terms are shared in the service agreement; we aim for clarity and fair terms.' },
+                  { q: 'How do you ensure the quality of partner accommodation?', a: 'We verify partners through on-ground checks, traveler reviews, and contract transparency. Listings marked "Verified" have passed our checks and offer support channels.' }
+                ].map((item, i) => (
+                  <div key={i} className="mb-3 border border-gray-100 rounded-xl overflow-hidden bg-white shadow-sm">
+                    <button
+                      aria-expanded={activeFaq === i}
+                      onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                      className="w-full flex items-center justify-between px-5 py-4 text-left"
+                    >
+                      <span className="text-gray-800 font-semibold">{item.q}</span>
+                      <svg className={`w-5 h-5 text-gray-500 transform transition-transform ${activeFaq === i ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div className={`px-5 pb-4 transition-max-h duration-300 ease-in-out ${activeFaq === i ? 'max-h-96' : 'max-h-0'} overflow-hidden text-gray-700`}> 
+                      <div className="pt-1">{item.a}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              </div>
+
+              
+            </div>
+          </div>
+        </section>
       <Footer />
     </div>
   );
