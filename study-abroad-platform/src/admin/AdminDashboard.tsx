@@ -56,43 +56,69 @@ export default function AdminDashboard() {
     setLoading(true)
     setError(null)
     try {
-      // Fetch all leads to count by lead_source
-      const url = `${API_BASE}/api/leads/list.php?limit=1000`
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const text = await res.text()
-      let data: any = null
-      try { data = JSON.parse(text) } catch {
-        throw new Error(`Invalid server response: ${text}`)
-      }
-      if (!res.ok || !data?.success) throw new Error(data?.message || `HTTP ${res.status}`)
-      
-      const leads: Lead[] = data.data || []
       const counts: LeadCounts = {
         registration: 0,
         accommodation: 0,
         eligibility: 0,
         learnMore: 0,
-        total: leads.length
+        total: 0
       }
 
-      // Count leads by source
-      leads.forEach(lead => {
-        const source = lead.lead_source?.toLowerCase() || ''
-        if (source.includes('registration') || source.includes('register')) {
-          counts.registration++
-        } else if (source.includes('accommodation') || source.includes('accom')) {
-          counts.accommodation++
-        } else if (source.includes('eligibility') || source.includes('eligible')) {
-          counts.eligibility++
-        } else if (source.includes('learn') || source.includes('more')) {
-          counts.learnMore++
+      // Fetch registration leads count from registrationleads table
+      try {
+        const regUrl = `${API_BASE}/api/registration_leads/count.php`
+        const regRes = await fetch(regUrl, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (regRes.ok) {
+          const regData = await regRes.json()
+          if (regData?.success) {
+            counts.registration = regData.count || 0
+            counts.total += counts.registration
+          }
         } else {
-          // Default to learn more if source is not specified or unknown
-          counts.learnMore++
+          console.warn('Registration leads API not available')
         }
-      })
+      } catch (regError) {
+        console.warn('Failed to fetch registration leads count:', regError)
+      }
+
+      // Fetch other leads from main leads table (Learn More, Accommodation, Eligibility)
+      try {
+        const url = `${API_BASE}/api/leads/list.php?limit=1000`
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const text = await res.text()
+          try {
+            const data = JSON.parse(text)
+            if (data?.success && data?.data) {
+              const leads: Lead[] = data.data || []
+              counts.total += leads.length
+
+              // Count leads by source (these are from the main leads table)
+              leads.forEach(lead => {
+                const source = lead.lead_source?.toLowerCase() || ''
+                if (source.includes('accommodation') || source.includes('accom')) {
+                  counts.accommodation++
+                } else if (source.includes('eligibility') || source.includes('eligible')) {
+                  counts.eligibility++
+                } else {
+                  // All other leads from main table are "Learn More" leads
+                  counts.learnMore++
+                }
+              })
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse main leads:', parseError)
+          }
+        } else {
+          console.warn('Main leads API returned error:', res.status)
+        }
+      } catch (leadsError) {
+        console.warn('Failed to fetch main leads:', leadsError)
+      }
 
       setLeadCounts(counts)
     } catch (err: any) {
@@ -142,9 +168,13 @@ export default function AdminDashboard() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow">
+          <div 
+            onClick={() => navigate('/admin/registration-leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+          >
             <span className="text-lg font-semibold mb-2">Registration Leads</span>
             <span className="text-3xl font-bold text-blue-600">{leadCounts.registration}</span>
+            <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
           <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow">
             <span className="text-lg font-semibold mb-2">Accommodation Inquiry Leads</span>

@@ -11,6 +11,7 @@ import AdminLogin from './admin/AdminLogin'
 import AdminRegister from './admin/AdminRegister'
 import AdminLeads from './admin/AdminLeads'
 import AdminDashboard from './admin/AdminDashboard'
+import AdminRegistrationLeads from './admin/AdminRegistrationLeads'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -41,6 +42,14 @@ export default function App() {
             element={
               <AdminRoute>
                 <AdminLeads />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/registration-leads"
+            element={
+              <AdminRoute>
+                <AdminRegistrationLeads />
               </AdminRoute>
             }
           />
