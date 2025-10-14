@@ -3,6 +3,7 @@ import HeroSection from '../components/HeroSection';
 import StatsSection from '../components/StatsSection';
 import Footer from '../components/Footer';
 import UserBubble from '../components/UserBubble';
+import AccommodationForm from '../components/AccommodationForm'
 import RegistrationModal from '../components/RegistrationModal';
 import ChatBubbleAssistant from '../components/ChatBubbleAssistant';
 import SuccessStories from '../components/SuccessStories';
@@ -178,27 +179,7 @@ const HomePage = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl p-6 shadow">
-                    <h4 className="text-lg font-bold text-gray-900 mb-3">Find Accommodation</h4>
-                    <form onSubmit={(e) => { e.preventDefault(); alert('Thanks — request sent (demo)'); }} className="space-y-3">
-                      <input name="name" placeholder="Full name" className="w-full px-3 py-2 rounded-md border border-gray-200" />
-                      <input name="country" placeholder="Destination country" className="w-full px-3 py-2 rounded-md border border-gray-200" />
-                      <input name="university" placeholder="University" className="w-full px-3 py-2 rounded-md border border-gray-200" />
-                      <div className="grid grid-cols-2 gap-2">
-                        <input name="budget" placeholder="Budget range" className="px-3 py-2 rounded-md border border-gray-200" />
-                        <select name="type" className="px-3 py-2 rounded-md border border-gray-200">
-                          <option>Shared</option>
-                          <option>Private</option>
-                          <option>Studio</option>
-                        </select>
-                      </div>
-                      <input name="contact" placeholder="Phone or email" className="w-full px-3 py-2 rounded-md border border-gray-200" />
-                      <div className="flex gap-3">
-                        <button className="px-4 py-2 rounded-md bg-gradient-to-r from-primary to-accent text-white font-semibold">Find My Accommodation</button>
-                        <button type="button" className="px-4 py-2 rounded-md border border-gray-200">Talk to Our Housing Expert</button>
-                      </div>
-                    </form>
-                  </div>
+                  <AccommodationForm />
                 </div>
               </div>
             </div>

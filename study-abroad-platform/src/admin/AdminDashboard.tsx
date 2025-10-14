@@ -83,7 +83,26 @@ export default function AdminDashboard() {
         console.warn('Failed to fetch registration leads count:', regError)
       }
 
-      // Fetch other leads from main leads table (Learn More, Accommodation, Eligibility)
+      // Fetch accommodation leads count from accommodation_leads table
+      try {
+        const accomUrl = `${API_BASE}/api/accommodation_leads/count.php`
+        const accomRes = await fetch(accomUrl, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (accomRes.ok) {
+          const accomData = await accomRes.json()
+          if (accomData?.success) {
+            counts.accommodation = accomData.count || 0
+            counts.total += counts.accommodation
+          }
+        } else {
+          console.warn('Accommodation leads API not available')
+        }
+      } catch (accomError) {
+        console.warn('Failed to fetch accommodation leads count:', accomError)
+      }
+
+      // Fetch other leads from main leads table (Learn More, Eligibility)
       try {
         const url = `${API_BASE}/api/leads/list.php?limit=1000`
         const res = await fetch(url, {
@@ -100,9 +119,7 @@ export default function AdminDashboard() {
               // Count leads by source (these are from the main leads table)
               leads.forEach(lead => {
                 const source = lead.lead_source?.toLowerCase() || ''
-                if (source.includes('accommodation') || source.includes('accom')) {
-                  counts.accommodation++
-                } else if (source.includes('eligibility') || source.includes('eligible')) {
+                if (source.includes('eligibility') || source.includes('eligible')) {
                   counts.eligibility++
                 } else {
                   // All other leads from main table are "Learn More" leads
@@ -176,9 +193,13 @@ export default function AdminDashboard() {
             <span className="text-3xl font-bold text-blue-600">{leadCounts.registration}</span>
             <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
-          <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow">
+          <div 
+            onClick={() => navigate('/admin/accommodation-leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+          >
             <span className="text-lg font-semibold mb-2">Accommodation Inquiry Leads</span>
             <span className="text-3xl font-bold text-green-600">{leadCounts.accommodation}</span>
+            <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
           <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow">
             <span className="text-lg font-semibold mb-2">Check Eligibility Inquiry Leads</span>
