@@ -154,24 +154,15 @@ export default function AdminDashboard() {
             <span className="text-lg font-semibold mb-2">Check Eligibility Inquiry Leads</span>
             <span className="text-3xl font-bold text-yellow-600">{leadCounts.eligibility}</span>
           </div>
-          <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow w-full">
             <span className="text-lg font-semibold mb-2">Learn More Leads</span>
             <span className="text-3xl font-bold text-purple-600">{leadCounts.learnMore}</span>
-          </div>
-        </div>
-
-        <div className="mt-6 bg-white rounded-lg shadow p-4">
-          <h2 className="text-lg font-semibold mb-2">Quick Stats</h2>
-          <div className="text-gray-600">
-            <p>Total Leads: <span className="font-medium">{leadCounts.total}</span></p>
-            <p className="text-sm mt-1">
-              <button 
-                onClick={() => navigate('/admin/leads')}
-                className="text-blue-600 hover:underline"
-              >
-                View all leads →
-              </button>
-            </p>
+            <button 
+              onClick={() => navigate('/admin/leads')}
+              className="mt-3 text-blue-600 hover:underline text-sm"
+            >
+              View all leads →
+            </button>
           </div>
         </div>
       </main>

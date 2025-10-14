@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'   // type-only import
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 import HomePage from './pages/HomePage'
 import SearchResults from './pages/SearchResults'
@@ -17,27 +18,35 @@ function AdminRoute({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+  if (!clientId) {
+    console.error('VITE_GOOGLE_CLIENT_ID is not defined in environment variables')
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/search-results" element={<SearchResults />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/register" element={<AdminRegister />} />
-        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route
-          path="/admin/leads"
-          element={
-            <AdminRoute>
-              <AdminLeads />
-            </AdminRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </div>
+    <GoogleOAuthProvider clientId={clientId || ''}>
+      <div className="min-h-screen bg-gray-50">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/search-results" element={<SearchResults />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/register" element={<AdminRegister />} />
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route
+            path="/admin/leads"
+            element={
+              <AdminRoute>
+                <AdminLeads />
+              </AdminRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </GoogleOAuthProvider>
   )
 }

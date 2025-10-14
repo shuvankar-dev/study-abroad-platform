@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MenuIcon, XIcon } from 'lucide-react'
+import RegistrationModal from './RegistrationModal'
 
 import logo from '../assets/logo.png'
 
@@ -9,6 +10,7 @@ const Navbar = () => {
   const [destOpen, setDestOpen] = useState(false)
   const [mobileDestOpen, setMobileDestOpen] = useState(false)
   const [productOpen, setProductOpen] = useState(false)
+  const [isRegOpen, setIsRegOpen] = useState(false)
   const navigate = useNavigate()
 
   const countries = [
@@ -108,7 +110,10 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white px-6 py-2 rounded-lg text-base font-medium transition-all">
+            <button 
+              onClick={() => setIsRegOpen(true)}
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white px-6 py-2 rounded-lg text-base font-medium transition-all"
+            >
               Get Started
             </button>
           </div>
@@ -154,7 +159,10 @@ const Navbar = () => {
                 About
               </a>
               <div className="border-t border-gray-100 pt-3">
-                <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-2 rounded-lg text-base font-medium mt-2">
+                <button 
+                  onClick={() => setIsRegOpen(true)}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-2 rounded-lg text-base font-medium mt-2"
+                >
                   Get Started
                 </button>
               </div>
@@ -162,6 +170,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
+      <RegistrationModal isOpen={isRegOpen} onClose={() => setIsRegOpen(false)} source="other" />
     </nav>
   )
 }
