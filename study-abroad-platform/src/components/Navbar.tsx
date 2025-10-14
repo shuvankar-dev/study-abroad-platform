@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MenuIcon, XIcon } from 'lucide-react'
+
 import logo from '../assets/logo.png'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [destOpen, setDestOpen] = useState(false)
   const [mobileDestOpen, setMobileDestOpen] = useState(false)
+  const [productOpen, setProductOpen] = useState(false)
   const navigate = useNavigate()
 
   const countries = [
@@ -34,17 +36,44 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <a href="/" className="flex items-center space-x-4 group">
-            <div className="flex items-center justify-center w-28 h-28 md:w-40 md:h-40 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
-              <img src={logo} alt="StudyAbroad logo" className="w-full h-full object-contain bg-white/0" />
-            </div>
-            {/* <div>
-              <span className="text-2xl font-bold text-gray-900">
-                Study abroad
-              </span>
-              <div className="text-xs text-blue-600 -mt-1">Platform</div>
-            </div> */}
-          </a>
+          <div className="relative flex items-center">
+            <a href="/" className="flex items-center group">
+              <div className="flex items-center justify-center w-28 h-28 md:w-40 md:h-40 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
+                <img src={logo} alt="StudyAbroad logo" className="w-full h-full object-contain bg-white/0" />
+              </div>
+            </a>
+            {/* Dropdown icon for products */}
+            <button
+              className="ml-1 mt-2 text-orange-500 hover:text-orange-600 focus:outline-none flex items-center"
+              onClick={() => setProductOpen((s) => !s)}
+              onMouseEnter={() => setProductOpen(true)}
+              onMouseLeave={() => setProductOpen(false)}
+              aria-label="Show products dropdown"
+            >
+              <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            {/* Dropdown menu */}
+            {productOpen && (
+              <div
+                className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg z-50 p-4"
+                onMouseEnter={() => setProductOpen(true)}
+                onMouseLeave={() => setProductOpen(false)}
+              >
+                <div className="text-xs font-semibold text-gray-500 mb-3 pl-1">PRODUCTS</div>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg">C</span>
+                    <span className="font-medium text-gray-800">Codescholar Overseas</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg">C</span>
+                    <span className="font-medium text-gray-800">Codescholar Writers</span>
+                  </div>
+                </div>
+                <div className="mt-4 text-center text-sm text-gray-500 italic">Coming soon</div>
+              </div>
+            )}
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -68,9 +97,6 @@ const Navbar = () => {
             </button>
             <button onClick={() => navigate('/explore')} className="text-gray-700 hover:text-gray-900 px-3 py-2 text-base lg:text-lg font-medium transition-colors">
               Explore
-            </button>
-            <button onClick={() => navigate('/')} className="text-gray-700 hover:text-gray-900 px-3 py-2 text-base lg:text-lg font-medium transition-colors">
-              Products
             </button>
             <button onClick={() => navigate('/services')} className="text-gray-700 hover:text-gray-900 px-3 py-2 text-base lg:text-lg font-medium transition-colors">
               Services

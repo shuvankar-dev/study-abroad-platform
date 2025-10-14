@@ -9,6 +9,7 @@ import Services from './pages/Services'
 import AdminLogin from './admin/AdminLogin'
 import AdminRegister from './admin/AdminRegister'
 import AdminLeads from './admin/AdminLeads'
+import AdminDashboard from './admin/AdminDashboard'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -21,12 +22,12 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />
-  <Route path="/services" element={<Services />} />
+        <Route path="/services" element={<Services />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
-        <Route path="/admin" element={<Navigate to="/admin/leads" replace />} />
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route
           path="/admin/leads"
           element={
