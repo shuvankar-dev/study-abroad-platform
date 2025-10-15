@@ -102,39 +102,52 @@ export default function AdminDashboard() {
         console.warn('Failed to fetch accommodation leads count:', accomError)
       }
 
-      // Fetch other leads from main leads table (Learn More, Eligibility)
+      // Fetch eligibility checks count from eligibility_checks table
       try {
-        const url = `${API_BASE}/api/leads/list.php?limit=1000`
-        const res = await fetch(url, {
+        const eligibilityUrl = `${API_BASE}/api/eligibility_checks/count.php`
+        const eligibilityRes = await fetch(eligibilityUrl, {
           headers: { Authorization: `Bearer ${token}` }
         })
-        if (res.ok) {
-          const text = await res.text()
-          try {
-            const data = JSON.parse(text)
-            if (data?.success && data?.data) {
-              const leads: Lead[] = data.data || []
-              counts.total += leads.length
-
-              // Count leads by source (these are from the main leads table)
-              leads.forEach(lead => {
-                const source = lead.lead_source?.toLowerCase() || ''
-                if (source.includes('eligibility') || source.includes('eligible')) {
-                  counts.eligibility++
-                } else {
-                  // All other leads from main table are "Learn More" leads
-                  counts.learnMore++
-                }
-              })
-            }
-          } catch (parseError) {
-            console.warn('Failed to parse main leads:', parseError)
+        if (eligibilityRes.ok) {
+          const eligibilityData = await eligibilityRes.json()
+          if (eligibilityData?.success) {
+            counts.eligibility = eligibilityData.count || 0
+            counts.total += counts.eligibility
           }
         } else {
-          console.warn('Main leads API returned error:', res.status)
+          console.warn('Eligibility checks API not available')
+        }
+      } catch (eligibilityError) {
+        console.warn('Failed to fetch eligibility checks count:', eligibilityError)
+      }
+
+      // Fetch other leads from main leads table (Learn More only)
+      try {
+        // Use the new count endpoint instead of list
+        const url = `${API_BASE}/api/leads/count.php`
+        console.log('Fetching Learn More leads count from:', url)
+        const res = await fetch(url)
+        
+        console.log('Learn More leads response status:', res.status)
+        if (res.ok) {
+          const text = await res.text()
+          console.log('Learn More leads response text:', text)
+          try {
+            const data = JSON.parse(text)
+            console.log('Learn More leads parsed data:', data)
+            if (data?.success && typeof data?.count === 'number') {
+              counts.learnMore = data.count
+              console.log('Learn More count set to:', counts.learnMore)
+            }
+          } catch (parseError) {
+            console.error('Failed to parse leads count:', parseError)
+          }
+        } else {
+          const errorText = await res.text()
+          console.error('Leads count API returned error:', res.status, errorText)
         }
       } catch (leadsError) {
-        console.warn('Failed to fetch main leads:', leadsError)
+        console.error('Failed to fetch leads count:', leadsError)
       }
 
       setLeadCounts(counts)

@@ -3,6 +3,7 @@ import HeroSection from '../components/HeroSection';
 import StatsSection from '../components/StatsSection';
 import Footer from '../components/Footer';
 import UserBubble from '../components/UserBubble';
+import EligibilityChecker from '../components/EligibilityChecker'
 import AccommodationForm from '../components/AccommodationForm'
 import RegistrationModal from '../components/RegistrationModal';
 import ChatBubbleAssistant from '../components/ChatBubbleAssistant';
@@ -192,48 +193,7 @@ const HomePage = () => {
 
       {/* English Proficiency Test Section */}
         <section className="container mx-auto px-4 py-12">
-          <div className="max-w-3xl mx-auto bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg p-8 mb-8">
-            <div className="mb-6">
-              <div className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-semibold mb-2">English Proficiency Test</div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Check Your Eligibility</h2>
-              <p className="text-gray-700 mb-4">Let us know your English test status and results to see if you meet the requirements for your dream university.</p>
-            </div>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Test Status</label>
-                <select className="w-full px-3 py-2 rounded-md border border-gray-200" defaultValue="">
-                  <option value="" disabled>Select status</option>
-                  <option>Not Applied</option>
-                  <option>Applied</option>
-                  <option>Completed</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Which Exam?</label>
-                <select className="w-full px-3 py-2 rounded-md border border-gray-200" defaultValue="">
-                  <option value="" disabled>Select exam</option>
-                  <option>IELTS</option>
-                  <option>TOEFL</option>
-                  <option>PTE</option>
-                  <option>Duolingo</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Percentage / Score</label>
-                <input type="text" className="w-full px-3 py-2 rounded-md border border-gray-200" placeholder="e.g. 7.5 Band / 95 / 60%" />
-              </div>
-              <div className="md:col-span-2 flex justify-end mt-2">
-                <button
-                  type="button"
-                  className="px-6 py-2 rounded-md bg-gradient-to-r from-primary to-accent text-white font-semibold shadow"
-                  onClick={() => openRegistration('other')}
-                >
-                  Check Eligibility
-                </button>
-              </div>
-            </form>
-          </div>
+          <EligibilityChecker />
         </section>
 
          {/* FAQ Section - premium styled accordion */}

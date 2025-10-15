@@ -29,7 +29,7 @@ const parseJWT = (token: string) => {
 const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ 
   onSuccess, 
   onError, 
-  text = "Sign in with Google" 
+  text = "Sign in with Google"
 }) => {
   const handleSuccess = (credentialResponse: CredentialResponse) => {
     if (credentialResponse.credential) {
