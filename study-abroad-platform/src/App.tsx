@@ -7,10 +7,13 @@ import SearchResults from './pages/SearchResults'
 import About from './pages/About'
 import Explore from './pages/Explore'
 import Services from './pages/Services'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import Legal from './pages/Legal'
 import AdminLogin from './admin/AdminLogin'
 import AdminRegister from './admin/AdminRegister'
 import AdminLeads from './admin/AdminLeads'
 import AdminDashboard from './admin/AdminDashboard'
+import AdminEligibilityLeads from './admin/AdminEligibilityLeads'
 import AdminRegistrationLeads from './admin/AdminRegistrationLeads'
 import AdminAccommodationLeads from './admin/AdminAccommodationLeads'
 
@@ -35,6 +38,8 @@ export default function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/search-results" element={<SearchResults />} />
+    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+    <Route path="/legal" element={<Legal />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/register" element={<AdminRegister />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
@@ -59,6 +64,14 @@ export default function App() {
             element={
               <AdminRoute>
                 <AdminAccommodationLeads />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/eligibility-leads"
+            element={
+              <AdminRoute>
+                <AdminEligibilityLeads />
               </AdminRoute>
             }
           />

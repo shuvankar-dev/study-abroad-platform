@@ -214,9 +214,13 @@ export default function AdminDashboard() {
             <span className="text-3xl font-bold text-green-600">{leadCounts.accommodation}</span>
             <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
-          <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow">
+          <div 
+            onClick={() => navigate('/admin/eligibility-leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+          >
             <span className="text-lg font-semibold mb-2">Check Eligibility Inquiry Leads</span>
             <span className="text-3xl font-bold text-yellow-600">{leadCounts.eligibility}</span>
+            <span className="mt-2 text-sm text-blue-600 hover:underline">Click to view details →</span>
           </div>
           <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow w-full">
             <span className="text-lg font-semibold mb-2">Learn More Leads</span>
