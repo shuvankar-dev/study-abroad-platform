@@ -38,8 +38,8 @@ export default function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/search-results" element={<SearchResults />} />
-    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-    <Route path="/legal" element={<Legal />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/legal" element={<Legal />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/register" element={<AdminRegister />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
@@ -79,5 +79,6 @@ export default function App() {
         </Routes>
       </div>
     </GoogleOAuthProvider>
+    
   )
 }
