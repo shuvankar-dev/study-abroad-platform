@@ -29,6 +29,9 @@ export default function AccommodationForm() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  
+  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
@@ -227,12 +230,15 @@ export default function AccommodationForm() {
             )}
           </button>
           
-          <button
-            type="button"
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+          <a
+            href="https://wa.me/918777841275?text=Hello%2C%20I%20am%20interested%20in%20student%20accommodation.%20Can%20you%20help%20me%20find%20options%3F"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 px-4 py-2 border border-green-500 text-green-700 rounded-md hover:bg-green-50 transition-colors text-center flex items-center justify-center"
+            style={{ textDecoration: 'none' }}
           >
             Talk to Our Housing Expert
-          </button>
+          </a>
         </div>
       </form>
     </div>

@@ -20,7 +20,7 @@ const UserBubble: React.FC<UserBubbleProps> = ({ onOpenRegistration }) => {
   }, [open])
 
   const handleScheduleCall = () => {
-    const message = 'shedule a call for me i wnat more information abou you study abord facility'
+    const message = 'Schedule a call for me. I want more information about your study abroad facility'
     const phone = '918777841275'
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
     window.open(url, '_blank')

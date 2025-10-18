@@ -174,7 +174,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, onClose, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-5 border-b">
           <div>
             <h3 className="text-lg font-semibold">Register to Get More Discount</h3>
@@ -188,7 +188,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, onClose, 
           <div className="mb-4">
             <GoogleSignInButton 
               onSuccess={handleGoogleSuccess}
-              onError={(error) => setErrors({ submit: 'Google sign-in failed. Please try again.' })}
+              onError={() => setErrors({ submit: 'Google sign-in failed. Please try again.' })}
             />
           </div>
 

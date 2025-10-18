@@ -54,16 +54,7 @@ const destinations = [
     image: 'germany-study.jpg',
     bgGradient: 'from-black to-red-600'
   },
-  {
-    country: 'Ireland',
-    flag: '🇮🇪',
-    universities: '20+',
-    avgCost: '$15,000/year',
-    duration: '1-2 years',
-    highlights: ['English Speaking', 'EU Access', 'Tech Hub'],
-    image: 'ireland-study.jpg',
-    bgGradient: 'from-green-600 to-orange-500'
-  }
+  
 ]
 
 const programs = [
@@ -250,28 +241,6 @@ const Explore = () => {
             ))}
           </div>
         )}
-      </section>
-
-      {/* CTA Section */}
-    
-
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-700 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-blue-100 mb-8 text-lg">
-            Get personalized guidance from our expert counselors
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-              Book Free Consultation
-            </button>
-            <button className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-all">
-              Download Brochure
-            </button>
-          </div>
-        </div>
       </section>
 
       <Footer />

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { MenuIcon, XIcon } from 'lucide-react'
 import RegistrationModal from './RegistrationModal'
 
@@ -17,7 +17,6 @@ const Navbar = () => {
     'Australia',
     'Canada',
     'Germany',
-    'Ireland',
     'United Kingdom',
     'United States'
   ]
@@ -133,12 +132,18 @@ const Navbar = () => {
           {isOpen && (
           <div className="md:hidden bg-white rounded-lg mt-2 mb-4 border border-gray-100 shadow-sm">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">
-                Destinations
-              </a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">
-                Programs
-              </a>
+              <Link to="/" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>
+                Home
+              </Link>
+              <Link to="/about" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>
+                About
+              </Link>
+              <Link to="/services" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>
+                Services
+              </Link>
+              <Link to="/explore" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>
+                Explore
+              </Link>
               <div>
                 <button onClick={() => setMobileDestOpen((s) => !s)} className="w-full text-left text-gray-700 hover:text-gray-900 px-3 py-2 text-base font-medium flex items-center justify-between">
                   Destinations
@@ -152,16 +157,10 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">
-                Services
-              </a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">
-                About
-              </a>
-              <div className="border-t border-gray-100 pt-3">
+              <div className="px-3 py-2">
                 <button 
-                  onClick={() => setIsRegOpen(true)}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-2 rounded-lg text-base font-medium mt-2"
+                  onClick={() => {setIsRegOpen(true); setIsOpen(false)}}
+                  className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   Get Started
                 </button>

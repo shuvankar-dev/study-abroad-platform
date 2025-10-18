@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
   : '/studyabroadplatform-api'
 
-type Lead = {
-  id: number
-  name: string
-  email: string
-  phone: string
-  country: string
-  course_id: number
-  course_title: string
-  university_name: string
-  message?: string
-  lead_source: string
-  status: 'new'|'contacted'|'qualified'|'converted'|'closed'
-  priority: 'low'|'medium'|'high'
-  created_at: string
-}
+// type Lead = {
+//   id: number
+//   name: string
+//   email: string
+//   phone: string
+//   country: string
+//   course_id: number
+//   course_title: string
+//   university_name: string
+//   message?: string
+//   lead_source: string
+//   status: 'new'|'contacted'|'qualified'|'converted'|'closed'
+//   priority: 'low'|'medium'|'high'
+//   created_at: string
+// }
 
 type LeadCounts = {
   registration: number
