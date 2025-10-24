@@ -142,6 +142,7 @@ const SearchResults = () => {
     { value: 'Canada', label: 'Canada 🇨🇦' },
     { value: 'Australia', label: 'Australia 🇦🇺' },
     { value: 'Germany', label: 'Germany 🇩🇪' },
+    { value: 'Ireland', label: 'Ireland 🇮🇪' },
     { value: 'France', label: 'France 🇫🇷' },
     { value: 'Netherlands', label: 'Netherlands 🇳🇱' },
     { value: 'Switzerland', label: 'Switzerland 🇨🇭' }
@@ -160,6 +161,7 @@ const SearchResults = () => {
         'Australia': '1',
         'Germany': '3',
         'France': '4',
+        'Ireland': '9',
         'Netherlands': '7',
         'Switzerland': '8'
       }

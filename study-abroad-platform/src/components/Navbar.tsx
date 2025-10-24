@@ -17,6 +17,7 @@ const Navbar = () => {
     'Australia',
     'Canada',
     'Germany',
+    'Ireland',
     'United Kingdom',
     'United States'
   ]

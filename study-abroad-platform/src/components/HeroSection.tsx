@@ -24,6 +24,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
     { name: 'Australia', flag: '🇦🇺', code: 'AU' },
     { name: 'Canada', flag: '🇨🇦', code: 'CA' },
     { name: 'Germany', flag: '🇩🇪', code: 'DE' },
+    { name: 'Ireland', flag: '🇮🇪', code: 'IE' },
     { name: 'United Kingdom', flag: '🇬🇧', code: 'UK' },
     { name: 'United States', flag: '🇺🇸', code: 'US' }
   ]
