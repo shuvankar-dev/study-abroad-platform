@@ -38,10 +38,6 @@ export default function Services() {
             </div>
           ))}
         </div>
-
-        <div className="mt-12 text-center">
-          <p className="text-gray-600 mb-4">Prefer a quick chat? <button onClick={() => setIsOpen(true)} className="underline text-blue-700">Schedule a free consultation</button></p>
-        </div>
       </main>
 
       <RegistrationModal isOpen={isOpen} onClose={() => setIsOpen(false)} source={'other'} />

@@ -101,44 +101,74 @@ const programs = [
   {
     title: 'Engineering & Technology',
     icon: '⚙️',
-    description: 'Cutting-edge programs in AI, Robotics, Software Engineering',
+    description: 'Mechanical, Civil, Electrical, Chemical Engineering and Technology',
     universities: '2,500+',
-    color: 'from-blue-500 to-cyan-500'
+    color: 'from-blue-500 to-cyan-500',
+    searchTerms: ['Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Electrical Engineering', 'Chemical Engineering']
+  },
+  {
+    title: 'Computer Science & IT',
+    icon: '💻',
+    description: 'Software Engineering, Data Science, AI, Cybersecurity, Information Technology',
+    universities: '2,800+',
+    color: 'from-teal-500 to-blue-500',
+    searchTerms: ['Computer Science', 'Software Engineering', 'Data Science', 'Information Technology', 'Computing']
   },
   {
     title: 'Business & Management',
     icon: '💼',
-    description: 'MBA, Finance, Marketing, and Entrepreneurship programs',
+    description: 'MBA, Finance, Marketing, International Business, Entrepreneurship',
     universities: '3,200+',
-    color: 'from-green-500 to-emerald-500'
+    color: 'from-green-500 to-emerald-500',
+    searchTerms: ['MBA', 'Business', 'Management', 'Finance', 'Marketing']
   },
   {
     title: 'Medicine & Healthcare',
     icon: '🏥',
-    description: 'Medical, Nursing, Pharmacy, and Health Sciences',
+    description: 'MBBS, MD, Nursing, Pharmacy, Dentistry, Health Sciences',
     universities: '1,800+',
-    color: 'from-red-500 to-pink-500'
+    color: 'from-red-500 to-pink-500',
+    searchTerms: ['Medicine', 'Medical', 'MBBS', 'Healthcare', 'Nursing']
   },
   {
-    title: 'Arts & Humanities',
-    icon: '🎨',
-    description: 'Fine Arts, Literature, Philosophy, and Cultural Studies',
-    universities: '2,100+',
-    color: 'from-purple-500 to-indigo-500'
+    title: 'Law & Legal Studies',
+    icon: '⚖️',
+    description: 'LLB, LLM, Juris Doctor, International Law, Legal Studies',
+    universities: '1,200+',
+    color: 'from-amber-600 to-yellow-500',
+    searchTerms: ['Law', 'Legal', 'LLB', 'LLM', 'Juris Doctor']
   },
   {
     title: 'Science & Research',
     icon: '🔬',
-    description: 'Biology, Chemistry, Physics, and Research programs',
+    description: 'Biology, Chemistry, Physics, Mathematics, Environmental Science',
     universities: '1,900+',
-    color: 'from-orange-500 to-yellow-500'
+    color: 'from-orange-500 to-red-500',
+    searchTerms: ['Science', 'Biology', 'Chemistry', 'Physics', 'Mathematics']
   },
   {
-    title: 'Computer Science',
-    icon: '💻',
-    description: 'Data Science, Cybersecurity, and Software Development',
-    universities: '2,800+',
-    color: 'from-teal-500 to-blue-500'
+    title: 'Arts & Humanities',
+    icon: '🎨',
+    description: 'Fine Arts, Literature, History, Philosophy, Cultural Studies',
+    universities: '2,100+',
+    color: 'from-purple-500 to-indigo-500',
+    searchTerms: ['Arts', 'Humanities', 'Literature', 'Philosophy', 'History']
+  },
+  {
+    title: 'Psychology & Social Sciences',
+    icon: '🧠',
+    description: 'Psychology, Sociology, Anthropology, Political Science, Social Work',
+    universities: '1,600+',
+    color: 'from-pink-500 to-purple-600',
+    searchTerms: ['Psychology', 'Social Sciences', 'Sociology', 'Political Science', 'Anthropology']
+  },
+  {
+    title: 'Architecture & Design',
+    icon: '🏗️',
+    description: 'Architecture, Interior Design, Urban Planning, Graphic Design',
+    universities: '800+',
+    color: 'from-gray-600 to-blue-600',
+    searchTerms: ['Architecture', 'Design', 'Interior Design', 'Urban Planning', 'Graphic Design']
   }
 ]
 
@@ -149,6 +179,17 @@ const Explore = () => {
   const searchByCountry = (country: string) => {
     const params = new URLSearchParams()
     params.set('country', country)
+    navigate(`/search-results?${params.toString()}`)
+  }
+
+  const searchByProgram = (program: any) => {
+    const params = new URLSearchParams()
+    // Use the first search term which is more likely to match database field_of_study values
+    // For example: "Business" instead of "Business & Management"
+    const searchTerm = program.searchTerms && program.searchTerms.length > 0 
+      ? program.searchTerms[0] 
+      : program.title
+    params.set('course', searchTerm)
     navigate(`/search-results?${params.toString()}`)
   }
 
@@ -271,7 +312,7 @@ const Explore = () => {
                   </div>
 
                   <button
-                    onClick={() => navigate('/search-results')}
+                    onClick={() => searchByProgram(program)}
                     className={`w-full bg-gradient-to-r ${program.color} text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105`}
                   >
                     View Programs

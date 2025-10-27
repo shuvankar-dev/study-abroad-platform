@@ -218,6 +218,12 @@ const SearchResults = () => {
         setAllCourses(allData.data || [])
         setFilteredCourses(currentData.data || [])
         setPagination(currentData.pagination)
+        
+        // If no results found with exact search, try fallback searches for common program keywords
+        if ((!currentData.data || currentData.data.length === 0) && courseQuery) {
+          console.log('No results found, trying fallback searches...')
+          await tryFallbackSearch(courseQuery, countryId)
+        }
       } else {
         setError('No courses found matching your criteria')
         setCourses([])
@@ -234,6 +240,51 @@ const SearchResults = () => {
       setPagination(null)
     }
     setLoading(false)
+  }
+
+  // Fallback search function to try alternative search terms
+  const tryFallbackSearch = async (originalQuery: string, countryId: string) => {
+    const fallbackTerms: { [key: string]: string[] } = {
+      'Business & Management': ['Business', 'Management', 'MBA', 'Commerce'],
+      'Engineering & Technology': ['Engineering', 'Technology', 'Computer', 'Mechanical'],
+      'Computer Science & IT': ['Computer', 'IT', 'Software', 'Technology'],
+      'Medicine & Healthcare': ['Medicine', 'Medical', 'Health', 'MBBS'],
+      'Science & Research': ['Science', 'Research', 'Biology', 'Chemistry'],
+      'Arts & Humanities': ['Arts', 'Humanities', 'Literature', 'History'],
+      'Law & Legal Studies': ['Law', 'Legal', 'LLB', 'LLM']
+    }
+
+    const searchTerms = fallbackTerms[originalQuery] || [originalQuery.split(' ')[0], originalQuery.split('&')[0].trim()]
+    
+    for (const term of searchTerms) {
+      try {
+        const params = new URLSearchParams({
+          field_of_study: term.trim(),
+          country_id: countryId,
+          page: '1',
+          limit: String(limitPerPage)
+        })
+
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+          ? 'http://localhost/studyabroadplatform-api/api' 
+          : '/studyabroadplatform-api/api'
+
+        const response = await fetch(`${API_BASE_URL}/search_smart.php?${params}`)
+        if (response.ok) {
+          const data: ApiResponse = await response.json()
+          if (data.success && data.data && data.data.length > 0) {
+            console.log(`Fallback search successful with term: ${term}`)
+            setCourses(data.data)
+            setFilteredCourses(data.data)
+            setPagination(data.pagination)
+            setError(null)
+            return // Success, stop trying other terms
+          }
+        }
+      } catch (err) {
+        console.log(`Fallback search failed for term: ${term}`)
+      }
+    }
   }
 
   // Events
