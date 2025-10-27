@@ -30,8 +30,7 @@ const SearchFiltersBar: React.FC<SearchFiltersBarProps> = ({
     { value: 'United Kingdom', label: 'United Kingdom' },
     { value: 'Canada', label: 'Canada' },
     { value: 'Australia', label: 'Australia' },
-    { value: 'Germany', label: 'Germany' },
-    { value: 'France', label: 'France' }
+    { value: 'Germany', label: 'Germany' }
   ]
 
   const courseLevels = [

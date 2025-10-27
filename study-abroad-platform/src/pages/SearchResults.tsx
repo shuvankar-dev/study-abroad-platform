@@ -145,7 +145,7 @@ const SearchResults = () => {
     { value: 'Ireland', label: 'Ireland 🇮🇪' },
     { value: 'France', label: 'France 🇫🇷' },
     { value: 'Netherlands', label: 'Netherlands 🇳🇱' },
-    { value: 'Switzerland', label: 'Switzerland 🇨🇭' }
+    { value: 'New Zealand', label: 'New Zealand 🇳🇿' }
   ]
 
   // API
@@ -160,10 +160,10 @@ const SearchResults = () => {
         'Canada': '2',
         'Australia': '1',
         'Germany': '3',
-        'France': '4',
-        'Ireland': '9',
-        'Netherlands': '7',
-        'Switzerland': '8'
+        'France': '8',
+        'Ireland': '4',
+        'Netherlands': '9',
+        'New Zealand': '7'
       }
       const countryId = countryMap[countryQuery] || ''
 

@@ -8,7 +8,6 @@ import EligibilityChecker from '../components/EligibilityChecker'
 import AccommodationForm from '../components/AccommodationForm'
 import RegistrationModal from '../components/RegistrationModal';
 import ChatBubbleAssistant from '../components/ChatBubbleAssistant';
-import SuccessStories from '../components/SuccessStories';
 import { useState, useEffect } from 'react';
 
 // Resolve accommodation images added by the user (Vite-friendly)
@@ -187,7 +186,6 @@ const HomePage = () => {
           </div>
         </section>
 
-        <SuccessStories />
         {/* Accommodation Section (moved from Explore) */}
         <section className="container mx-auto px-4 py-12">
           <div className="max-w-7xl mx-auto rounded-2xl overflow-hidden shadow-lg">
