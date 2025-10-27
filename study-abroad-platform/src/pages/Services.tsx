@@ -1,7 +1,5 @@
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import RegistrationModal from '../components/RegistrationModal'
-import { useState } from 'react'
 
 const services = [
   { title: 'Visa Guidance', desc: 'Complete support with visa documentation, application and tracking.' },
@@ -14,7 +12,12 @@ const services = [
 ]
 
 export default function Services() {
-  const [isOpen, setIsOpen] = useState(false)
+  const handleWhatsAppConsult = (serviceName: string) => {
+    const phoneNumber = "918777841275" 
+    const message = `Hi! I'm interested in booking a consultation for ${serviceName}. Could you please provide more details about this service?`
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -32,15 +35,19 @@ export default function Services() {
               <div className="text-xl font-semibold text-blue-700 mb-2">{s.title}</div>
               <div className="text-gray-600 mb-4">{s.desc}</div>
               <div className="flex gap-2">
-                <button onClick={() => setIsOpen(true)} className="px-3 py-2 rounded bg-gradient-to-r from-primary to-accent text-white text-sm">Book Consult</button>
-                <button className="px-3 py-2 rounded border border-gray-200 text-sm text-gray-700">Learn more</button>
+                <button 
+                  onClick={() => handleWhatsAppConsult(s.title)} 
+                  className="px-3 py-2 rounded bg-gradient-to-r from-primary to-accent text-white text-sm hover:shadow-md transition-all"
+                >
+                  Book Consult
+                </button>
+                <button className="px-3 py-2 rounded border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-all">Learn more</button>
               </div>
             </div>
           ))}
         </div>
       </main>
 
-      <RegistrationModal isOpen={isOpen} onClose={() => setIsOpen(false)} source={'other'} />
       <Footer />
     </div>
   )
