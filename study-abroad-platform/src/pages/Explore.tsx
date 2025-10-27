@@ -54,6 +54,46 @@ const destinations = [
     image: 'germany-study.jpg',
     bgGradient: 'from-black to-red-600'
   },
+  {
+    country: 'Ireland',
+    flag: '🇮🇪',
+    universities: '20+',
+    avgCost: '$15,000/year',
+    duration: '1-2 years',
+    highlights: ['English Speaking', 'EU Access', 'Tech Hub'],
+    image: 'ireland-study.jpg',
+    bgGradient: 'from-green-600 to-orange-500'
+  },
+  {
+    country: 'France',
+    flag: '🇫🇷',
+    universities: '80+',
+    avgCost: '$3,000/year',
+    duration: '1-3 years',
+    highlights: ['Cultural Heritage', 'Fashion & Arts', 'Research Excellence'],
+    image: 'france-study.jpg',
+    bgGradient: 'from-blue-600 to-red-600'
+  },
+  {
+    country: 'Netherlands',
+    flag: '🇳🇱',
+    universities: '40+',
+    avgCost: '$12,000/year',
+    duration: '1-3 years',
+    highlights: ['English Programs', 'Innovation Hub', 'High Quality of Life'],
+    image: 'netherlands-study.jpg',
+    bgGradient: 'from-orange-500 to-blue-600'
+  },
+  {
+    country: 'New Zealand',
+    flag: '🇳🇿',
+    universities: '25+',
+    avgCost: '$25,000/year',
+    duration: '2-4 years',
+    highlights: ['Natural Beauty', 'Safe Environment', 'Adventure Activities'],
+    image: 'newzealand-study.jpg',
+    bgGradient: 'from-green-500 to-blue-600'
+  }
   
 ]
 
