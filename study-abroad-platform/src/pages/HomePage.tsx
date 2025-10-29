@@ -90,7 +90,7 @@ const HomePage = () => {
               {/* We'll toggle a class on mount via a tiny effect below */}
             </div>
             <div className="flex justify-center">
-              <div className="w-80 h-80 rounded-3xl shadow-2xl bg-gradient-to-br from-blue-100 via-white to-indigo-100 overflow-hidden flex items-center justify-center border-4 border-white">
+              <div className="w-100 h-100 rounded-3xl shadow-2xl bg-gradient-to-br from-blue-100 via-white to-indigo-100 overflow-hidden flex items-center justify-center border-4 border-white">
                 <img src="/whyUs.png" alt="Study Abroad" className="w-full h-full object-cover scale-105 transition-transform duration-500 hover:scale-110" />
               </div>
             </div>

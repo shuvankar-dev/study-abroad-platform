@@ -12,7 +12,7 @@ const Footer = () => {
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
                 {/* translucent rounded background for logo to increase contrast */}
-                <div className="rounded-md p-6 mr-3 bg-white/80 shadow-lg ring-1 ring-white/20 flex items-center justify-center" style={{ minWidth: 72, minHeight: 72, width: 'auto' }}>
+                <div className="rounded-md p-8 mr-3 bg-white/80 shadow-lg ring-1 ring-white/20 flex items-center justify-center" style={{ minWidth: 72, minHeight: 72, width: 'auto' }}>
                   <img src={logo} alt="Codescholar Overseas" className="h-14 w-auto max-w-[120px] object-contain" style={{ display: 'block' }} />
                 </div>
                 <div>

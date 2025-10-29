@@ -1,8 +1,7 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { Shield, Scale, FileText, Users, Globe, CheckCircle } from 'lucide-react'
+import { Shield, Scale, Users, Globe, CheckCircle } from 'lucide-react'
 import { useScrollToTop } from '../hooks/useScrollToTop'
 
 const TermsConditions = () => {

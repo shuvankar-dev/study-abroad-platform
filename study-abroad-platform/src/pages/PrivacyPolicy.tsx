@@ -1,8 +1,7 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { Shield, Lock, Eye, Database, Users, Globe, CheckCircle, AlertTriangle } from 'lucide-react'
+import { Shield, Lock, Eye, Database, Users, Globe, CheckCircle} from 'lucide-react'
 import { useScrollToTop } from '../hooks/useScrollToTop'
 
 export default function PrivacyPolicy() {
