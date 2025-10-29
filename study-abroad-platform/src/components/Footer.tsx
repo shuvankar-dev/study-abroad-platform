@@ -114,14 +114,29 @@ const Footer = () => {
           </div>
         </div>
 
-        
-
-        <div className="px-6 py-6 mt-6 flex flex-col md:flex-row items-center justify-between text-sm">
-          <div className="text-white/90">
-            &copy; {new Date().getFullYear()} Codescholar Overseas. All rights reserved.
-          </div>
-          <div className="flex items-center gap-6 mt-3 md:mt-0">
-            <span className="text-white/80">Developed by <a href="https://algorithmssolutions.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">algorithmssolutions.com</a></span>
+        {/* Enhanced Copyright Section */}
+        <div className="mt-8 border-t border-white/20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl mx-6 mt-6 px-8 py-6 shadow-lg border border-white/20">
+            <div className="flex flex-col md:flex-row items-center justify-between text-sm">
+              <div className="text-white font-medium flex items-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                &copy; {new Date().getFullYear()} Codescholar Overseas. All rights reserved.
+              </div>
+              <div className="flex items-center gap-3 mt-3 md:mt-0">
+                <div className="w-px h-4 bg-white/30 hidden md:block"></div>
+                <span className="text-white/90 flex items-center gap-2">
+                  Developed by 
+                  <a 
+                    href="https://algorithmssolutions.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="font-semibold text-white hover:text-yellow-300 transition-colors duration-300 underline decoration-dotted underline-offset-2"
+                  >
+                    algorithmssolutions.com
+                  </a>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
