@@ -24,7 +24,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
     { name: 'Australia', flag: '🇦🇺', code: 'AU' },
     { name: 'Canada', flag: '🇨🇦', code: 'CA' },
     { name: 'Germany', flag: '🇩🇪', code: 'DE' },
-    { name: 'Ireland', flag: '🇮🇪', code: 'IE' },
     { name: 'United Kingdom', flag: '🇬🇧', code: 'UK' },
     { name: 'United States', flag: '🇺🇸', code: 'US' }
   ]
@@ -76,83 +75,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
               </div>
             </div>
             <button onClick={() => onOpenRegistration && onOpenRegistration()} className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white font-semibold px-8 py-3 rounded-lg shadow-xl transition mb-4 mt-2 w-fit">Register Now</button>
-            {/* Search bar moved here */}
-            <div className="w-full max-w-6xl bg-blue-50 border border-blue-100 rounded-2xl p-6 shadow-2xl mt-6 scale-105">
-              <div className="mb-6 text-center">
-                <span className="block text-2xl md:text-3xl font-bold text-blue-700 tracking-tight">
-                  Join <span className="bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">thousands</span> of students finding their path
-                </span>
-              </div>
-              <form onSubmit={handleSearch}>
-                <div className="grid gap-8 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-blue-700">What do you want to study?</label>
-                    <div className="relative">
-                      <BookOpenIcon className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
-                      <input 
-                        type="text" 
-                        placeholder="e.g., Computer Science, MBA"
-                        value={course}
-                        onChange={(e) => setCourse(e.target.value)}
-                        className="w-full rounded-lg border border-blue-100 bg-white py-3 pl-10 pr-4 text-gray-900 placeholder-blue-300 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2" ref={dropdownRef}>
-                    <label className="text-sm font-semibold text-blue-700">Where do you want to study?</label>
-                    <div className="relative">
-                      <MapPinIcon className="absolute left-3 top-3 h-5 w-5 text-blue-500 z-10" />
-                      <button
-                        type="button"
-                        onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                        className="w-full rounded-lg border border-blue-100 bg-white py-3 pl-10 pr-10 text-left text-gray-900 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                      >
-                        {selectedCountry || "Select a country"}
-                      </button>
-                      <ChevronDownIcon 
-                        className={`absolute right-3 top-3 h-5 w-5 text-blue-400 transition-transform duration-200 ${
-                          isCountryDropdownOpen ? 'rotate-180' : ''
-                        }`} 
-                      />
-                      {isCountryDropdownOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-blue-100 rounded-lg shadow-2xl max-h-60 overflow-y-auto z-[9999]">
-                          <div className="p-2">
-                            <div className="text-xs font-semibold text-blue-600 px-3 py-2 border-b border-blue-50">
-                              Search by Destination Country
-                            </div>
-                            {countries.map((country) => (
-                              <button
-                                key={country.code}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedCountry(country.name)
-                                  setIsCountryDropdownOpen(false)
-                                }}
-                                className="flex items-center space-x-3 w-full px-3 py-3 text-left hover:bg-blue-50 rounded-md transition-colors duration-150"
-                              >
-                                <span className="text-xl">{country.flag}</span>
-                                <span className="text-gray-900 font-medium">{country.name}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-end">
-                    <button
-                      type="submit"
-                      disabled={!course || !selectedCountry}
-                      className="w-full bg-gray-600 hover:bg-gray-700 focus:ring-2 focus:ring-gray-300 py-3 text-lg font-bold text-white rounded-lg shadow-md transition-all flex items-center justify-center hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <SearchIcon className="mr-2 h-5 w-5" />
-                      Search Courses
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
           </div>
           {/* Right: Diamond images */}
           <div className="w-full md:w-1/2 flex justify-center items-center">
@@ -181,7 +103,86 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
             </div>
           </div>
         </div>
-        {/* Search section removed from below */}
+        
+        {/* Search Section - Full Width Below Hero */}
+        <div className="w-full max-w-6xl mx-auto mt-12">
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 lg:p-6 shadow-2xl">
+            <div className="mb-4 lg:mb-6 text-center">
+              <span className="block text-xl lg:text-2xl xl:text-3xl font-bold text-blue-700 tracking-tight">
+                Join <span className="bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">thousands</span> of students finding their path
+              </span>
+            </div>
+            <form onSubmit={handleSearch}>
+              <div className="grid gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-blue-700">What do you want to study?</label>
+                  <div className="relative">
+                    <BookOpenIcon className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
+                    <input 
+                      type="text" 
+                      placeholder="e.g., Computer Science, MBA"
+                      value={course}
+                      onChange={(e) => setCourse(e.target.value)}
+                      className="w-full rounded-lg border border-blue-100 bg-white py-3 pl-10 pr-4 text-gray-900 placeholder-blue-300 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition text-sm lg:text-base"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2" ref={dropdownRef}>
+                  <label className="text-sm font-semibold text-blue-700">Where do you want to study?</label>
+                  <div className="relative">
+                    <MapPinIcon className="absolute left-3 top-3 h-5 w-5 text-blue-500 z-10" />
+                    <button
+                      type="button"
+                      onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                      className="w-full rounded-lg border border-blue-100 bg-white py-3 pl-10 pr-10 text-left text-gray-900 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition text-sm lg:text-base"
+                    >
+                      {selectedCountry || "Select a country"}
+                    </button>
+                    <ChevronDownIcon 
+                      className={`absolute right-3 top-3 h-5 w-5 text-blue-400 transition-transform duration-200 ${
+                        isCountryDropdownOpen ? 'rotate-180' : ''
+                      }`} 
+                    />
+                    {isCountryDropdownOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-blue-100 rounded-lg shadow-2xl max-h-60 overflow-y-auto z-[9999]">
+                        <div className="p-2">
+                          <div className="text-xs font-semibold text-blue-600 px-3 py-2 border-b border-blue-50">
+                            Search by Destination Country
+                          </div>
+                          {countries.map((country) => (
+                            <button
+                              key={country.code}
+                              type="button"
+                              onClick={() => {
+                                setSelectedCountry(country.name)
+                                setIsCountryDropdownOpen(false)
+                              }}
+                              className="flex items-center space-x-3 w-full px-3 py-3 text-left hover:bg-blue-50 rounded-md transition-colors duration-150"
+                            >
+                              <span className="text-xl">{country.flag}</span>
+                              <span className="text-gray-900 font-medium text-sm lg:text-base">{country.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-end sm:col-span-2 lg:col-span-1">
+                  <button
+                    type="submit"
+                    disabled={!course || !selectedCountry}
+                    className="w-full bg-gray-600 hover:bg-gray-700 focus:ring-2 focus:ring-gray-300 py-3 text-base lg:text-lg font-bold text-white rounded-lg shadow-md transition-all flex items-center justify-center hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <SearchIcon className="mr-2 h-5 w-5" />
+                    Search Courses
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </section>
   )
