@@ -103,7 +103,15 @@ export default function AdminLeads() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900">Admin • Leads</h1>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/admin')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ← Back to Dashboard
+            </button>
+            <h1 className="text-xl font-semibold text-gray-900">Learn More Leads</h1>
+          </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-600 hidden sm:block">
               {user ? JSON.parse(user).email : ''}

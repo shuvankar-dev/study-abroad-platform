@@ -13,7 +13,6 @@ import RefundPolicy from './pages/RefundPolicy'
 import DataProtection from './pages/DataProtection'
 import Legal from './pages/Legal'
 import AdminLogin from './admin/AdminLogin'
-import AdminRegister from './admin/AdminRegister'
 import AdminLeads from './admin/AdminLeads'
 import AdminDashboard from './admin/AdminDashboard'
 import AdminEligibilityLeads from './admin/AdminEligibilityLeads'
@@ -47,7 +46,6 @@ export default function App() {
           <Route path="/data-protection" element={<DataProtection />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/register" element={<AdminRegister />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route
             path="/admin/leads"

@@ -29,6 +29,13 @@ type LeadCounts = {
   total: number
 }
 
+type NewLeadCounts = {
+  registration: number
+  accommodation: number
+  eligibility: number
+  learnMore: number
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate()
   const [leadCounts, setLeadCounts] = useState<LeadCounts>({
@@ -37,6 +44,12 @@ export default function AdminDashboard() {
     eligibility: 0,
     learnMore: 0,
     total: 0
+  })
+  const [newLeadCounts, setNewLeadCounts] = useState<NewLeadCounts>({
+    registration: 0,
+    accommodation: 0,
+    eligibility: 0,
+    learnMore: 0
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -50,6 +63,13 @@ export default function AdminDashboard() {
       return
     }
     fetchLeadCounts()
+    
+    // Set up auto-refresh every 30 seconds for real-time updates
+    const interval = setInterval(() => {
+      fetchLeadCounts()
+    }, 30000)
+    
+    return () => clearInterval(interval)
   }, [token, navigate])
 
   const fetchLeadCounts = async () => {
@@ -64,6 +84,9 @@ export default function AdminDashboard() {
         total: 0
       }
 
+      // Get previous counts from localStorage to calculate new leads
+      const previousCounts = JSON.parse(localStorage.getItem('admin_previous_counts') || '{"registration":0,"accommodation":0,"eligibility":0,"learnMore":0}')
+
       // Fetch registration leads count from registrationleads table
       try {
         const regUrl = `${API_BASE}/api/registration_leads/count.php`
@@ -76,8 +99,6 @@ export default function AdminDashboard() {
             counts.registration = regData.count || 0
             counts.total += counts.registration
           }
-        } else {
-          console.warn('Registration leads API not available')
         }
       } catch (regError) {
         console.warn('Failed to fetch registration leads count:', regError)
@@ -151,6 +172,40 @@ export default function AdminDashboard() {
       }
 
       setLeadCounts(counts)
+      
+      // Calculate new leads by comparing with previous counts
+      const newCounts: NewLeadCounts = {
+        registration: Math.max(0, counts.registration - previousCounts.registration),
+        accommodation: Math.max(0, counts.accommodation - previousCounts.accommodation),
+        eligibility: Math.max(0, counts.eligibility - previousCounts.eligibility),
+        learnMore: Math.max(0, counts.learnMore - previousCounts.learnMore)
+      }
+      setNewLeadCounts(newCounts)
+      
+      // Store current counts for next comparison (only if this is not the first load)
+      if (localStorage.getItem('admin_previous_counts')) {
+        localStorage.setItem('admin_previous_counts', JSON.stringify({
+          registration: counts.registration,
+          accommodation: counts.accommodation,
+          eligibility: counts.eligibility,
+          learnMore: counts.learnMore
+        }))
+      } else {
+        // First time loading, set current counts as baseline
+        localStorage.setItem('admin_previous_counts', JSON.stringify({
+          registration: counts.registration,
+          accommodation: counts.accommodation,
+          eligibility: counts.eligibility,
+          learnMore: counts.learnMore
+        }))
+        // No new leads on first load
+        setNewLeadCounts({
+          registration: 0,
+          accommodation: 0,
+          eligibility: 0,
+          learnMore: 0
+        })
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load lead counts')
     } finally {
@@ -162,6 +217,17 @@ export default function AdminDashboard() {
     localStorage.removeItem('admin_token')
     localStorage.removeItem('admin_user')
     navigate('/admin/login', { replace: true })
+  }
+
+  const handleBoxClick = (leadType: keyof NewLeadCounts, route: string) => {
+    // Mark this lead type as viewed (reset new count for this type)
+    setNewLeadCounts(prev => ({
+      ...prev,
+      [leadType]: 0
+    }))
+    
+    // Navigate to the lead page
+    navigate(route)
   }
 
   if (loading) {
@@ -191,6 +257,25 @@ export default function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
+        {/* Welcome Message */}
+        <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-blue-600 font-bold text-lg">👋</span>
+              </div>
+            </div>
+            <div className="ml-4">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Welcome back, {user ? JSON.parse(user).name || 'Admin' : 'Admin'}!
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Here's an overview of your leads and system activity. Use the cards below to navigate to different sections.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {error && (
           <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
             {error}
@@ -199,38 +284,56 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <div 
-            onClick={() => navigate('/admin/registration-leads')}
-            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleBoxClick('registration', '/admin/registration-leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
           >
+            {newLeadCounts.registration > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                {newLeadCounts.registration}
+              </div>
+            )}
             <span className="text-lg font-semibold mb-2">Registration Leads</span>
             <span className="text-3xl font-bold text-blue-600">{leadCounts.registration}</span>
             <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
           <div 
-            onClick={() => navigate('/admin/accommodation-leads')}
-            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleBoxClick('accommodation', '/admin/accommodation-leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
           >
+            {newLeadCounts.accommodation > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                {newLeadCounts.accommodation}
+              </div>
+            )}
             <span className="text-lg font-semibold mb-2">Accommodation Inquiry Leads</span>
             <span className="text-3xl font-bold text-green-600">{leadCounts.accommodation}</span>
             <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
           <div 
-            onClick={() => navigate('/admin/eligibility-leads')}
-            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleBoxClick('eligibility', '/admin/eligibility-leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
           >
+            {newLeadCounts.eligibility > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                {newLeadCounts.eligibility}
+              </div>
+            )}
             <span className="text-lg font-semibold mb-2">Check Eligibility Inquiry Leads</span>
             <span className="text-3xl font-bold text-yellow-600">{leadCounts.eligibility}</span>
-            <span className="mt-2 text-sm text-blue-600 hover:underline">Click to view details →</span>
+            <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
-          <div className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow w-full">
+          <div 
+            onClick={() => handleBoxClick('learnMore', '/admin/leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
+          >
+            {newLeadCounts.learnMore > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                {newLeadCounts.learnMore}
+              </div>
+            )}
             <span className="text-lg font-semibold mb-2">Learn More Leads</span>
             <span className="text-3xl font-bold text-purple-600">{leadCounts.learnMore}</span>
-            <button 
-              onClick={() => navigate('/admin/leads')}
-              className="mt-3 text-blue-600 hover:underline text-sm"
-            >
-              View all leads →
-            </button>
+            <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
         </div>
       </main>

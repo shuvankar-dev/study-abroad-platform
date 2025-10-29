@@ -30,7 +30,7 @@ export default function AdminLogin() {
       if (!res.ok || !data?.success) throw new Error(data?.message || `HTTP ${res.status}`)
       localStorage.setItem('admin_token', data.token)
       localStorage.setItem('admin_user', JSON.stringify(data.user))
-      navigate('/admin/leads', { replace: true })
+      navigate('/admin', { replace: true })
     } catch (err: any) {
       setError(err.message || 'Login failed')
     } finally {
@@ -76,10 +76,6 @@ export default function AdminLogin() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-
-        <div className="text-sm text-gray-600 mt-4">
-          New admin? <Link to="/admin/register" className="text-blue-600 hover:underline">Create an account</Link>
-        </div>
       </div>
     </div>
   )
