@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 
 // Import profile images
 import arjunImage from '../assets/SuccessStories/Arjun Sharma.png';

@@ -12,7 +12,7 @@ const Footer = () => {
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
                 {/* translucent rounded background for logo to increase contrast */}
-                <div className="rounded-md p-2 mr-3 bg-white/80 shadow-lg ring-1 ring-white/20 flex items-center justify-center" style={{ minWidth: 56, minHeight: 56 }}>
+                <div className="rounded-md p-6 mr-3 bg-white/80 shadow-lg ring-1 ring-white/20 flex items-center justify-center" style={{ minWidth: 72, minHeight: 72, width: 'auto' }}>
                   <img src={logo} alt="Codescholar Overseas" className="h-14 w-auto max-w-[120px] object-contain" style={{ display: 'block' }} />
                 </div>
                 <div>
@@ -92,6 +92,17 @@ const Footer = () => {
               </ul>
             </div>
 
+            {/* Legal Pages */}
+            <div className="md:pl-6">
+              <h4 className="font-semibold text-white mb-3">Legal Pages</h4>
+              <ul className="space-y-2 text-sm text-white/90">
+                <li><Link to="/terms-conditions" className="hover:underline">Terms & Conditions</Link></li>
+                <li><Link to="/privacy-policy" className="hover:underline">Privacy Policy</Link></li>
+                <li><Link to="/refund-policy" className="hover:underline">Refund Policy</Link></li>
+                <li><Link to="/data-protection" className="hover:underline">Data Protection</Link></li>
+              </ul>
+            </div>
+
             {/* Resources */}
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Resources</h4>
@@ -108,11 +119,9 @@ const Footer = () => {
         <div className="px-6 py-6 mt-6 flex flex-col md:flex-row items-center justify-between text-sm">
           <div className="text-white/90">
             &copy; {new Date().getFullYear()} Codescholar Overseas. All rights reserved.
-            <span className="inline-block text-sm text-white/80 ml-3">Developed by <a href="https://algorithmssolutions.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">algorithmssolutions.com</a></span>
           </div>
           <div className="flex items-center gap-6 mt-3 md:mt-0">
-            <Link to="/privacy-policy" className="text-white/90 hover:underline">Privacy Policy</Link>
-            <Link to="/legal" className="text-white/90 hover:underline">Legal</Link>
+            <span className="text-white/80">Developed by <a href="https://algorithmssolutions.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">algorithmssolutions.com</a></span>
           </div>
         </div>
       </div>

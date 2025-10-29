@@ -8,6 +8,9 @@ import About from './pages/About'
 import Explore from './pages/Explore'
 import Services from './pages/Services'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsConditions from './pages/TermsConditions'
+import RefundPolicy from './pages/RefundPolicy'
+import DataProtection from './pages/DataProtection'
 import Legal from './pages/Legal'
 import AdminLogin from './admin/AdminLogin'
 import AdminRegister from './admin/AdminRegister'
@@ -39,6 +42,9 @@ export default function App() {
           <Route path="/explore" element={<Explore />} />
           <Route path="/search-results" element={<SearchResults />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-conditions" element={<TermsConditions />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/data-protection" element={<DataProtection />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/register" element={<AdminRegister />} />
