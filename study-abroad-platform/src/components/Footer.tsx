@@ -57,15 +57,18 @@ const Footer = () => {
             </div>
 
             {/* Study Destinations (only countries present on site) */}
-            <div className="md:pl-6">
+            <div className="md:pl-6 md:border-l md:border-white/6">
               <h4 className="font-semibold text-white mb-3">Study Destinations</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><a href="#" className="hover:underline">United States</a></li>
-                <li><a href="#" className="hover:underline">United Kingdom</a></li>
-                <li><a href="#" className="hover:underline">Canada</a></li>
-                <li><a href="#" className="hover:underline">Australia</a></li>
-                <li><a href="#" className="hover:underline">Germany</a></li>
-                  {/* <li><a href="#" className="hover:underline">Ireland</a></li> */}
+                <li><Link to="/search-results?country=United States" className="hover:underline">United States</Link></li>
+                <li><Link to="/search-results?country=United Kingdom" className="hover:underline">United Kingdom</Link></li>
+                <li><Link to="/search-results?country=Canada" className="hover:underline">Canada</Link></li>
+                <li><Link to="/search-results?country=Australia" className="hover:underline">Australia</Link></li>
+                <li><Link to="/search-results?country=Germany" className="hover:underline">Germany</Link></li>
+                <li><Link to="/search-results?country=Ireland" className="hover:underline">Ireland</Link></li>
+                <li><Link to="/search-results?country=France" className="hover:underline">France</Link></li>
+                <li><Link to="/search-results?country=Netherlands" className="hover:underline">Netherlands</Link></li>
+                <li><Link to="/search-results?country=New Zealand" className="hover:underline">New Zealand</Link></li>
               </ul>
             </div>
 

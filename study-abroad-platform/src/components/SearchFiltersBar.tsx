@@ -26,11 +26,15 @@ const SearchFiltersBar: React.FC<SearchFiltersBarProps> = ({
 
   const countries = [
     { value: '', label: 'All Countries' },
-    { value: 'United States', label: 'United States' },
-    { value: 'United Kingdom', label: 'United Kingdom' },
-    { value: 'Canada', label: 'Canada' },
     { value: 'Australia', label: 'Australia' },
-    { value: 'Germany', label: 'Germany' }
+    { value: 'Canada', label: 'Canada' },
+    { value: 'France', label: 'France' },
+    { value: 'Germany', label: 'Germany' },
+    { value: 'Ireland', label: 'Ireland' },
+    { value: 'Netherlands', label: 'Netherlands' },
+    { value: 'New Zealand', label: 'New Zealand' },
+    { value: 'United Kingdom', label: 'United Kingdom' },
+    { value: 'United States', label: 'United States' }
   ]
 
   const courseLevels = [
