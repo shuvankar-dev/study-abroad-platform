@@ -1,6 +1,13 @@
 
 import { useState, useEffect } from 'react';
 
+// Import profile images
+import arjunImage from '../assets/SuccessStories/Arjun Sharma.png';
+import priyaImage from '../assets/SuccessStories/Priya Patel.png';
+import rahulImage from '../assets/SuccessStories/Rahul Verma.png';
+import snehaImage from '../assets/SuccessStories/Sneha Das.png';
+import vikashImage from '../assets/SuccessStories/Vikash Kumar.png';
+
 const testimonials = [
   {
     id: 1,
@@ -8,7 +15,7 @@ const testimonials = [
     degree: 'Masters in Germany',
     text: 'Codescholar Overseas made my study abroad dream come true. The team was supportive at every step!',
     rating: 4.5,
-    avatar: 'https://ui-avatars.com/api/?name=Arjun+Sharma&background=4F46E5&color=fff'
+    avatar: arjunImage
   },
   {
     id: 2,
@@ -16,7 +23,7 @@ const testimonials = [
     degree: 'Bachelors in Canada',
     text: 'The guidance for my visa and accommodation was excellent. Highly recommend their services!',
     rating: 4.0,
-    avatar: 'https://ui-avatars.com/api/?name=Priya+Patel&background=059669&color=fff'
+    avatar: priyaImage
   },
   {
     id: 3,
@@ -24,7 +31,7 @@ const testimonials = [
     degree: 'MBA in UK',
     text: 'Thanks to Codescholar Overseas, I got admission to my dream university. The process was smooth and stress-free.',
     rating: 4.5,
-    avatar: 'https://ui-avatars.com/api/?name=Rahul+Verma&background=DC2626&color=fff'
+    avatar: rahulImage
   },
   {
     id: 4,
@@ -32,7 +39,7 @@ const testimonials = [
     degree: 'Masters in Data Science',
     text: 'Professional guidance and excellent support throughout my journey. Very satisfied with their service.',
     rating: 3.5,
-    avatar: 'https://ui-avatars.com/api/?name=Sneha+Das&background=7C3AED&color=fff'
+    avatar: snehaImage
   },
   {
     id: 5,
@@ -40,7 +47,7 @@ const testimonials = [
     degree: 'Engineering in Australia',
     text: 'From application to visa approval, everything was handled perfectly. Great team and amazing results!',
     rating: 4.0,
-    avatar: 'https://ui-avatars.com/api/?name=Vikash+Kumar&background=EA580C&color=fff'
+    avatar: vikashImage
   }
 ];
 
@@ -98,7 +105,7 @@ export default function SuccessStories() {
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background with colorful gradient */}
-      <div className="absolute inset-0 bg-gradient-to-r from-green-100 via-blue-100 via-purple-100 to-pink-100 opacity-60"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-green-100 via-indigo-100 via-purple-100 to-pink-100 opacity-60"></div>
       
       <div className="relative max-w-7xl mx-auto px-4">
         {/* Header */}
