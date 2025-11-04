@@ -19,6 +19,7 @@ import AdminEligibilityLeads from './admin/AdminEligibilityLeads'
 import AdminRegistrationLeads from './admin/AdminRegistrationLeads'
 import AdminAccommodationLeads from './admin/AdminAccommodationLeads'
 import AdminAuthors from './admin/AdminAuthors'
+import AdminBlog from './admin/AdminBlog'
 import BlogPage from './pages/BlogPage'
 
 function AdminRoute({ children }: { children: ReactNode }) {
@@ -86,6 +87,14 @@ export default function App() {
             element={
               <AdminRoute>
                 <AdminAuthors />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/blog"
+            element={
+              <AdminRoute>
+                <AdminBlog />
               </AdminRoute>
             }
           />

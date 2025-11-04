@@ -27,6 +27,7 @@ type LeadCounts = {
   eligibility: number
   learnMore: number
   authors: number
+  blog: number
   total: number
 }
 
@@ -45,6 +46,7 @@ export default function AdminDashboard() {
     eligibility: 0,
     learnMore: 0,
     authors: 0,
+    blog: 0,
     total: 0
   })
   const [newLeadCounts, setNewLeadCounts] = useState<NewLeadCounts>({
@@ -84,6 +86,7 @@ export default function AdminDashboard() {
         eligibility: 0,
         learnMore: 0,
         authors: 0,
+        blog: 0,
         total: 0
       }
 
@@ -188,6 +191,22 @@ export default function AdminDashboard() {
         }
       } catch (authorsError) {
         console.warn('Failed to fetch authors count:', authorsError)
+      }
+
+      // Fetch blog count
+      try {
+        const blogUrl = `${API_BASE}/api/blog/count.php`
+        const blogRes = await fetch(blogUrl)
+        if (blogRes.ok) {
+          const blogData = await blogRes.json()
+          if (blogData?.success) {
+            counts.blog = blogData.count || 0
+          }
+        } else {
+          console.warn('Blog API not available')
+        }
+      } catch (blogError) {
+        console.warn('Failed to fetch blog count:', blogError)
       }
 
       setLeadCounts(counts)
@@ -301,7 +320,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-6">
           <div 
             onClick={() => handleBoxClick('registration', '/admin/registration-leads')}
             className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
@@ -361,6 +380,14 @@ export default function AdminDashboard() {
             <span className="text-lg font-semibold mb-2">Authors</span>
             <span className="text-3xl font-bold text-indigo-600">{leadCounts.authors}</span>
             <span className="text-xs text-gray-500 mt-1">Click to manage authors</span>
+          </div>
+          <div 
+            onClick={() => navigate('/admin/blog')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+          >
+            <span className="text-lg font-semibold mb-2">Blog</span>
+            <span className="text-3xl font-bold text-indigo-600">{leadCounts.blog}</span>
+            <span className="text-xs text-gray-500 mt-1">Click to manage blog posts</span>
           </div>
         </div>
       </main>
