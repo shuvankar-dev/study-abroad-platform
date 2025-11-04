@@ -26,6 +26,7 @@ type LeadCounts = {
   accommodation: number
   eligibility: number
   learnMore: number
+  authors: number
   total: number
 }
 
@@ -43,6 +44,7 @@ export default function AdminDashboard() {
     accommodation: 0,
     eligibility: 0,
     learnMore: 0,
+    authors: 0,
     total: 0
   })
   const [newLeadCounts, setNewLeadCounts] = useState<NewLeadCounts>({
@@ -81,6 +83,7 @@ export default function AdminDashboard() {
         accommodation: 0,
         eligibility: 0,
         learnMore: 0,
+        authors: 0,
         total: 0
       }
 
@@ -169,6 +172,22 @@ export default function AdminDashboard() {
         }
       } catch (leadsError) {
         console.error('Failed to fetch leads count:', leadsError)
+      }
+
+      // Fetch authors count
+      try {
+        const authorsUrl = `${API_BASE}/api/authors/count.php`
+        const authorsRes = await fetch(authorsUrl)
+        if (authorsRes.ok) {
+          const authorsData = await authorsRes.json()
+          if (authorsData?.success) {
+            counts.authors = authorsData.count || 0
+          }
+        } else {
+          console.warn('Authors API not available')
+        }
+      } catch (authorsError) {
+        console.warn('Failed to fetch authors count:', authorsError)
       }
 
       setLeadCounts(counts)
@@ -282,7 +301,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
           <div 
             onClick={() => handleBoxClick('registration', '/admin/registration-leads')}
             className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
@@ -334,6 +353,14 @@ export default function AdminDashboard() {
             <span className="text-lg font-semibold mb-2">Learn More Leads</span>
             <span className="text-3xl font-bold text-purple-600">{leadCounts.learnMore}</span>
             <span className="text-xs text-gray-500 mt-1">Click to view details</span>
+          </div>
+          <div 
+            onClick={() => navigate('/admin/authors')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+          >
+            <span className="text-lg font-semibold mb-2">Authors</span>
+            <span className="text-3xl font-bold text-indigo-600">{leadCounts.authors}</span>
+            <span className="text-xs text-gray-500 mt-1">Click to manage authors</span>
           </div>
         </div>
       </main>

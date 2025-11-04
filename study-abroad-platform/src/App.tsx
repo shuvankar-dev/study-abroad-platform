@@ -18,6 +18,8 @@ import AdminDashboard from './admin/AdminDashboard'
 import AdminEligibilityLeads from './admin/AdminEligibilityLeads'
 import AdminRegistrationLeads from './admin/AdminRegistrationLeads'
 import AdminAccommodationLeads from './admin/AdminAccommodationLeads'
+import AdminAuthors from './admin/AdminAuthors'
+import BlogPage from './pages/BlogPage'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -79,6 +81,15 @@ export default function App() {
               </AdminRoute>
             }
           />
+          <Route
+            path="/admin/authors"
+            element={
+              <AdminRoute>
+                <AdminAuthors />
+              </AdminRoute>
+            }
+          />
+          <Route path="/blog" element={<BlogPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

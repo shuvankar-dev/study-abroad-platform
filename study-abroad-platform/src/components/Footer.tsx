@@ -1,4 +1,3 @@
-
 import logo from '../assets/logo.png'
 import { Link } from 'react-router-dom'
 
@@ -110,7 +109,7 @@ const Footer = () => {
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Resources</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><a href="#" className="hover:underline">Blog</a></li>
+                <li><Link to="/blog" className="hover:underline">Blog</Link></li>
                 <li><a href="#" className="hover:underline">ApplyInsights</a></li>
               </ul>
             </div>
