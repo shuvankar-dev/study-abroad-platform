@@ -176,6 +176,13 @@ export default function AdminAuthors() {
     setIsModalOpen(true)
   }
 
+  const getImageUrl = (imagePath?: string): string => {
+    if (!imagePath) return '';
+    return imagePath.startsWith('http') 
+      ? imagePath 
+      : `${API_BASE}/${imagePath}`;
+  };
+
   const logout = () => {
     localStorage.removeItem('admin_token')
     localStorage.removeItem('admin_user')
@@ -258,10 +265,7 @@ export default function AdminAuthors() {
                     <div className="flex items-center gap-3">
                       {author.profile_picture ? (
                         <img
-                          src={author.profile_picture.startsWith('http') 
-                            ? author.profile_picture 
-                            : `http://localhost/studyabroadplatform-api/${author.profile_picture}`
-                          }
+                          src={getImageUrl(author.profile_picture)}
                           alt={author.name}
                           className="w-12 h-12 rounded-full object-cover"
                           onError={(e) => {
@@ -270,7 +274,8 @@ export default function AdminAuthors() {
                             if (next) next.style.display = 'flex';
                           }}
                         />
-                      ) : (
+                      ) : null}
+                      {(!author.profile_picture || author.profile_picture === '') && (
                         <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
                           <User className="h-6 w-6 text-gray-500" />
                         </div>
