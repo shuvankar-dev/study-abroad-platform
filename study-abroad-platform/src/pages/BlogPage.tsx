@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Calendar, User, Clock, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -27,7 +28,6 @@ const BlogPage = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null);
 
   const API_BASE = window.location.hostname === 'localhost'
@@ -86,19 +86,7 @@ const BlogPage = () => {
     });
   };
 
-  // Ensure modal content starts at top when opened
-  useEffect(() => {
-    if (selectedBlog) {
-      // Scroll window to top so modal is visible
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-      // Also reset modal inner scroll after render
-      setTimeout(() => {
-        const el = document.querySelector('.full-blog-modal');
-        if (el) el.scrollTop = 0;
-      }, 50);
-    }
-  }, [selectedBlog]);
-
+  // Author modal scroll behavior
   useEffect(() => {
     if (selectedAuthor) {
       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
@@ -109,9 +97,9 @@ const BlogPage = () => {
     }
   }, [selectedAuthor]);
 
-  // Disable background scroll while any modal is open
+  // Disable background scroll only for author modal
   useEffect(() => {
-    const modalOpen = !!selectedBlog || !!selectedAuthor;
+    const modalOpen = !!selectedAuthor;
     const prev = document.body.style.overflow;
     if (modalOpen) {
       document.body.style.overflow = 'hidden';
@@ -119,7 +107,12 @@ const BlogPage = () => {
       document.body.style.overflow = prev || '';
     }
     return () => { document.body.style.overflow = prev || ''; };
-  }, [selectedBlog, selectedAuthor]);
+  }, [selectedAuthor]);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (loading) {
     return (
@@ -227,12 +220,12 @@ const BlogPage = () => {
                     <span>By {blog.author}</span>
                   </button>
                   
-                  <button
-                    onClick={() => setSelectedBlog(blog)}
+                  <Link
+                    to={`/blog/${blog.id}`}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     Read Full Blog
-                  </button>
+                  </Link>
                 </div>
               </div>
             </article>
@@ -249,88 +242,10 @@ const BlogPage = () => {
         )}
       </div>
 
-      {/* Full Blog Modal */}
-      {selectedBlog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-2xl font-bold text-gray-900 pr-8">
-                {selectedBlog.title}
-              </h3>
-              <button
-                onClick={() => setSelectedBlog(null)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            {/* Modal Content */}
-            <div className="overflow-y-auto max-h-[calc(90vh-200px)] full-blog-modal">
-              {/* Blog Image */}
-              <div className="relative h-64 md:h-80">
-                <img
-                  src={getImageUrl(selectedBlog.image_url)}
-                  alt={selectedBlog.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/src/assets/blog image/default.png';
-                  }}
-                />
-              </div>
-
-              {/* Blog Content */}
-              <div className="p-6">
-                {/* Meta Info */}
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{formatDate(selectedBlog.created_at)}</span>
-                  </div>
-                  <button
-                    onClick={() => fetchAuthorDetails(selectedBlog.author)}
-                    className="flex items-center gap-1 hover:text-blue-600 transition-colors"
-                  >
-                    <User className="h-4 w-4" />
-                    <span>By {selectedBlog.author}</span>
-                  </button>
-                </div>
-
-                {/* H1 Section */}
-                {selectedBlog.h1_section && (
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                      {selectedBlog.h1_section}
-                    </h2>
-                  </div>
-                )}
-
-                {/* H2 Section */}
-                {selectedBlog.h2_section && (
-                  <div className="mb-6">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                      {selectedBlog.h2_section}
-                    </h3>
-                  </div>
-                )}
-
-                {/* Full Content */}
-                <div className="prose prose-lg max-w-none">
-                  <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {selectedBlog.content}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Author Profile Modal */}
+      {/* Author Profile Modal Only */}
       {selectedAuthor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden author-modal">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden author-modal">
             {/* Header with gradient */}
             <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 pt-8 pb-6 px-6">
               <div className="flex items-center justify-between">
@@ -390,9 +305,15 @@ const BlogPage = () => {
                   <div className="text-xs text-gray-500">Latest Posts</div>
                   <div className="mt-2 space-y-2">
                     {blogs.filter(b => b.author === selectedAuthor.name).slice(0,4).map(b => (
-                      <button key={b.id} onClick={() => { setSelectedAuthor(null); setSelectedBlog(b); }} className="text-left w-full hover:text-blue-600 text-sm text-gray-700">
+                      // Updated: Navigate to blog detail page instead of setting selectedBlog
+                      <Link 
+                        key={b.id} 
+                        to={`/blog/${b.id}`} 
+                        onClick={() => setSelectedAuthor(null)} 
+                        className="text-left w-full block hover:text-blue-600 text-sm text-gray-700"
+                      >
                         • {b.title}
-                      </button>
+                      </Link>
                     ))}
                     {blogs.filter(b => b.author === selectedAuthor.name).length === 0 && (
                       <div className="text-sm text-gray-400">No posts yet</div>

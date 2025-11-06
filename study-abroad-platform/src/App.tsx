@@ -21,6 +21,7 @@ import AdminAccommodationLeads from './admin/AdminAccommodationLeads'
 import AdminAuthors from './admin/AdminAuthors'
 import AdminBlog from './admin/AdminBlog'
 import BlogPage from './pages/BlogPage'
+import BlogDetail from './pages/BlogDetail'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -99,6 +100,7 @@ export default function App() {
             }
           />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
