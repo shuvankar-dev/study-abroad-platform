@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Edit, Trash2, Calendar, User, FileText, Search, Filter } from 'lucide-react';
+import ReactQuill from 'react-quill-new';  // Changed from 'react-quill'
+import 'react-quill-new/dist/quill.snow.css';  // Changed from 'react-quill/dist/quill.snow.css'
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
@@ -49,6 +51,35 @@ export default function AdminBlog() {
     featured_image: '',
     status: 'draft' as 'draft' | 'published'
   });
+
+  // Quill editor configuration
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'align': [] }],
+      ['blockquote', 'code-block'],
+      ['link', 'image', 'video'],
+      ['clean']
+    ]
+  };
+
+  const quillFormats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'script',
+    'list', 'bullet', 'indent',
+    'align',
+    'blockquote', 'code-block',
+    'link', 'image', 'video'
+  ];
 
   useEffect(() => {
     fetchPosts();
@@ -109,7 +140,6 @@ export default function AdminBlog() {
       let response;
 
       if (uploadType === 'file' && selectedFile) {
-        // Handle file upload
         const formDataToSend = new FormData();
         formDataToSend.append('title', formData.title);
         formDataToSend.append('h1_section', formData.h1_section);
@@ -128,7 +158,6 @@ export default function AdminBlog() {
           body: formDataToSend
         });
       } else {
-        // Handle URL or no image
         const payload = editingPost 
           ? { ...formData, id: editingPost.id, author_id: parseInt(formData.author_id) }
           : { ...formData, author_id: parseInt(formData.author_id) };
@@ -390,7 +419,9 @@ export default function AdminBlog() {
                     <p className="text-sm text-gray-600 mb-2 line-clamp-2">{post.h1_section}</p>
                   )}
                   
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-3">{post.content.substring(0, 100)}...</p>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                    {post.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                  </p>
                   
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Calendar className="h-3 w-3" />
@@ -406,14 +437,14 @@ export default function AdminBlog() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
               <h3 className="text-lg font-semibold">
                 {editingPost ? 'Edit Blog Post' : 'Add New Blog Post'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 text-2xl"
               >
                 ×
               </button>
@@ -489,7 +520,6 @@ export default function AdminBlog() {
                       Featured Image
                     </label>
                     
-                    {/* Toggle between URL and File Upload */}
                     <div className="flex gap-2 mb-3">
                       <button
                         type="button"
@@ -563,21 +593,29 @@ export default function AdminBlog() {
                 </div>
               </div>
               
+              {/* Rich Text Editor for Content */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Content *
+                  Content * <span className="text-xs text-gray-500">(Use toolbar for formatting)</span>
                 </label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={8}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Write your blog post content here..."
-                  required
-                />
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.content}
+                    onChange={(content) => setFormData({ ...formData, content })}
+                    modules={quillModules}
+                    formats={quillFormats}
+                    placeholder="Write your blog post content here... Use the toolbar above to format text."
+                    className="bg-white"
+                    style={{ height: '400px' }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Tip: You can add headings, lists, links, images, and format text using the toolbar above.
+                </p>
               </div>
               
-              <div className="flex items-center gap-3 pt-4 border-t">
+              <div className="flex items-center gap-3 pt-4 border-t mt-16">
                 <button
                   type="submit"
                   disabled={loading}

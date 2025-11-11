@@ -12,6 +12,8 @@ import TermsConditions from './pages/TermsConditions'
 import RefundPolicy from './pages/RefundPolicy'
 import DataProtection from './pages/DataProtection'
 import Legal from './pages/Legal'
+import ConsultantsPage from './pages/ConsultantsPage'
+import CityLandingPage from './pages/CityLandingPage'
 import AdminLogin from './admin/AdminLogin'
 import AdminLeads from './admin/AdminLeads'
 import AdminDashboard from './admin/AdminDashboard'
@@ -22,6 +24,7 @@ import AdminAuthors from './admin/AdminAuthors'
 import AdminBlog from './admin/AdminBlog'
 import BlogPage from './pages/BlogPage'
 import BlogDetail from './pages/BlogDetail'
+import AuthorDetail from './pages/AuthorDetail';
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -49,6 +52,8 @@ export default function App() {
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/data-protection" element={<DataProtection />} />
           <Route path="/legal" element={<Legal />} />
+          <Route path="/consultants" element={<ConsultantsPage />} />
+          <Route path="/consultants/:citySlug" element={<CityLandingPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route
@@ -100,7 +105,8 @@ export default function App() {
             }
           />
           <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} /> 
+          <Route path="/author/:name" element={<AuthorDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

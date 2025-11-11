@@ -109,6 +109,9 @@ const Navbar = () => {
             <button onClick={() => navigate('/about')} className="text-gray-700 hover:text-gray-900 px-3 py-2 text-base lg:text-lg font-medium transition-colors">
               About
             </button>
+            <button onClick={() => navigate('/consultants')} className="text-gray-700 hover:text-gray-900 px-3 py-2 text-base lg:text-lg font-medium transition-colors">
+              Consultants
+            </button>
           </div>
 
           {/* Desktop CTA */}
@@ -147,6 +150,9 @@ const Navbar = () => {
               </Link>
               <Link to="/explore" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>
                 Explore
+              </Link>
+              <Link to="/consultants" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>
+                Consultants
               </Link>
               <div>
                 <button onClick={() => setMobileDestOpen((s) => !s)} className="w-full text-left text-gray-700 hover:text-gray-900 px-3 py-2 text-base font-medium flex items-center justify-between">

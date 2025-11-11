@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Calendar, User, Clock, X } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -15,20 +15,10 @@ interface Blog {
   created_at: string;
 }
 
-interface Author {
-  id: number;
-  name: string;
-  email: string;
-  bio: string;
-  profile_picture?: string;
-  created_at: string;
-}
-
 const BlogPage = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null);
 
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost/studyabroadplatform-api'
@@ -55,22 +45,6 @@ const BlogPage = () => {
     fetchBlogs();
   }, []);
 
-  const fetchAuthorDetails = async (authorName: string) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/authors/list.php`);
-      const data = await response.json();
-      
-      if (data.success) {
-        const author = data.data.find((a: Author) => a.name === authorName);
-        if (author) {
-          setSelectedAuthor(author);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch author details:', err);
-    }
-  };
-
   const getImageUrl = (imagePath?: string): string => {
     if (!imagePath) return '/src/assets/blog image/default.png';
     return imagePath.startsWith('http') 
@@ -78,38 +52,20 @@ const BlogPage = () => {
       : `${API_BASE}/${imagePath}`;
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  // Create URL-friendly slug from title
+  const createSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   };
 
-  // Author modal scroll behavior
-  useEffect(() => {
-    if (selectedAuthor) {
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-      setTimeout(() => {
-        const el = document.querySelector('.author-modal');
-        if (el) el.scrollTop = 0;
-      }, 50);
-    }
-  }, [selectedAuthor]);
+  // Generate blog URL with slug
+  const getBlogUrl = (blog: Blog): string => {
+    const slug = createSlug(blog.title);
+    return `/blog/${slug}`;
+  };
 
-  // Disable background scroll only for author modal
-  useEffect(() => {
-    const modalOpen = !!selectedAuthor;
-    const prev = document.body.style.overflow;
-    if (modalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = prev || '';
-    }
-    return () => { document.body.style.overflow = prev || ''; };
-  }, [selectedAuthor]);
-
-  // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -165,7 +121,7 @@ const BlogPage = () => {
           {blogs.map((blog) => (
             <article key={blog.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
               {/* Blog Image */}
-              <div className="relative h-48 overflow-hidden">
+              <Link to={getBlogUrl(blog)} className="block relative h-48 overflow-hidden">
                 <img
                   src={getImageUrl(blog.image_url)}
                   alt={blog.title}
@@ -175,32 +131,30 @@ const BlogPage = () => {
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-              </div>
+              </Link>
 
               {/* Blog Content */}
               <div className="p-6">
-                {/* Meta Information */}
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{formatDate(blog.created_at)}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>5 min read</span>
-                  </div>
+                {/* Meta Information - Only Read Time */}
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                  <Clock className="h-4 w-4" />
+                  <span>5 min read</span>
                 </div>
 
-                {/* Title */}
-                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                  {blog.title}
-                </h2>
+                {/* Title - Clickable */}
+                <Link to={getBlogUrl(blog)}>
+                  <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors cursor-pointer">
+                    {blog.title}
+                  </h2>
+                </Link>
 
-                {/* H1 Section */}
+                {/* H1 Section - Clickable */}
                 {blog.h1_section && (
-                  <p className="text-gray-700 mb-2 line-clamp-2 text-sm">
-                    {blog.h1_section}
-                  </p>
+                  <Link to={getBlogUrl(blog)}>
+                    <p className="text-gray-700 mb-2 line-clamp-2 text-sm hover:text-gray-900 cursor-pointer transition-colors">
+                      {blog.h1_section}
+                    </p>
+                  </Link>
                 )}
 
                 {/* H2 Section */}
@@ -210,19 +164,11 @@ const BlogPage = () => {
                   </p>
                 )}
 
-                {/* Author and Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <button
-                    onClick={() => fetchAuthorDetails(blog.author)}
-                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                  >
-                    <User className="h-4 w-4" />
-                    <span>By {blog.author}</span>
-                  </button>
-                  
+                {/* Action Button - UPDATED: Full width button, author removed */}
+                <div className="pt-4 border-t border-gray-100">
                   <Link
-                    to={`/blog/${blog.id}`}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    to={getBlogUrl(blog)}
+                    className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     Read Full Blog
                   </Link>
@@ -241,95 +187,6 @@ const BlogPage = () => {
           </div>
         )}
       </div>
-
-      {/* Author Profile Modal Only */}
-      {selectedAuthor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden author-modal">
-            {/* Header with gradient */}
-            <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 pt-8 pb-6 px-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div>
-                    <div className="w-28 h-28 rounded-full ring-4 ring-white overflow-hidden bg-white shadow-lg">
-                      {selectedAuthor.profile_picture ? (
-                        <img src={getImageUrl(selectedAuthor.profile_picture)} alt={selectedAuthor.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-blue-700 bg-gradient-to-br from-white/20 to-white/10">
-                          {selectedAuthor.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-white">
-                    <h3 className="text-2xl font-bold">{selectedAuthor.name}</h3>
-                    <p className="text-sm opacity-90 mt-1">Author • Study Abroad Expert</p>
-                    <div className="text-xs opacity-80 mt-2">Member since {formatDate(selectedAuthor.created_at)}</div>
-                  </div>
-                </div>
-                <div>
-                  <button onClick={() => setSelectedAuthor(null)} className="text-white/90 hover:text-white">
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Left: Bio + Contact */}
-              <div className="md:col-span-2">
-                <h4 className="text-lg font-semibold text-gray-800 mb-2">About {selectedAuthor.name}</h4>
-                <div className="prose max-w-none text-gray-700 mb-4">
-                  {selectedAuthor.bio ? selectedAuthor.bio : <span className="text-gray-400">No bio available.</span>}
-                </div>
-
-                <div className="flex items-center gap-3 mt-4">
-                  <button
-                    onClick={() => navigator.clipboard?.writeText(selectedAuthor.email)}
-                    className="inline-flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50 shadow"
-                  >
-                    Copy Email
-                  </button>
-                </div>
-              </div>
-
-              {/* Right: Quick stats & recent posts */}
-              <aside className="bg-gray-50 p-4 rounded-lg">
-                <div className="mb-4">
-                  <div className="text-xs text-gray-500">Contact</div>
-                  <div className="font-medium text-gray-800 break-words">{selectedAuthor.email}</div>
-                </div>
-
-                <div className="mb-4">
-                  <div className="text-xs text-gray-500">Latest Posts</div>
-                  <div className="mt-2 space-y-2">
-                    {blogs.filter(b => b.author === selectedAuthor.name).slice(0,4).map(b => (
-                      // Updated: Navigate to blog detail page instead of setting selectedBlog
-                      <Link 
-                        key={b.id} 
-                        to={`/blog/${b.id}`} 
-                        onClick={() => setSelectedAuthor(null)} 
-                        className="text-left w-full block hover:text-blue-600 text-sm text-gray-700"
-                      >
-                        • {b.title}
-                      </Link>
-                    ))}
-                    {blogs.filter(b => b.author === selectedAuthor.name).length === 0 && (
-                      <div className="text-sm text-gray-400">No posts yet</div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-500">Profile</div>
-                  <div className="mt-2 text-sm text-gray-700">Expert in student mobility, university admissions and visa guidance.</div>
-                </div>
-              </aside>
-            </div>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </div>
