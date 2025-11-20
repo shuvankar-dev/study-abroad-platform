@@ -25,6 +25,7 @@ import AdminBlog from './admin/AdminBlog'
 import BlogPage from './pages/BlogPage'
 import BlogDetail from './pages/BlogDetail'
 import AuthorDetail from './pages/AuthorDetail';
+import StudentRoadmap from './pages/StudentRoadmap'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -108,6 +109,8 @@ export default function App() {
           <Route path="/blog/:slug" element={<BlogDetail />} /> 
           <Route path="/author/:name" element={<AuthorDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/student-roadmap" element={<StudentRoadmap />} />
+
         </Routes>
       </div>
     </GoogleOAuthProvider>

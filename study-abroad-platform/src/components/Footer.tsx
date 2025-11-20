@@ -1,7 +1,7 @@
 import logo from '../assets/logo.png'
 import { Link } from 'react-router-dom'
 
-const Footer = () => {
+const Footer: React.FC = () => {
   return (
     <footer className="bg-gradient-to-r from-primary to-accent text-white py-12 mt-16">
       <div className="container mx-auto px-6">
@@ -10,7 +10,6 @@ const Footer = () => {
             {/* Contact & logo */}
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
-                {/* translucent rounded background for logo to increase contrast */}
                 <div className="rounded-md p-8 mr-3 bg-white/80 shadow-lg ring-1 ring-white/20 flex items-center justify-center" style={{ minWidth: 72, minHeight: 72, width: 'auto' }}>
                   <img src={logo} alt="Codescholar Overseas" className="h-14 w-auto max-w-[120px] object-contain" style={{ display: 'block' }} />
                 </div>
@@ -28,7 +27,6 @@ const Footer = () => {
                 <a href="https://www.facebook.com/profile.php?id=61580675820793&sk=about" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-white/90 hover:text-white transition">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-facebook-icon lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                 </a>
-                {/* Twitter removed per request */}
                 <a href="https://www.linkedin.com/company/codescholaroverseas/?viewAsMember=true" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white/90 hover:text-white transition">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
                 </a>
@@ -38,7 +36,7 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Test Prep (new) */}
+            {/* Test Prep */}
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Test Prep</h4>
               <ul className="space-y-2 text-sm text-white/90">
@@ -55,7 +53,7 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Study Destinations (only countries present on site) */}
+            {/* Study Destinations */}
             <div className="md:pl-6 md:border-l md:border-white/6">
               <h4 className="font-semibold text-white mb-3">Study Destinations</h4>
               <ul className="space-y-2 text-sm text-white/90">
@@ -71,7 +69,7 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Student Services (new) */}
+            {/* Student Services */}
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Student Services</h4>
               <ul className="space-y-2 text-sm text-white/90">
@@ -91,6 +89,7 @@ const Footer = () => {
               <h4 className="font-semibold text-white mb-3">About</h4>
               <ul className="space-y-2 text-sm text-white/90">
                 <li><Link to="/services" className="hover:underline">Our Service</Link></li>
+                <li><Link to="/student-roadmap" className="hover:underline hover:text-yellow-300 transition-colors">Student Roadmap</Link></li>
               </ul>
             </div>
 
@@ -111,6 +110,13 @@ const Footer = () => {
               <ul className="space-y-2 text-sm text-white/90">
                 <li><Link to="/blog" className="hover:underline">Blog</Link></li>
                 <li><a href="#" className="hover:underline">ApplyInsights</a></li>
+              </ul>
+            </div>
+            <div className="md:pl-6">
+              <h4 className="font-semibold text-white mb-3">Our Product</h4>
+              <ul className="space-y-2 text-sm text-white/90">
+                <li><Link to="https://codescholarwriters.com/" className="hover:underline">Codescholar Writers</Link></li>
+                <li><a href="https://codescholaroverseas.com/" className="hover:underline">Codescholaroverseas</a></li>
               </ul>
             </div>
           </div>
