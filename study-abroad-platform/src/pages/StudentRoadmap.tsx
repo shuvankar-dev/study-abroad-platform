@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin, Award } from 'lucide-react';
-import React from 'react';
+import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin, Award, X } from 'lucide-react';
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -24,7 +24,31 @@ interface RoadmapStep {
   image: string;
 }
 
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  dreamCountry: string;
+  preferredIntake: string;
+  educationLevel: string;
+  currentCity: string;
+}
+
 const StudentRoadmap: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    phone: '',
+    dreamCountry: '',
+    preferredIntake: '',
+    educationLevel: '',
+    currentCity: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
   const roadmapSteps: RoadmapStep[] = [
     {
       step: 1,
@@ -109,6 +133,145 @@ const StudentRoadmap: React.FC = () => {
     "Zero Hidden Charges"
   ];
 
+  const countries = [
+    { name: 'USA', flag: '🇺🇸' },
+    { name: 'UK', flag: '🇬🇧' },
+    { name: 'Canada', flag: '🇨🇦' },
+    { name: 'Ireland', flag: '🇮🇪' },
+    { name: 'Australia', flag: '🇦🇺' },
+    { name: 'Germany', flag: '🇩🇪' },
+    { name: 'Dubai/UAE', flag: '🇦🇪' },
+    { name: 'Singapore', flag: '🇸🇬' },
+    { name: 'Other', flag: '🌍' }
+  ];
+
+  const intakes = ['Jan 2026', 'Sep 2026', '2027 Intake'];
+  const educationLevels = ['10th', '12th', "Bachelor's", "Master's", 'MBBS / MD', 'Diploma'];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (field: keyof FormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    setCurrentStep(1);
+    setSubmitSuccess(false);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentStep(1);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      dreamCountry: '',
+      preferredIntake: '',
+      educationLevel: '',
+      currentCity: ''
+    });
+    document.body.style.overflow = 'unset';
+  };
+
+  const nextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // API base URL detection for local vs production
+    const API_BASE = window.location.hostname === 'localhost'
+      ? 'http://localhost/studyabroadplatform-api/api'
+      : '/studyabroadplatform-api/api';
+
+    try {
+      const submitData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        dream_country: formData.dreamCountry,
+        preferred_intake: formData.preferredIntake,
+        education_level: formData.educationLevel,
+        current_city: formData.currentCity
+      };
+
+      console.log('Submitting journey form to:', `${API_BASE}/journey/submit.php`);
+      console.log('Form data:', submitData);
+
+      const response = await fetch(`${API_BASE}/journey/submit.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submitData),
+      });
+
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON:', responseText);
+        throw new Error('Invalid server response');
+      }
+
+      if (result.success) {
+        console.log('Journey form submitted successfully:', result);
+        setSubmitSuccess(true);
+        setTimeout(() => {
+          closeModal();
+        }, 3000);
+      } else {
+        console.error('Server returned error:', result.message);
+        alert(`Error: ${result.message || 'Unknown error occurred'}`);
+      }
+    } catch (error) {
+      console.error('Journey form submission error:', error);
+      alert(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.dreamCountry && formData.preferredIntake;
+      case 2:
+        return formData.educationLevel && formData.currentCity;
+      case 3:
+        return formData.name && formData.email && formData.phone;
+      default:
+        return false;
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -125,18 +288,12 @@ const StudentRoadmap: React.FC = () => {
                 From dream to destination - A step-by-step roadmap designed just for you
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link 
-                  to="/contact" 
+                <button 
+                  onClick={openModal}
                   className="bg-white text-primary px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
                 >
                   Start Your Journey
-                </Link>
-                <a 
-                  href="tel:+918777841275" 
-                  className="bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white/20 transition-all"
-                >
-                  Call Us Now
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -162,6 +319,14 @@ const StudentRoadmap: React.FC = () => {
                   <span className="text-gray-700 font-medium">{benefit}</span>
                 </div>
               ))}
+            </div>
+            <div className="text-center mt-12">
+              <button 
+                onClick={openModal}
+                className="bg-gradient-to-r from-primary to-accent text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+              >
+                Start Your Journey
+              </button>
             </div>
           </div>
         </section>
@@ -201,7 +366,6 @@ const StudentRoadmap: React.FC = () => {
                                     animation: `fadeInLeft 0.6s ease-out ${index * 0.1}s both` 
                                   }}
                                 >
-                                  {/* Branch Line to Center */}
                                   <div className="absolute top-1/2 -right-12 w-12 h-0.5 bg-gradient-to-r from-gray-300 to-primary"></div>
                                   
                                   <div className="flex items-start gap-4 mb-4">
@@ -221,7 +385,6 @@ const StudentRoadmap: React.FC = () => {
                                     {item.description}
                                   </p>
                                   
-                                  {/* Step Number Badge */}
                                   <div className={`absolute -top-4 -right-4 w-10 h-10 bg-gradient-to-br ${item.color} text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg`}>
                                     {item.step}
                                   </div>
@@ -241,16 +404,13 @@ const StudentRoadmap: React.FC = () => {
                                     alt={item.title}
                                     className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                                   />
-                                  {/* Overlay gradient */}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                   
-                                  {/* Center Circle Connector */}
                                   <div className="absolute -left-12 top-1/2 transform -translate-y-1/2">
                                     <div className={`w-6 h-6 bg-gradient-to-br ${item.color} rounded-full border-4 border-white shadow-lg relative z-10`}></div>
                                     <div className={`absolute inset-0 w-6 h-6 bg-gradient-to-br ${item.color} rounded-full animate-ping opacity-20`}></div>
                                   </div>
                                   
-                                  {/* Branch Line from Center to Image */}
                                   <div className="absolute -left-12 top-1/2 w-12 h-0.5 bg-gradient-to-l from-gray-300 to-primary"></div>
                                 </div>
                               </div>
@@ -270,16 +430,13 @@ const StudentRoadmap: React.FC = () => {
                                     alt={item.title}
                                     className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                                   />
-                                  {/* Overlay gradient */}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                   
-                                  {/* Center Circle Connector */}
                                   <div className="absolute -right-12 top-1/2 transform -translate-y-1/2">
                                     <div className={`w-6 h-6 bg-gradient-to-br ${item.color} rounded-full border-4 border-white shadow-lg relative z-10`}></div>
                                     <div className={`absolute inset-0 w-6 h-6 bg-gradient-to-br ${item.color} rounded-full animate-ping opacity-20`}></div>
                                   </div>
                                   
-                                  {/* Branch Line from Center to Image */}
                                   <div className="absolute -right-12 top-1/2 w-12 h-0.5 bg-gradient-to-r from-gray-300 to-primary"></div>
                                 </div>
                               </div>
@@ -292,7 +449,6 @@ const StudentRoadmap: React.FC = () => {
                                     animation: `fadeInRight 0.6s ease-out ${index * 0.1}s both` 
                                   }}
                                 >
-                                  {/* Branch Line to Center */}
                                   <div className="absolute top-1/2 -left-12 w-12 h-0.5 bg-gradient-to-l from-gray-300 to-primary"></div>
                                   
                                   <div className="flex items-start gap-4 mb-4">
@@ -312,7 +468,6 @@ const StudentRoadmap: React.FC = () => {
                                     {item.description}
                                   </p>
                                   
-                                  {/* Step Number Badge */}
                                   <div className={`absolute -top-4 -left-4 w-10 h-10 bg-gradient-to-br ${item.color} text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg`}>
                                     {item.step}
                                   </div>
@@ -325,12 +480,10 @@ const StudentRoadmap: React.FC = () => {
                         {/* Mobile Layout */}
                         <div className="lg:hidden relative pb-12">
                           <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100 mb-6">
-                            {/* Vertical Line for Mobile */}
                             {index < roadmapSteps.length - 1 && (
                               <div className="absolute left-3 top-6 w-0.5 h-full bg-gradient-to-b from-primary to-purple-500"></div>
                             )}
                             
-                            {/* Circle Dot */}
                             <div className="absolute -left-3 top-6">
                               <div className={`w-6 h-6 bg-gradient-to-br ${item.color} rounded-full border-4 border-white shadow-lg relative z-10`}></div>
                             </div>
@@ -352,7 +505,6 @@ const StudentRoadmap: React.FC = () => {
                               {item.description}
                             </p>
                             
-                            {/* Image for Mobile */}
                             <div className="rounded-xl overflow-hidden shadow-md">
                               <img 
                                 src={item.image} 
@@ -366,6 +518,15 @@ const StudentRoadmap: React.FC = () => {
                     );
                   })}
                 </div>
+              </div>
+
+              <div className="text-center mt-12">
+                <button 
+                  onClick={openModal}
+                  className="bg-gradient-to-r from-primary to-accent text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+                >
+                  Start Your Journey
+                </button>
               </div>
             </div>
           </div>
@@ -401,6 +562,14 @@ const StudentRoadmap: React.FC = () => {
                   </div>
                 </div>
               </div>
+              <div className="text-center mt-12">
+                <button 
+                  onClick={openModal}
+                  className="bg-gradient-to-r from-primary to-accent text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+                >
+                  Start Your Journey
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -415,23 +584,12 @@ const StudentRoadmap: React.FC = () => {
               Book a free counseling session with our experts today and take the first step towards your international education
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link 
-                to="/contact" 
+              <button 
+                onClick={openModal}
                 className="bg-white text-primary px-10 py-5 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
               >
                 Book Free Consultation
-              </Link>
-              <a 
-                href="https://wa.me/918777841275" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-500 text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-green-600 transition-all transform hover:scale-105 shadow-xl flex items-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                </svg>
-                WhatsApp Us
-              </a>
+              </button>
             </div>
           </div>
         </section>
@@ -467,6 +625,281 @@ const StudentRoadmap: React.FC = () => {
           </div>
         </section>
       </div>
+
+      {/* Multi-Step Modal Form - COMPACT VERSION */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-3 right-3 z-10 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+
+            {!submitSuccess ? (
+              <div className="p-6">
+                {/* Progress Indicator - Compact */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between">
+                    {[1, 2, 3].map((step) => (
+                      <React.Fragment key={step}>
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
+                              currentStep >= step
+                                ? 'bg-gradient-to-r from-primary to-accent text-white shadow-md'
+                                : 'bg-gray-200 text-gray-500'
+                            }`}
+                          >
+                            {step}
+                          </div>
+                          <span className="text-[10px] mt-1 text-gray-600 hidden sm:block">
+                            {step === 1 && 'Study Plans'}
+                            {step === 2 && 'Background'}
+                            {step === 3 && 'Contact Info'}
+                          </span>
+                        </div>
+                        {step < 3 && (
+                          <div
+                            className={`flex-1 h-0.5 mx-2 transition-all ${
+                              currentStep > step ? 'bg-primary' : 'bg-gray-200'
+                            }`}
+                          />
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                  {/* Step 1: Choose Dream Country & Intake */}
+                  {currentStep === 1 && (
+                    <div className="space-y-6 animate-fade-in">
+                      <div className="text-center mb-4">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-1">
+                          Start your study abroad journey
+                        </h2>
+                        <p className="text-sm text-gray-600">Let's begin by understanding your preferences</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-semibold text-gray-800 mb-3">
+                          Choose your dream country
+                        </label>
+                        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                          {countries.map((country) => (
+                            <button
+                              key={country.name}
+                              type="button"
+                              onClick={() => handleSelectChange('dreamCountry', country.name)}
+                              className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${
+                                formData.dreamCountry === country.name
+                                  ? 'border-primary bg-primary/5 shadow-md'
+                                  : 'border-gray-200 hover:border-primary/50'
+                              }`}
+                            >
+                              <span className="text-2xl mb-1">{country.flag}</span>
+                              <span className="text-xs font-medium text-gray-700">{country.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-semibold text-gray-800 mb-3">
+                          What's your preferred intake?
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {intakes.map((intake) => (
+                            <button
+                              key={intake}
+                              type="button"
+                              onClick={() => handleSelectChange('preferredIntake', intake)}
+                              className={`p-3 rounded-lg border-2 font-medium transition-all text-sm ${
+                                formData.preferredIntake === intake
+                                  ? 'border-primary bg-primary/5 text-primary shadow-md'
+                                  : 'border-gray-200 text-gray-700 hover:border-primary/50'
+                              }`}
+                            >
+                              {intake}
+                              {intake === 'Jan 2026' && (
+                                <span className="block text-[10px] text-green-600 mt-0.5">Recommended</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Education Level & Current City */}
+                  {currentStep === 2 && (
+                    <div className="space-y-6 animate-fade-in">
+                      <div className="text-center mb-4">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-1">
+                          Are you ready for your study abroad journey?
+                        </h2>
+                        <p className="text-sm text-gray-600">Tell us about your educational background</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-semibold text-gray-800 mb-3">
+                          What's the highest education you've completed (or are currently pursuing)?
+                        </label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {educationLevels.map((level) => (
+                            <button
+                              key={level}
+                              type="button"
+                              onClick={() => handleSelectChange('educationLevel', level)}
+                              className={`p-3 rounded-lg border-2 font-medium transition-all text-sm ${
+                                formData.educationLevel === level
+                                  ? 'border-primary bg-primary/5 text-primary shadow-md'
+                                  : 'border-gray-200 text-gray-700 hover:border-primary/50'
+                              }`}
+                            >
+                              {level}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-semibold text-gray-800 mb-3">
+                          Select your current city
+                        </label>
+                        <input
+                          type="text"
+                          name="currentCity"
+                          value={formData.currentCity}
+                          onChange={handleInputChange}
+                          placeholder="e.g., Ludhiana, Punjab"
+                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3: Contact Information */}
+                  {currentStep === 3 && (
+                    <div className="space-y-5 animate-fade-in">
+                      <div className="text-center mb-4">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-1">
+                          Just one last step!
+                        </h2>
+                        <p className="text-sm text-gray-600">Share your contact details so we can reach you</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-2">
+                          Your name
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          placeholder="Name"
+                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-2">
+                          Your email
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="Email"
+                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-2">
+                          Your Phone
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          placeholder="Phone"
+                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Navigation Buttons - Compact */}
+                  <div className="flex justify-between mt-8 pt-4 border-t border-gray-200">
+                    {currentStep > 1 && (
+                      <button
+                        type="button"
+                        onClick={prevStep}
+                        className="px-6 py-2.5 rounded-full border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all text-sm"
+                      >
+                        Back
+                      </button>
+                    )}
+                    
+                    {currentStep < 3 ? (
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={!isStepValid()}
+                        className={`ml-auto px-6 py-2.5 rounded-full font-semibold transition-all text-sm ${
+                          isStepValid()
+                            ? 'bg-gradient-to-r from-primary to-accent text-white hover:shadow-lg'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={!isStepValid() || isSubmitting}
+                        className={`ml-auto px-6 py-2.5 rounded-full font-semibold transition-all text-sm ${
+                          isStepValid() && !isSubmitting
+                            ? 'bg-gradient-to-r from-primary to-accent text-white hover:shadow-lg'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <div className="p-10 text-center">
+                <div className="mb-4">
+                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                  Thank You!
+                </h2>
+                <p className="text-lg text-gray-600 mb-1">
+                  Your journey to study abroad has begun!
+                </p>
+                <p className="text-sm text-gray-500">
+                  Our counselor will contact you shortly to guide you through the next steps.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <Footer />
 
       {/* Custom Animations */}
@@ -491,6 +924,21 @@ const StudentRoadmap: React.FC = () => {
             opacity: 1;
             transform: translateX(0);
           }
+        }
+
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.4s ease-out;
         }
       `}</style>
     </>
