@@ -26,6 +26,7 @@ type LeadCounts = {
   accommodation: number
   eligibility: number
   learnMore: number
+  journey: number
   authors: number
   blog: number
   total: number
@@ -36,6 +37,7 @@ type NewLeadCounts = {
   accommodation: number
   eligibility: number
   learnMore: number
+  journey: number
 }
 
 export default function AdminDashboard() {
@@ -45,6 +47,7 @@ export default function AdminDashboard() {
     accommodation: 0,
     eligibility: 0,
     learnMore: 0,
+    journey: 0,
     authors: 0,
     blog: 0,
     total: 0
@@ -53,7 +56,8 @@ export default function AdminDashboard() {
     registration: 0,
     accommodation: 0,
     eligibility: 0,
-    learnMore: 0
+    learnMore: 0,
+    journey: 0
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -85,13 +89,14 @@ export default function AdminDashboard() {
         accommodation: 0,
         eligibility: 0,
         learnMore: 0,
+        journey: 0,
         authors: 0,
         blog: 0,
         total: 0
       }
 
       // Get previous counts from localStorage to calculate new leads
-      const previousCounts = JSON.parse(localStorage.getItem('admin_previous_counts') || '{"registration":0,"accommodation":0,"eligibility":0,"learnMore":0}')
+      const previousCounts = JSON.parse(localStorage.getItem('admin_previous_counts') || '{"registration":0,"accommodation":0,"eligibility":0,"learnMore":0,"journey":0}')
 
       // Fetch registration leads count from registrationleads table
       try {
@@ -146,6 +151,25 @@ export default function AdminDashboard() {
         }
       } catch (eligibilityError) {
         console.warn('Failed to fetch eligibility checks count:', eligibilityError)
+      }
+
+      // Fetch journey form submissions count
+      try {
+        const journeyUrl = `${API_BASE}/api/journey/count.php`
+        const journeyRes = await fetch(journeyUrl, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (journeyRes.ok) {
+          const journeyData = await journeyRes.json()
+          if (journeyData?.success) {
+            counts.journey = journeyData.count || 0
+            counts.total += counts.journey
+          }
+        } else {
+          console.warn('Journey leads API not available')
+        }
+      } catch (journeyError) {
+        console.warn('Failed to fetch journey leads count:', journeyError)
       }
 
       // Fetch other leads from main leads table (Learn More only)
@@ -216,7 +240,8 @@ export default function AdminDashboard() {
         registration: Math.max(0, counts.registration - previousCounts.registration),
         accommodation: Math.max(0, counts.accommodation - previousCounts.accommodation),
         eligibility: Math.max(0, counts.eligibility - previousCounts.eligibility),
-        learnMore: Math.max(0, counts.learnMore - previousCounts.learnMore)
+        learnMore: Math.max(0, counts.learnMore - previousCounts.learnMore),
+        journey: Math.max(0, counts.journey - (previousCounts.journey || 0))
       }
       setNewLeadCounts(newCounts)
       
@@ -226,7 +251,8 @@ export default function AdminDashboard() {
           registration: counts.registration,
           accommodation: counts.accommodation,
           eligibility: counts.eligibility,
-          learnMore: counts.learnMore
+          learnMore: counts.learnMore,
+          journey: counts.journey
         }))
       } else {
         // First time loading, set current counts as baseline
@@ -234,14 +260,16 @@ export default function AdminDashboard() {
           registration: counts.registration,
           accommodation: counts.accommodation,
           eligibility: counts.eligibility,
-          learnMore: counts.learnMore
+          learnMore: counts.learnMore,
+          journey: counts.journey
         }))
         // No new leads on first load
         setNewLeadCounts({
           registration: 0,
           accommodation: 0,
           eligibility: 0,
-          learnMore: 0
+          learnMore: 0,
+          journey: 0
         })
       }
     } catch (err: any) {
@@ -320,7 +348,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-7 gap-6">
           <div 
             onClick={() => handleBoxClick('registration', '/admin/registration-leads')}
             className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
@@ -371,6 +399,19 @@ export default function AdminDashboard() {
             )}
             <span className="text-lg font-semibold mb-2">Learn More Leads</span>
             <span className="text-3xl font-bold text-purple-600">{leadCounts.learnMore}</span>
+            <span className="text-xs text-gray-500 mt-1">Click to view details</span>
+          </div>
+          <div 
+            onClick={() => handleBoxClick('journey', '/admin/journey-leads')}
+            className="bg-white rounded-lg shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow relative"
+          >
+            {newLeadCounts.journey > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                {newLeadCounts.journey}
+              </div>
+            )}
+            <span className="text-lg font-semibold mb-2">Journey Leads</span>
+            <span className="text-3xl font-bold text-orange-600">{leadCounts.journey}</span>
             <span className="text-xs text-gray-500 mt-1">Click to view details</span>
           </div>
           <div 

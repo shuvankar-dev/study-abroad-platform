@@ -3,6 +3,7 @@ import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin,
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 // Import images from assets
 import counselingImage from '../assets/Free_Counseling_Session.png';
@@ -35,6 +36,8 @@ interface FormData {
 }
 
 const StudentRoadmap: React.FC = () => {
+  useScrollToTop()
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({

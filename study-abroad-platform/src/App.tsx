@@ -22,6 +22,7 @@ import AdminRegistrationLeads from './admin/AdminRegistrationLeads'
 import AdminAccommodationLeads from './admin/AdminAccommodationLeads'
 import AdminAuthors from './admin/AdminAuthors'
 import AdminBlog from './admin/AdminBlog'
+import AdminJourneyLeads from './admin/AdminJourneyLeads'
 import BlogPage from './pages/BlogPage'
 import BlogDetail from './pages/BlogDetail'
 import AuthorDetail from './pages/AuthorDetail';
@@ -102,6 +103,14 @@ export default function App() {
             element={
               <AdminRoute>
                 <AdminBlog />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/journey-leads"
+            element={
+              <AdminRoute>
+                <AdminJourneyLeads />
               </AdminRoute>
             }
           />
