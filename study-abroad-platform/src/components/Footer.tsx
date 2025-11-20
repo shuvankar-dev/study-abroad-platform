@@ -1,7 +1,16 @@
 import logo from '../assets/logo.png'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { cities } from '../data/cities'
 
 const Footer: React.FC = () => {
+  const navigate = useNavigate();
+
+  // Function to scroll to top when navigating
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="bg-gradient-to-r from-primary to-accent text-white py-12 mt-16">
       <div className="container mx-auto px-6">
@@ -40,32 +49,122 @@ const Footer: React.FC = () => {
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Test Prep</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><a href="#" className="hover:underline">TOEFL</a></li>
-                <li><a href="#" className="hover:underline">PTE</a></li>
-                <li><a href="#" className="hover:underline">IELTS</a></li>
-                <li><a href="#" className="hover:underline">GMAT</a></li>
-                <li><a href="#" className="hover:underline">GRE</a></li>
-                <li><a href="#" className="hover:underline">SAT</a></li>
-                <li><a href="#" className="hover:underline">CAEL</a></li>
-                <li><a href="#" className="hover:underline">CELPIP</a></li>
-                <li><a href="#" className="hover:underline">Duolingo</a></li>
-                <li><a href="#" className="hover:underline">ACT</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">TOEFL</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">PTE</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">IELTS</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">GMAT</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">GRE</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">SAT</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">CAEL</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">CELPIP</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Duolingo</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">ACT</a></li>
               </ul>
             </div>
 
             {/* Study Destinations */}
-            <div className="md:pl-6 md:border-l md:border-white/6">
+            <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Study Destinations</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><Link to="/search-results?country=United States" className="hover:underline">United States</Link></li>
-                <li><Link to="/search-results?country=United Kingdom" className="hover:underline">United Kingdom</Link></li>
-                <li><Link to="/search-results?country=Canada" className="hover:underline">Canada</Link></li>
-                <li><Link to="/search-results?country=Australia" className="hover:underline">Australia</Link></li>
-                <li><Link to="/search-results?country=Germany" className="hover:underline">Germany</Link></li>
-                <li><Link to="/search-results?country=Ireland" className="hover:underline">Ireland</Link></li>
-                <li><Link to="/search-results?country=France" className="hover:underline">France</Link></li>
-                <li><Link to="/search-results?country=Netherlands" className="hover:underline">Netherlands</Link></li>
-                <li><Link to="/search-results?country=New Zealand" className="hover:underline">New Zealand</Link></li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=United States')} 
+                    className="hover:underline text-left"
+                  >
+                    United States
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=United Kingdom')} 
+                    className="hover:underline text-left"
+                  >
+                    United Kingdom
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=Canada')} 
+                    className="hover:underline text-left"
+                  >
+                    Canada
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=Australia')} 
+                    className="hover:underline text-left"
+                  >
+                    Australia
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=Germany')} 
+                    className="hover:underline text-left"
+                  >
+                    Germany
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=Ireland')} 
+                    className="hover:underline text-left"
+                  >
+                    Ireland
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=France')} 
+                    className="hover:underline text-left"
+                  >
+                    France
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=Netherlands')} 
+                    className="hover:underline text-left"
+                  >
+                    Netherlands
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/search-results?country=New Zealand')} 
+                    className="hover:underline text-left"
+                  >
+                    New Zealand
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Consultant Areas */}
+            <div className="md:pl-6">
+              <h4 className="font-semibold text-white mb-3">Consultant Areas</h4>
+              <ul className="space-y-2 text-sm text-white/90">
+                {cities.slice(0, 10).map((city) => (
+                  <li key={city.slug}>
+                    <button
+                      onClick={() => handleNavigation(`/consultants/${city.slug}`)}
+                      className="hover:underline hover:text-yellow-300 transition-colors text-left"
+                    >
+                      {city.name}
+                    </button>
+                  </li>
+                ))}
+                {cities.length > 10 && (
+                  <li>
+                    <button
+                      onClick={() => handleNavigation('/consultants')}
+                      className="hover:underline text-yellow-300 font-medium text-left"
+                    >
+                      View All Cities →
+                    </button>
+                  </li>
+                )}
               </ul>
             </div>
 
@@ -73,23 +172,14 @@ const Footer: React.FC = () => {
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Student Services</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><a href="#" className="hover:underline">Visa Guidance</a></li>
-                <li><a href="#" className="hover:underline">Admission Guidance</a></li>
-                <li><a href="#" className="hover:underline">Career Counseling</a></li>
-                <li><a href="#" className="hover:underline">Finance Assistance</a></li>
-                <li><a href="#" className="hover:underline">Travel Assistance</a></li>
-                <li><a href="#" className="hover:underline">Forex Assistance</a></li>
-                <li><a href="#" className="hover:underline">Scholarship</a></li>
-                <li><a href="#" className="hover:underline">Study Abroad</a></li>
-              </ul>
-            </div>
-
-            {/* About */}
-            <div className="md:pl-6">
-              <h4 className="font-semibold text-white mb-3">About</h4>
-              <ul className="space-y-2 text-sm text-white/90">
-                <li><Link to="/services" className="hover:underline">Our Service</Link></li>
-                <li><Link to="/student-roadmap" className="hover:underline hover:text-yellow-300 transition-colors">Student Roadmap</Link></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Visa Guidance</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Admission Guidance</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Career Counseling</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Finance Assistance</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Travel Assistance</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Forex Assistance</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Scholarship</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">Study Abroad</a></li>
               </ul>
             </div>
 
@@ -97,10 +187,38 @@ const Footer: React.FC = () => {
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Legal Pages</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><Link to="/terms-conditions" className="hover:underline">Terms & Conditions</Link></li>
-                <li><Link to="/privacy-policy" className="hover:underline">Privacy Policy</Link></li>
-                <li><Link to="/refund-policy" className="hover:underline">Refund Policy</Link></li>
-                <li><Link to="/data-protection" className="hover:underline">Data Protection</Link></li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/terms-conditions')} 
+                    className="hover:underline text-left"
+                  >
+                    Terms & Conditions
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/privacy-policy')} 
+                    className="hover:underline text-left"
+                  >
+                    Privacy Policy
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/refund-policy')} 
+                    className="hover:underline text-left"
+                  >
+                    Refund Policy
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/data-protection')} 
+                    className="hover:underline text-left"
+                  >
+                    Data Protection
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -108,14 +226,45 @@ const Footer: React.FC = () => {
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Resources</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><Link to="/blog" className="hover:underline">Blog</Link></li>
-                <li><a href="#" className="hover:underline">ApplyInsights</a></li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/blog')} 
+                    className="hover:underline text-left"
+                  >
+                    Blog
+                  </button>
+                </li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:underline">ApplyInsights</a></li>
               </ul>
             </div>
+              {/* About */}
+            <div className="md:pl-6">
+              <h4 className="font-semibold text-white mb-3">About</h4>
+              <ul className="space-y-2 text-sm text-white/90">
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/services')} 
+                    className="hover:underline text-left"
+                  >
+                    Our Service
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleNavigation('/student-roadmap')} 
+                    className="hover:underline hover:text-yellow-300 transition-colors text-left"
+                  >
+                    Student Roadmap
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Our Product */}
             <div className="md:pl-6">
               <h4 className="font-semibold text-white mb-3">Our Product</h4>
               <ul className="space-y-2 text-sm text-white/90">
-                <li><Link to="https://codescholarwriters.com/" className="hover:underline">Codescholar Writers</Link></li>
+                <li><a href="https://codescholarwriters.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Codescholar Writers</a></li>
                 <li><a href="https://codescholaroverseas.com/" className="hover:underline">Codescholaroverseas</a></li>
               </ul>
             </div>
