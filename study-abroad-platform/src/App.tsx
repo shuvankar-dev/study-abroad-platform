@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'   // type-only import
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import TopBanner from './components/TopBanner'
 
 import HomePage from './pages/HomePage'
 import SearchResults from './pages/SearchResults'
@@ -43,6 +44,7 @@ export default function App() {
   return (
     <GoogleOAuthProvider clientId={clientId || ''}>
       <div className="min-h-screen bg-gray-50">
+        <TopBanner />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />

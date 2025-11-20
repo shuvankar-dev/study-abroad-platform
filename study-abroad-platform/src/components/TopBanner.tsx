@@ -1,54 +1,159 @@
 import { useEffect, useState } from 'react'
-import { X } from 'lucide-react'
+import { X, GraduationCap, MessageCircle, Star, ArrowRight } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
 
-
-const STORAGE_KEY = 'codescholar_top_banner_dismissed'
+const STORAGE_KEY = 'codescholar_banner_closed_today'
 
 export default function TopBanner() {
   const [visible, setVisible] = useState(false)
+  const [showAnimation, setShowAnimation] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
-    try {
-      const dismissed = localStorage.getItem(STORAGE_KEY)
-      if (dismissed !== 'true') {
-        // Show banner on first visit
-        setVisible(true)
-      }
-    } catch (err) {
-      // if localStorage is not available, still show banner
-      setVisible(true)
-    }
-  }, [])
-
-  const dismiss = (remember = true) => {
-    try {
-      if (remember) localStorage.setItem(STORAGE_KEY, 'true')
-    } catch (err) {
-      // ignore
-    }
+    // Show banner on every page navigation
+    // Reset visibility when location changes
     setVisible(false)
+    setShowAnimation(false)
+    
+    // Show banner with a slight delay for better UX
+    const timer = setTimeout(() => {
+      setVisible(true)
+      setShowAnimation(true)
+    }, 1000)
+    
+    return () => clearTimeout(timer)
+  }, [location.pathname])
+
+  const dismiss = () => {
+    // Just hide for current page - will show again on next page navigation
+    setShowAnimation(false)
+    setTimeout(() => setVisible(false), 300)
+  }
+
+  const handleRegistration = () => {
+    dismiss()
+    // Navigate to student roadmap and auto-open the form
+    navigate('/student-roadmap?openForm=true')
+  }
+
+  const handleConsultation = () => {
+    dismiss()
+    // Navigate to consultants page and auto-open the form
+    navigate('/consultants?openForm=true')
   }
 
   if (!visible) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div className="w-full max-w-2xl bg-gradient-to-r from-purple-600 to-orange-500 text-white rounded-xl shadow-2xl overflow-hidden min-h-[140px]">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-8 md:p-10">
-          <div className="text-center md:text-left">
-            <strong className="block text-lg md:text-xl">Limited time offer — 10% off application assistance</strong>
-            <span className="block mt-1 text-sm md:text-base opacity-95">Register now and talk to our experts to claim the discount.</span>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div 
+        className={`w-full max-w-4xl bg-white text-gray-800 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 ${
+          showAnimation ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        }`}
+      >
+        {/* Header with gradient */}
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-orange-500 p-1">
+          <div className="bg-white rounded-t-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-gray-900">🎉 Limited Time Offer!</h3>
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-current" />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600">Join thousands of successful students worldwide</p>
+                </div>
+              </div>
+              <button
+                onClick={dismiss}
+                aria-label="Close banner"
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          <div className="flex items-center gap-3">
-            {/* <Link to="/services" className="inline-block bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-md text-sm">Learn more</Link> */}
-            <button
-              onClick={() => dismiss(true)}
-              aria-label="Close banner"
-              className="p-2 rounded-full hover:bg-white/10 bg-white/10"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {/* Main content */}
+            <div className="grid md:grid-cols-2 gap-6 items-center">
+              <div>
+                <div className="inline-block bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                  🔥 10% OFF Application Assistance
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-tight">
+                  Start Your Study Abroad Journey Today!
+                </h2>
+                <p className="text-gray-600 mb-4 leading-relaxed">
+                  Get expert guidance for university applications, visa support, and end-to-end assistance. 
+                  <span className="text-blue-600 font-semibold"> Save 10% on our premium services!</span>
+                </p>
+                
+                {/* Features */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  {[
+                    ['✅ 35+ Countries', '920+ Universities'],
+                    ['🎯 100% Visa Success', 'Expert Counselling'],
+                    ['💰 Scholarship Help', 'Loan Assistance'],
+                    ['🏠 Accommodation', 'Post-arrival Support']
+                  ].map(([left, right], idx) => (
+                    <div key={idx} className="text-sm">
+                      <div className="text-blue-700 font-medium">{left}</div>
+                      <div className="text-gray-600">{right}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-100">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-blue-600" />
+                    Ready to Apply?
+                  </h4>
+                  <button
+                    onClick={handleRegistration}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
+                  >
+                    Start Registration Journey
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <p className="text-xs text-gray-500 mt-2 text-center">Complete your profile & get matched instantly</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border border-orange-100">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-orange-600" />
+                    Need Expert Advice?
+                  </h4>
+                  <button
+                    onClick={handleConsultation}
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
+                  >
+                    Get Free Consultation
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <p className="text-xs text-gray-500 mt-2 text-center">Talk to our certified counselors for free</p>
+                </div>
+
+                {/* Trust indicators */}
+                <div className="flex items-center justify-center gap-4 pt-2 text-xs text-gray-500">
+                  <span className="flex items-center gap-1">
+                    ✅ Trusted by 50,000+ students
+                  </span>
+                  <span className="flex items-center gap-1">
+                    ⚡ Quick response in 24hrs
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin, Award, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useScrollToTop } from '../hooks/useScrollToTop';
@@ -37,6 +37,7 @@ interface FormData {
 
 const StudentRoadmap: React.FC = () => {
   useScrollToTop()
+  const [searchParams] = useSearchParams();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -51,6 +52,14 @@ const StudentRoadmap: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Auto-open form if navigated from TopBanner
+  useEffect(() => {
+    const openForm = searchParams.get('openForm');
+    if (openForm === 'true') {
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
 
   const roadmapSteps: RoadmapStep[] = [
     {

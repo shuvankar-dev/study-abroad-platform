@@ -1,6 +1,5 @@
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
-import TopBanner from '../components/TopBanner';
 import StatsSection from '../components/StatsSection';
 import Footer from '../components/Footer';
 import UserBubble from '../components/UserBubble';
@@ -35,7 +34,6 @@ const HomePage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
   <Navbar />
-  <TopBanner />
   <main className="flex-1">
         <HeroSection onOpenRegistration={() => openRegistration('hero')} />
         <StatsSection />
