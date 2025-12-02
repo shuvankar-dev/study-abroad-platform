@@ -164,7 +164,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpenRegistration }) => {
                               }}
                               className="flex items-center space-x-3 w-full px-3 py-3 text-left hover:bg-blue-50 rounded-md transition-colors duration-150"
                             >
-                              <span className="text-xl">{country.flag}</span>
+                              <span className="text-xl" style={{ fontFamily: 'Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif', fontFeatureSettings: '"liga"' }}>{country.flag}</span>
                               <span className="text-gray-900 font-medium text-sm lg:text-base">{country.name}</span>
                             </button>
                           ))}

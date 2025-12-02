@@ -28,6 +28,7 @@ import BlogPage from './pages/BlogPage'
 import BlogDetail from './pages/BlogDetail'
 import AuthorDetail from './pages/AuthorDetail';
 import StudentRoadmap from './pages/StudentRoadmap'
+import ConsultationSuccess from './pages/ConsultationSuccess'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -58,6 +59,7 @@ export default function App() {
           <Route path="/legal" element={<Legal />} />
           <Route path="/consultants" element={<ConsultantsPage />} />
           <Route path="/consultants/:citySlug" element={<CityLandingPage />} />
+          <Route path="/consultation-success" element={<ConsultationSuccess />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route

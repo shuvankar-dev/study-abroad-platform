@@ -1,5 +1,5 @@
-import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin, Award, X } from 'lucide-react';
+import {useSearchParams, useNavigate } from 'react-router-dom';
+import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin, Award, X, Building2, BadgeCheck, Gift, Trophy, Handshake, ShieldCheck } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -14,6 +14,14 @@ import financeImage from '../assets/Finance_Loan_Assistance.png';
 import visaImage from '../assets/Visa_Guidance.png';
 import preDepartureImage from '../assets/Pre-Departure_Support.png';
 import postLandingImage from '../assets/Post-Landing_Support.png';
+
+// Import hero section images
+import s1 from '../assets/Herosection/s1.png';
+import s2 from '../assets/Herosection/s2.png';
+import s3 from '../assets/Herosection/s3.png';
+import s4 from '../assets/Herosection/s4.png';
+import s5 from '../assets/Herosection/s5.png';
+import s6 from '../assets/Herosection/s6.png';
 
 interface RoadmapStep {
   step: number;
@@ -38,6 +46,7 @@ interface FormData {
 const StudentRoadmap: React.FC = () => {
   useScrollToTop()
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -67,7 +76,7 @@ const StudentRoadmap: React.FC = () => {
       icon: <Users className="w-8 h-8" />,
       title: "Free Counseling Session",
       description: "Connect with our expert counselors to discuss your dreams, goals, and academic background. We'll help you understand your options and create a personalized plan.",
-      duration: "1-2 weeks",
+      duration: "1-2 day",
       color: "from-blue-500 to-blue-600",
       image: counselingImage
     },
@@ -76,7 +85,7 @@ const StudentRoadmap: React.FC = () => {
       icon: <GraduationCap className="w-8 h-8" />,
       title: "University Selection",
       description: "Based on your profile, budget, and preferences, we shortlist the best-fit universities and programs across multiple countries using our comprehensive database.",
-      duration: "2-3 weeks",
+      duration: " 6- 15 days",
       color: "from-purple-500 to-purple-600",
       image: universityImage
     },
@@ -85,7 +94,7 @@ const StudentRoadmap: React.FC = () => {
       icon: <FileText className="w-8 h-8" />,
       title: "Test Preparation & Application",
       description: "Get guidance on IELTS, TOEFL, GRE, GMAT, and other required tests. We help craft compelling SOPs, LORs, and complete your university applications.",
-      duration: "3-6 months",
+      duration: "2 months",
       color: "from-indigo-500 to-indigo-600",
       image: testPrepImage
     },
@@ -94,7 +103,7 @@ const StudentRoadmap: React.FC = () => {
       icon: <Award className="w-8 h-8" />,
       title: "Admission & Scholarships",
       description: "Receive offers from universities and explore scholarship opportunities. We negotiate on your behalf and help you choose the best option.",
-      duration: "4-8 weeks",
+      duration: "2 weeks",
       color: "from-pink-500 to-pink-600",
       image: admissionImage
     },
@@ -103,7 +112,7 @@ const StudentRoadmap: React.FC = () => {
       icon: <CreditCard className="w-8 h-8" />,
       title: "Finance & Loan Assistance",
       description: "Get connected with trusted education loan providers and explore financial aid options. We assist with documentation and application processes.",
-      duration: "2-4 weeks",
+      duration: "1 week",
       color: "from-orange-500 to-orange-600",
       image: financeImage
     },
@@ -136,13 +145,37 @@ const StudentRoadmap: React.FC = () => {
     }
   ];
 
-  const benefits: string[] = [
-    "200+ Partner Universities Worldwide",
-    "95% Visa Success Rate",
-    "Scholarship Worth ₹50+ Crores Secured",
-    "10,000+ Success Stories",
-    "End-to-End Personalized Guidance",
-    "Zero Hidden Charges"
+  const benefits = [
+    {
+      icon: <Building2 className="w-6 h-6" />,
+      text: "920+ Partner Universities Worldwide",
+      color: "from-blue-500 to-blue-600"
+    },
+    {
+      icon: <BadgeCheck className="w-6 h-6" />,
+      text: "98% Visa Success Rate",
+      color: "from-green-500 to-green-600"
+    },
+    {
+      icon: <Gift className="w-6 h-6" />,
+      text: "Scholarship Worth ₹5+ Crores Secured",
+      color: "from-purple-500 to-purple-600"
+    },
+    {
+      icon: <Trophy className="w-6 h-6" />,
+      text: "10,000+ Success Stories",
+      color: "from-yellow-500 to-orange-600"
+    },
+    {
+      icon: <Handshake className="w-6 h-6" />,
+      text: "End-to-End Free Consultation",
+      color: "from-indigo-500 to-indigo-600"
+    },
+    {
+      icon: <ShieldCheck className="w-6 h-6" />,
+      text: "Zero Hidden Charges",
+      color: "from-teal-500 to-teal-600"
+    }
   ];
 
   const countries = [
@@ -282,10 +315,8 @@ const StudentRoadmap: React.FC = () => {
       } else {
         // For other errors, still show success since data might be stored
         console.log('Error occurred but data might be stored - showing success');
-        setSubmitSuccess(true);
-        setTimeout(() => {
-          closeModal();
-        }, 3000);
+        closeModal();
+        navigate('/consultation-success');
       }
     } finally {
       setIsSubmitting(false);
@@ -310,30 +341,60 @@ const StudentRoadmap: React.FC = () => {
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-primary to-accent text-white py-20 overflow-hidden">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-                Your Journey to Study Abroad
-              </h1>
-              <p className="text-xl md:text-2xl text-white/90 mb-8">
-                From dream to destination - A step-by-step roadmap designed just for you
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <button 
-                  onClick={openModal}
-                  className="bg-white text-primary px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg"
-                >
-                  Start Your Journey
-                </button>
+        <section className="relative min-h-[80vh] bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center py-8 md:py-16">
+          {/* Background decoration */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-blue-100/30"></div>
+            <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-indigo-100/30"></div>
+          </div>
+
+          <div className="container relative mx-auto px-4 py-8 z-10">
+            <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-0">
+              {/* Left: Heading, description, CTA */}
+              <div className="w-full md:w-1/2 text-left md:pr-8 space-y-8 flex flex-col justify-center">
+                <div className="space-y-4">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                    Your Journey to <br />
+                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Study Abroad</span>
+                  </h1>
+                  <p className="text-lg md:text-xl text-gray-700 max-w-xl">
+                    From dream to destination - A step-by-step roadmap designed just for you. Connect with world-class universities and experience a life-changing journey.
+                  </p>
+                  <div className="bg-gradient-to-r from-primary-100 to-white rounded-xl px-5 py-3 shadow flex items-center gap-3 border border-primary-100">
+                    <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span className="text-base md:text-lg font-semibold text-primary-700">Complete roadmap with expert guidance at every step!</span>
+                  </div>
+                </div>
+                <button onClick={openModal} className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white font-semibold px-8 py-3 rounded-lg shadow-xl transition mb-4 mt-2 w-fit">Start Your Journey</button>
+              </div>
+              {/* Right: Diamond images */}
+              <div className="w-full md:w-1/2 flex justify-center items-center">
+                <div className="grid grid-cols-3 gap-4 md:gap-6">
+                  {[
+                    { src: s1, alt: 'Student 1', pos: 'col-start-2 row-start-1' },
+                    { src: s2, alt: 'Student 2', pos: 'col-start-1 row-start-2' },
+                    { src: s3, alt: 'Student 3', pos: 'col-start-2 row-start-2' },
+                    { src: s4, alt: 'Student 4', pos: 'col-start-3 row-start-2' },
+                    { src: s5, alt: 'Student 5', pos: 'col-start-2 row-start-3' },
+                    { src: s6, alt: 'Student 6', pos: 'col-start-3 row-start-3' },
+                  ].map((img, idx) => (
+                    <div
+                      key={img.alt}
+                      className={`w-32 h-32 md:w-44 md:h-44 bg-white shadow-xl rounded-2xl flex items-center justify-center transform rotate-45 overflow-hidden ${img.pos}`}
+                      style={{ zIndex: 10 - idx }}
+                    >
+                      <img
+                        src={img.src}
+                        alt={img.alt}
+                        className="w-full h-full object-cover -rotate-45 scale-[1.25] -m-4"
+                        style={{ minWidth: '120%', minHeight: '120%' }}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-          
-          {/* Decorative Elements */}
-          <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
-          <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
         </section>
 
         {/* Why Choose Us */}
@@ -343,13 +404,15 @@ const StudentRoadmap: React.FC = () => {
               Why Students Choose Codescholar Overseas
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {benefits.map((benefit: string, index: number) => (
+              {benefits.map((benefit, index: number) => (
                 <div 
                   key={index} 
-                  className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-center gap-4 bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
                 >
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">{benefit}</span>
+                  <div className={`flex-shrink-0 w-12 h-12 bg-gradient-to-br ${benefit.color} text-white rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                    {benefit.icon}
+                  </div>
+                  <span className="text-gray-700 font-medium">{benefit.text}</span>
                 </div>
               ))}
             </div>
@@ -733,7 +796,7 @@ const StudentRoadmap: React.FC = () => {
                                   : 'border-gray-200 hover:border-primary/50'
                               }`}
                             >
-                              <span className="text-2xl mb-1">{country.flag}</span>
+                              <span className="text-2xl mb-1" style={{ fontFamily: 'Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif', fontFeatureSettings: '"liga"' }}>{country.flag}</span>
                               <span className="text-xs font-medium text-gray-700">{country.name}</span>
                             </button>
                           ))}

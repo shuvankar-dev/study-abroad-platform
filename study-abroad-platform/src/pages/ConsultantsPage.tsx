@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { MapPinIcon, ArrowRightIcon, XMarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Helmet } from 'react-helmet-async';
 
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { cities } from '../data/cities';
+
+// Import hero section images
+import s1 from '../assets/Herosection/s1.png';
+import s2 from '../assets/Herosection/s2.png';
+import s3 from '../assets/Herosection/s3.png';
+import s4 from '../assets/Herosection/s4.png';
+import s5 from '../assets/Herosection/s5.png';
+import s6 from '../assets/Herosection/s6.png';
 
 interface FormData {
   name: string;
@@ -19,6 +27,7 @@ interface FormData {
 
 const ConsultantsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -45,6 +54,7 @@ const ConsultantsPage: React.FC = () => {
     { name: 'USA', flag: '🇺🇸' },
     { name: 'UK', flag: '🇬🇧' },
     { name: 'Canada', flag: '🇨🇦' },
+    { name: 'Ireland', flag: '🇮🇪' },
     { name: 'Australia', flag: '🇦🇺' },
     { name: 'Germany', flag: '🇩🇪' },
     { name: 'Dubai/UAE', flag: '🇦🇪' },
@@ -142,25 +152,19 @@ const ConsultantsPage: React.FC = () => {
           
           if (result.success) {
             console.log('Consultation form submitted successfully:', result);
-            setSubmitSuccess(true);
-            setTimeout(() => {
-              closeModal();
-            }, 3000);
+            closeModal();
+            navigate('/consultation-success');
           } else {
             // Even if success is false, data might be stored - show success anyway
             console.log('API returned success=false but data might be stored');
-            setSubmitSuccess(true);
-            setTimeout(() => {
-              closeModal();
-            }, 3000);
+            closeModal();
+            navigate('/consultation-success');
           }
         } catch (parseError) {
           // If JSON parsing fails but status is 200, assume success
           console.log('JSON parse failed but status 200 - assuming success');
-          setSubmitSuccess(true);
-          setTimeout(() => {
-            closeModal();
-          }, 3000);
+          closeModal();
+          navigate('/consultation-success');
         }
       } else {
         // For non-200 status codes, show error
@@ -177,10 +181,8 @@ const ConsultantsPage: React.FC = () => {
       } else {
         // For other errors, still show success since data might be stored
         console.log('Error occurred but data might be stored - showing success');
-        setSubmitSuccess(true);
-        setTimeout(() => {
-          closeModal();
-        }, 3000);
+        closeModal();
+        navigate('/consultation-success');
       }
     } finally {
       setIsSubmitting(false);
@@ -212,25 +214,57 @@ const ConsultantsPage: React.FC = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12 md:py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              Study Abroad Consultants Across India
-            </h1>
-            
-            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
-              Find expert study abroad consultants in your city. We provide personalized guidance 
-              for international education with offices and services across major Indian cities.
-            </p>
+      <section className="relative min-h-[80vh] bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center py-8 md:py-16">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-blue-100/30"></div>
+          <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-indigo-100/30"></div>
+        </div>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-              <button
-                onClick={openModal}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg inline-flex items-center justify-center gap-2"
-              >
-                🎓 Get Free Consultant
-              </button>
+        <div className="container relative mx-auto px-4 py-8 z-10">
+          <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-0">
+            {/* Left: Heading, description, CTA */}
+            <div className="w-full md:w-1/2 text-left md:pr-8 space-y-8 flex flex-col justify-center">
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                  Study Abroad Consultants, <br />
+                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Across India</span>
+                </h1>
+                <p className="text-lg md:text-xl text-gray-700 max-w-xl">
+                  Find expert study abroad consultants in your city. We provide personalized guidance for international education with offices and services across major Indian cities.
+                </p>
+                <div className="bg-gradient-to-r from-primary-100 to-white rounded-xl px-5 py-3 shadow flex items-center gap-3 border border-primary-100">
+                  <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span className="text-base md:text-lg font-semibold text-primary-700">Expert guidance with offices across major Indian cities!</span>
+                </div>
+              </div>
+              <button onClick={openModal} className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white font-semibold px-8 py-3 rounded-lg shadow-xl transition mb-4 mt-2 w-fit">Get Free Consultant</button>
+            </div>
+            {/* Right: Diamond images placeholder or consultant images */}
+            <div className="w-full md:w-1/2 flex justify-center items-center">
+              <div className="grid grid-cols-3 gap-4 md:gap-6">
+                {[
+                  { src: s1, alt: 'Student 1', pos: 'col-start-2 row-start-1' },
+                  { src: s2, alt: 'Student 2', pos: 'col-start-1 row-start-2' },
+                  { src: s3, alt: 'Student 3', pos: 'col-start-2 row-start-2' },
+                  { src: s4, alt: 'Student 4', pos: 'col-start-3 row-start-2' },
+                  { src: s5, alt: 'Student 5', pos: 'col-start-2 row-start-3' },
+                  { src: s6, alt: 'Student 6', pos: 'col-start-3 row-start-3' },
+                ].map((img, idx) => (
+                  <div
+                    key={img.alt}
+                    className={`w-32 h-32 md:w-44 md:h-44 bg-white shadow-xl rounded-2xl flex items-center justify-center transform rotate-45 overflow-hidden ${img.pos}`}
+                    style={{ zIndex: 10 - idx }}
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.alt}
+                      className="w-full h-full object-cover -rotate-45 scale-[1.25] -m-4"
+                      style={{ minWidth: '120%', minHeight: '120%' }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -468,7 +502,7 @@ const ConsultantsPage: React.FC = () => {
                                   : 'border-gray-200 hover:border-blue-300'
                               }`}
                             >
-                              <span className="text-2xl mb-1">{country.flag}</span>
+                              <span className="text-2xl mb-1" style={{ fontFamily: 'Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif', fontFeatureSettings: '"liga"' }}>{country.flag}</span>
                               <span className="text-xs font-medium text-gray-700">{country.name}</span>
                             </button>
                           ))}

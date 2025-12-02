@@ -1,26 +1,49 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { 
-  MapPinIcon, 
-  PhoneIcon, 
-  EnvelopeIcon, 
+  MapPinIcon,  
   AcademicCapIcon,
   GlobeAltIcon,
   CheckCircleIcon,
   StarIcon,
   ArrowRightIcon,
-  BuildingOffice2Icon
+  BuildingOffice2Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEOComponent from '../components/SEOComponent';
-import RegistrationModal from '../components/RegistrationModal';
 import { getCityBySlug } from '../data/cities';
+
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  dreamCountry: string;
+  preferredIntake: string;
+  educationLevel: string;
+  currentCity: string;
+}
 
 const CityLandingPage: React.FC = () => {
   const { citySlug } = useParams<{ citySlug: string }>();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    phone: '',
+    dreamCountry: '',
+    preferredIntake: '',
+    educationLevel: '',
+    currentCity: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Function to extract city name from SEO-friendly URLs
   const extractCityFromSlug = (slug: string): string => {
@@ -105,8 +128,124 @@ const CityLandingPage: React.FC = () => {
     );
   }
 
+  // Auto-open form if navigated from TopBanner
+  useEffect(() => {
+    const openForm = searchParams.get('openForm');
+    if (openForm === 'true') {
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
+
+  const countries = [
+    { name: 'USA', flag: '🇺🇸' },
+    { name: 'UK', flag: '🇬🇧' },
+    { name: 'Canada', flag: '🇨🇦' },
+    { name: 'Australia', flag: '🇦🇺' },
+    { name: 'Germany', flag: '🇩🇪' },
+    { name: 'Dubai/UAE', flag: '🇦🇪' },
+    { name: 'Singapore', flag: '🇸🇬' },
+    { name: 'Other', flag: '🌍' }
+  ];
+
+  const intakes = ['Jan 2026', 'Sep 2026', '2027 Intake'];
+  const educationLevels = ['10th', '12th', "Bachelor's", "Master's", 'MBBS / MD', 'Diploma'];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (field: keyof FormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleConsultationClick = () => {
     setIsModalOpen(true);
+    setCurrentStep(1);
+    setSubmitSuccess(false);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentStep(1);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      dreamCountry: '',
+      preferredIntake: '',
+      educationLevel: '',
+      currentCity: ''
+    });
+    document.body.style.overflow = 'unset';
+  };
+
+  const nextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const API_BASE = window.location.hostname === 'localhost'
+      ? 'http://localhost/studyabroadplatform-api/api'
+      : '/studyabroadplatform-api/api';
+
+    try {
+      const submitData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        dream_country: formData.dreamCountry,
+        preferred_intake: formData.preferredIntake,
+        education_level: formData.educationLevel,
+        current_city: formData.currentCity
+      };
+
+      const response = await fetch(`${API_BASE}/journey/submit.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submitData),
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        closeModal();
+        navigate('/consultation-success');
+      } else {
+        closeModal();
+        navigate('/consultation-success');
+      }
+    } catch (error) {
+      closeModal();
+      navigate('/consultation-success');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.dreamCountry && formData.preferredIntake;
+      case 2:
+        return formData.educationLevel && formData.currentCity;
+      case 3:
+        return formData.name && formData.email && formData.phone;
+      default:
+        return false;
+    }
   };
 
   return (
@@ -146,13 +285,6 @@ const CityLandingPage: React.FC = () => {
               >
                 Get Free Consultation
               </button>
-              <a
-                href="tel:+918777841275"
-                className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2"
-              >
-                <PhoneIcon className="w-5 h-5" />
-                Call Now
-              </a>
             </div>
 
             {/* Location Badge */}
@@ -389,48 +521,259 @@ const CityLandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-600">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Start Your Study Abroad Journey from {city.name}?
-            </h2>
-            <p className="text-xl mb-8 text-blue-100">
-              Book a free consultation with our expert counselors in {city.name} today!
-            </p>
-            
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button
-                onClick={handleConsultationClick}
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2"
-              >
-                <EnvelopeIcon className="w-5 h-5" />
-                Book Free Consultation
-              </button>
-              <a
-                href="tel:+918777841275"
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all inline-flex items-center justify-center gap-2"
-              >
-                <PhoneIcon className="w-5 h-5" />
-                +91 87778 41275
-              </a>
-            </div>
 
-            <div className="mt-8 text-blue-100">
-              <p>✓ Free Consultation ✓ Expert Guidance ✓ 95% Visa Success Rate</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <Footer />
       
-      <RegistrationModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        source="other"
-      />
+      {/* Multi-step Consultation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden relative">
+            <button 
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+
+            {!submitSuccess ? (
+              <div className="h-full flex flex-col">
+                {/* Header */}
+                <div className="px-6 py-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                  <h2 className="text-2xl font-bold">Free Consultation</h2>
+                  <p className="text-blue-100 text-sm">Step {currentStep} of 3</p>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="px-6 py-3 bg-gray-50">
+                  <div className="flex space-x-2">
+                    {[1, 2, 3].map((step) => (
+                      <div key={step} className="flex-1">
+                        <div className={`h-2 rounded-full ${
+                          step <= currentStep ? 'bg-blue-600' : 'bg-gray-200'
+                        }`} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Form Content */}
+                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+                  <div className="px-6 py-6">
+                    {/* Step 1: Study Preferences */}
+                    {currentStep === 1 && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-800 mb-4">Study Preferences</h3>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">Dream Country *</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {countries.map((country) => (
+                              <button
+                                key={country.name}
+                                type="button"
+                                onClick={() => handleSelectChange('dreamCountry', country.name)}
+                                className={`p-3 text-left border rounded-lg transition-all ${
+                                  formData.dreamCountry === country.name
+                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                <span className="mr-2">{country.flag}</span>
+                                {country.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">Preferred Intake *</label>
+                          <div className="space-y-2">
+                            {intakes.map((intake) => (
+                              <button
+                                key={intake}
+                                type="button"
+                                onClick={() => handleSelectChange('preferredIntake', intake)}
+                                className={`w-full p-3 text-left border rounded-lg transition-all ${
+                                  formData.preferredIntake === intake
+                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                {intake}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 2: Education Background */}
+                    {currentStep === 2 && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-800 mb-4">Education Background</h3>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">Current Education Level *</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {educationLevels.map((level) => (
+                              <button
+                                key={level}
+                                type="button"
+                                onClick={() => handleSelectChange('educationLevel', level)}
+                                className={`p-3 text-left border rounded-lg transition-all ${
+                                  formData.educationLevel === level
+                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                {level}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Current City *</label>
+                          <input
+                            type="text"
+                            name="currentCity"
+                            value={formData.currentCity}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter your current city"
+                            required
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 3: Contact Information */}
+                    {currentStep === 3 && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-800 mb-4">Contact Information</h3>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter your full name"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter your email"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter your phone number"
+                            required
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-6 py-4 border-t bg-gray-50 flex justify-between">
+                    {currentStep > 1 && (
+                      <button
+                        type="button"
+                        onClick={prevStep}
+                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        Previous
+                      </button>
+                    )}
+                    
+                    {currentStep < 3 ? (
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={!isStepValid()}
+                        className={`px-6 py-2 rounded-lg font-medium transition-colors ml-auto ${
+                          isStepValid()
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={!isStepValid() || isSubmitting}
+                        className={`px-6 py-2 rounded-lg font-medium transition-colors ml-auto ${
+                          isStepValid() && !isSubmitting
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <div className="p-10 text-center">
+                <div className="mb-6">
+                  <CheckCircleIcon className="w-20 h-20 text-green-500 mx-auto" />
+                </div>
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                  🎉 Consultation Request Submitted!
+                </h2>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
+                  <p className="text-lg font-semibold text-green-800 mb-2">
+                    Thank you for choosing CodeScholar!
+                  </p>
+                  <p className="text-gray-700 mb-3">
+                    Your free consultation request has been successfully received.
+                  </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <p className="text-blue-800 font-medium">
+                      📞 We will contact you within 12-24 hours
+                    </p>
+                    <p className="text-sm text-blue-600 mt-1">
+                      Our certified study abroad counselors will reach out to discuss your goals and create a personalized plan for your journey.
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500">
+                  Keep an eye on your phone and email. Your dream of studying abroad starts here! 🌟
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

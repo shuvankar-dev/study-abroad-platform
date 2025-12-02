@@ -1,5 +1,5 @@
 import logo from '../assets/logo.png'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { cities } from '../data/cities'
 
 const Footer: React.FC = () => {
