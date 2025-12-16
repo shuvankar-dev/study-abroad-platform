@@ -341,57 +341,189 @@ const StudentRoadmap: React.FC = () => {
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
         {/* Hero Section */}
-        <section className="relative min-h-[80vh] bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center py-8 md:py-16">
-          {/* Background decoration */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-blue-100/30"></div>
-            <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-indigo-100/30"></div>
-          </div>
+        <section 
+          className="relative min-h-[90vh] flex items-center py-12 md:py-16"
+          style={{
+            backgroundImage: 'url(https://images.unsplash.com/20/cambridge.JPG?q=80&w=1147&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          {/* Dark overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/50"></div>
 
           <div className="container relative mx-auto px-4 py-8 z-10">
-            <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-0">
-              {/* Left: Heading, description, CTA */}
-              <div className="w-full md:w-1/2 text-left md:pr-8 space-y-8 flex flex-col justify-center">
-                <div className="space-y-4">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                    Your Journey to <br />
-                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Study Abroad</span>
-                  </h1>
-                  <p className="text-lg md:text-xl text-gray-700 max-w-xl">
-                    From dream to destination - A step-by-step roadmap designed just for you. Connect with world-class universities and experience a life-changing journey.
-                  </p>
-                  <div className="bg-gradient-to-r from-primary-100 to-white rounded-xl px-5 py-3 shadow flex items-center gap-3 border border-primary-100">
-                    <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span className="text-base md:text-lg font-semibold text-primary-700">Complete roadmap with expert guidance at every step!</span>
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+              {/* Left: Content */}
+              <div className="w-full lg:w-1/2 text-left space-y-6">
+                <h1 className="text-3xl md:text-5xl lg:text-5xl font-bold text-white leading-tight">
+                  Take the First Step to STUDY ABROAD
+                </h1>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-white">
+                    <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
+                    <span className="text-lg">Courses starting from ₹8 Lakhs*</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-white">
+                    <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
+                    <span className="text-lg">Scholarship worth ₹10,00,000*</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-white">
+                    <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
+                    <span className="text-lg">Offer letter in less than 48 hours*</span>
                   </div>
                 </div>
-                <button onClick={openModal} className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white font-semibold px-8 py-3 rounded-lg shadow-xl transition mb-4 mt-2 w-fit">Start Your Journey</button>
               </div>
-              {/* Right: Diamond images */}
-              <div className="w-full md:w-1/2 flex justify-center items-center">
-                <div className="grid grid-cols-3 gap-4 md:gap-6">
-                  {[
-                    { src: s1, alt: 'Student 1', pos: 'col-start-2 row-start-1' },
-                    { src: s2, alt: 'Student 2', pos: 'col-start-1 row-start-2' },
-                    { src: s3, alt: 'Student 3', pos: 'col-start-2 row-start-2' },
-                    { src: s4, alt: 'Student 4', pos: 'col-start-3 row-start-2' },
-                    { src: s5, alt: 'Student 5', pos: 'col-start-2 row-start-3' },
-                    { src: s6, alt: 'Student 6', pos: 'col-start-3 row-start-3' },
-                  ].map((img, idx) => (
-                    <div
-                      key={img.alt}
-                      className={`w-32 h-32 md:w-44 md:h-44 bg-white shadow-xl rounded-2xl flex items-center justify-center transform rotate-45 overflow-hidden ${img.pos}`}
-                      style={{ zIndex: 10 - idx }}
-                    >
-                      <img
-                        src={img.src}
-                        alt={img.alt}
-                        className="w-full h-full object-cover -rotate-45 scale-[1.25] -m-4"
-                        style={{ minWidth: '120%', minHeight: '120%' }}
-                      />
-                    </div>
-                  ))}
-                </div>
+
+              {/* Right: Inline Form */}
+              <div className="w-full lg:w-[450px]">
+                {!submitSuccess ? (
+                  <div className="bg-white rounded-2xl shadow-2xl p-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
+                      Start your Study Abroad Journey
+                    </h2>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          placeholder="Enter Full Name*"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Enter Email Address*</label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="Enter Email Address*"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mobile number*</label>
+                        <div className="flex gap-2">
+                          <div className="w-16 flex items-center justify-center border border-gray-300 rounded-lg bg-gray-50">
+                            <span className="text-sm">🇮🇳 +91</span>
+                          </div>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            placeholder="+91"
+                            className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Dream Country*</label>
+                        <select
+                          value={formData.dreamCountry}
+                          onChange={(e) => handleSelectChange('dreamCountry', e.target.value)}
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                          required
+                        >
+                          <option value="">Select Country</option>
+                          {countries.map((country) => (
+                            <option key={country.name} value={country.name}>{country.flag} {country.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Intake*</label>
+                        <select
+                          value={formData.preferredIntake}
+                          onChange={(e) => handleSelectChange('preferredIntake', e.target.value)}
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                          required
+                        >
+                          <option value="">Select Intake</option>
+                          {intakes.map((intake) => (
+                            <option key={intake} value={intake}>{intake}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Education Level*</label>
+                        <select
+                          value={formData.educationLevel}
+                          onChange={(e) => handleSelectChange('educationLevel', e.target.value)}
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                          required
+                        >
+                          <option value="">Select Education Level</option>
+                          {educationLevels.map((level) => (
+                            <option key={level} value={level}>{level}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Current City*</label>
+                        <input
+                          type="text"
+                          name="currentCity"
+                          value={formData.currentCity}
+                          onChange={handleInputChange}
+                          placeholder="Enter your city"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                          required
+                        />
+                      </div>
+
+                      <div className="flex items-start gap-2 mt-4">
+                        <input
+                          type="checkbox"
+                          id="terms"
+                          required
+                          className="mt-1"
+                        />
+                        <label htmlFor="terms" className="text-xs text-gray-600">
+                          I have read and agreed to <a href="/terms-conditions" className="text-primary hover:underline">terms</a> & <a href="/privacy-policy" className="text-primary hover:underline">privacy policy</a>
+                        </label>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`w-full py-3 rounded-lg font-semibold text-white transition-all ${
+                          isSubmitting
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-blue-500 hover:bg-blue-600'
+                        }`}
+                      >
+                        {isSubmitting ? 'Submitting...' : 'Book your free consultation'}
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+                    <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                      🚀 Journey Started!
+                    </h2>
+                    <p className="text-gray-600 mb-4">
+                      We will contact you within 12-24 hours
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
