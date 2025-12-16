@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'   // type-only import
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import TopBanner from './components/TopBanner'
 
@@ -35,18 +35,14 @@ function AdminRoute({ children }: { children: ReactNode }) {
   return token ? <>{children}</> : <Navigate to="/admin/login" replace />
 }
 
-export default function App() {
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-
-  if (!clientId) {
-    console.error('VITE_GOOGLE_CLIENT_ID is not defined in environment variables')
-  }
+function AppContent() {
+  const location = useLocation()
+  const isAdminRoute = location.pathname.startsWith('/admin')
 
   return (
-    <GoogleOAuthProvider clientId={clientId || ''}>
-      <div className="min-h-screen bg-gray-50">
-        <TopBanner />
-        <Routes>
+    <div className="min-h-screen bg-gray-50">
+      {!isAdminRoute && <TopBanner />}
+      <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
@@ -126,7 +122,19 @@ export default function App() {
 
         </Routes>
       </div>
+  )
+}
+
+export default function App() {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+  if (!clientId) {
+    console.error('VITE_GOOGLE_CLIENT_ID is not defined in environment variables')
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={clientId || ''}>
+      <AppContent />
     </GoogleOAuthProvider>
-    
   )
 }

@@ -636,24 +636,24 @@ const StudentRoadmap: React.FC = () => {
                 Average Timeline to Study Abroad
               </h2>
               <p className="text-gray-600 mb-8 text-lg">
-                The entire process typically takes 8-12 months from initial counseling to departure
+                The entire process typically takes 3-4 months from initial counseling to departure
               </p>
               <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4   gap-6">
                   <div className="text-center">
                     <div className="text-4xl font-bold text-primary mb-2">1-2</div>
-                    <div className="text-gray-600">Months for Counseling & Shortlisting</div>
+                    <div className="text-gray-600">Days for Counseling & Shortlisting</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-purple-600 mb-2">3-6</div>
+                    <div className="text-4xl font-bold text-purple-600 mb-2">2</div>
                     <div className="text-gray-600">Months for Tests & Applications</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-green-600 mb-2">2-3</div>
-                    <div className="text-gray-600">Months for Visa Process</div>
+                    <div className="text-4xl font-bold text-green-600 mb-2">3-6</div>
+                    <div className="text-gray-600">Weeks for Visa Process</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-orange-600 mb-2">8-12</div>
+                    <div className="text-4xl font-bold text-orange-600 mb-2">3-4</div>
                     <div className="text-gray-600">Total Months to Departure</div>
                   </div>
                 </div>
