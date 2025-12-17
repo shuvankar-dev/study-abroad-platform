@@ -38,10 +38,11 @@ function AdminRoute({ children }: { children: ReactNode }) {
 function AppContent() {
   const location = useLocation()
   const isAdminRoute = location.pathname.startsWith('/admin')
+  const isHomePage = location.pathname === '/'
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {!isAdminRoute && <TopBanner />}
+      {!isAdminRoute && isHomePage && <TopBanner />}
       <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />
@@ -118,7 +119,7 @@ function AppContent() {
           <Route path="/blog/:slug" element={<BlogDetail />} /> 
           <Route path="/author/:name" element={<AuthorDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />
-          <Route path="/student-roadmap" element={<StudentRoadmap />} />
+          <Route path="/best-study-abroad-platform" element={<StudentRoadmap />} />
 
         </Routes>
       </div>

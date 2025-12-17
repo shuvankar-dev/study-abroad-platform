@@ -1,9 +1,9 @@
 import {useSearchParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin, Award, X, Building2, BadgeCheck, Gift, Trophy, Handshake, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Users, GraduationCap, FileText, Plane, CreditCard, MapPin, Award, X, Building2, BadgeCheck, Gift, Trophy, Handshake, ShieldCheck, Phone } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useScrollToTop } from '../hooks/useScrollToTop';
+import logo from '../assets/logo.png';
 
 // Import images from assets
 import counselingImage from '../assets/Free_Counseling_Session.png';
@@ -390,7 +390,31 @@ const StudentRoadmap: React.FC = () => {
 
   return (
     <>
-      <Navbar />
+      {/* Minimal Navbar with only logo and call button */}
+      <nav className="bg-white shadow sticky top-0 z-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <a href="/" className="flex items-center group">
+                <div className="flex items-center justify-center w-28 h-28 md:w-40 md:h-40 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
+                  <img src={logo} alt="Codescholar Overseas logo" className="w-full h-full object-contain bg-white/0" />
+                </div>
+              </a>
+            </div>
+
+            {/* Call Button */}
+            <a
+              href="tel:+918777841275"
+              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 py-2.5 rounded-lg shadow-lg transition-all transform hover:scale-105"
+            >
+              <Phone className="h-5 w-5" />
+              <span className="hidden sm:inline">Call Now</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
         {/* Hero Section */}
         <section 

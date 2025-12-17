@@ -27,7 +27,7 @@ export default function TopBanner() {
 
   const handleRegistration = () => {
     dismiss()
-    navigate('/student-roadmap?openForm=true')
+    navigate('/best-study-abroad-platform?openForm=true')
   }
 
   const handleConsultation = () => {

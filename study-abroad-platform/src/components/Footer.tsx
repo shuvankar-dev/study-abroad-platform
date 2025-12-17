@@ -251,10 +251,10 @@ const Footer: React.FC = () => {
                 </li>
                 <li>
                   <button 
-                    onClick={() => handleNavigation('/student-roadmap')} 
+                    onClick={() => handleNavigation('/best-study-abroad-platform')} 
                     className="hover:underline hover:text-yellow-300 transition-colors text-left"
                   >
-                    Student Roadmap
+                    Best Study Abroad Platform
                   </button>
                 </li>
               </ul>
