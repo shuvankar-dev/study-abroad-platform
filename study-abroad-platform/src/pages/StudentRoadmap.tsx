@@ -15,13 +15,13 @@ import visaImage from '../assets/Visa_Guidance.png';
 import preDepartureImage from '../assets/Pre-Departure_Support.png';
 import postLandingImage from '../assets/Post-Landing_Support.png';
 
-// Import hero section images
-import s1 from '../assets/Herosection/s1.png';
-import s2 from '../assets/Herosection/s2.png';
-import s3 from '../assets/Herosection/s3.png';
-import s4 from '../assets/Herosection/s4.png';
-import s5 from '../assets/Herosection/s5.png';
-import s6 from '../assets/Herosection/s6.png';
+// Testimonial images
+import arjunImage from '../assets/SuccessStories/Arjun Sharma.png';
+import priyaImage from '../assets/SuccessStories/Priya Patel.png';
+import rahulImage from '../assets/SuccessStories/Rahul Verma.png';
+import snehaImage from '../assets/SuccessStories/Sneha Das.png';
+import vikashImage from '../assets/SuccessStories/Vikash Kumar.png';
+import anitaImage from '../assets/SuccessStories/Anita Singh.png';
 
 interface RoadmapStep {
   step: number;
@@ -43,6 +43,13 @@ interface FormData {
   currentCity: string;
 }
 
+interface University {
+  name: string;
+  location: string;
+  courses: string;
+  logo: string;
+}
+
 const StudentRoadmap: React.FC = () => {
   useScrollToTop()
   const [searchParams] = useSearchParams();
@@ -61,6 +68,7 @@ const StudentRoadmap: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [activeCountry, setActiveCountry] = useState('United Kingdom');
 
   // Auto-open form if navigated from TopBanner
   useEffect(() => {
@@ -69,6 +77,50 @@ const StudentRoadmap: React.FC = () => {
       setIsModalOpen(true);
     }
   }, [searchParams]);
+
+  // University data by country
+  const universitiesByCountry: Record<string, University[]> = {
+    'United Kingdom': [
+      { name: 'University of Birmingham', location: 'Birmingham, United Kingdom', courses: '497+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/University_of_Birmingham_coat_of_arms.svg/120px-University_of_Birmingham_coat_of_arms.svg.png' },
+      { name: 'Queen Mary University of London', location: 'London, United Kingdom', courses: '579+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Queen_Mary_University_of_London_logo.svg/120px-Queen_Mary_University_of_London_logo.svg.png' },
+      { name: 'University of Essex', location: 'Colchester, United Kingdom', courses: '450+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/2a/University_of_Essex.svg/120px-University_of_Essex.svg.png' },
+      { name: 'Coventry University', location: 'Coventry, United Kingdom', courses: '503+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Coventry_University_Logo.svg/120px-Coventry_University_Logo.svg.png' },
+      { name: 'Nottingham Trent University', location: 'Nottingham, United Kingdom', courses: '335+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e7/Nottingham_Trent_University_shield.svg/100px-Nottingham_Trent_University_shield.svg.png' },
+      { name: 'University of East London', location: 'London, United Kingdom', courses: '373+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/University_of_East_London_logo.svg/120px-University_of_East_London_logo.svg.png' },
+    ],
+    'USA': [
+      { name: 'Harvard University', location: 'Cambridge, Massachusetts', courses: '450+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Harvard_shield_wreath.svg/100px-Harvard_shield_wreath.svg.png' },
+      { name: 'Stanford University', location: 'Stanford, California', courses: '380+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Seal_of_Leland_Stanford_Junior_University.svg/100px-Seal_of_Leland_Stanford_Junior_University.svg.png' },
+      { name: 'MIT', location: 'Cambridge, Massachusetts', courses: '320+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/MIT_logo.svg/120px-MIT_logo.svg.png' },
+      { name: 'University of California, Berkeley', location: 'Berkeley, California', courses: '420+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Seal_of_University_of_California%2C_Berkeley.svg/100px-Seal_of_University_of_California%2C_Berkeley.svg.png' },
+      { name: 'Columbia University', location: 'New York, New York', courses: '390+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/09/Columbia_University_Shield.svg/100px-Columbia_University_Shield.svg.png' },
+      { name: 'Yale University', location: 'New Haven, Connecticut', courses: '360+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Yale_University_Shield_1.svg/100px-Yale_University_Shield_1.svg.png' },
+    ],
+    'Germany': [
+      { name: 'Technical University of Munich', location: 'Munich, Germany', courses: '340+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Logo_of_the_Technical_University_of_Munich.svg/120px-Logo_of_the_Technical_University_of_Munich.svg.png' },
+      { name: 'Ludwig Maximilian University', location: 'Munich, Germany', courses: '380+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/LMU_Muenchen_Logo.svg/120px-LMU_Muenchen_Logo.svg.png' },
+      { name: 'Heidelberg University', location: 'Heidelberg, Germany', courses: '310+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Ruprecht-Karls-Universit%C3%A4t_Heidelberg_logo.svg/100px-Ruprecht-Karls-Universit%C3%A4t_Heidelberg_logo.svg.png' },
+      { name: 'Humboldt University of Berlin', location: 'Berlin, Germany', courses: '350+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Humboldt-Universit%C3%A4t_zu_Berlin_Logo.svg/120px-Humboldt-Universit%C3%A4t_zu_Berlin_Logo.svg.png' },
+      { name: 'Free University of Berlin', location: 'Berlin, Germany', courses: '320+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Logo_FU_Berlin.svg/120px-Logo_FU_Berlin.svg.png' },
+      { name: 'RWTH Aachen University', location: 'Aachen, Germany', courses: '290+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/RWTH_Aachen_Logo.svg/120px-RWTH_Aachen_Logo.svg.png' },
+    ],
+    'Canada': [
+      { name: 'University of Toronto', location: 'Toronto, Ontario', courses: '440+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/University_of_Toronto_coat_of_arms.svg/100px-University_of_Toronto_coat_of_arms.svg.png' },
+      { name: 'University of British Columbia', location: 'Vancouver, British Columbia', courses: '410+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Coat_of_arms_of_the_University_of_British_Columbia.svg/100px-Coat_of_arms_of_the_University_of_British_Columbia.svg.png' },
+      { name: 'McGill University', location: 'Montreal, Quebec', courses: '380+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/29/McGill_University_CoA.svg/100px-McGill_University_CoA.svg.png' },
+      { name: 'University of Alberta', location: 'Edmonton, Alberta', courses: '350+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/University_of_Alberta_coat_of_arms.svg/100px-University_of_Alberta_coat_of_arms.svg.png' },
+      { name: 'McMaster University', location: 'Hamilton, Ontario', courses: '320+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/McMaster_University_coat_of_arms.svg/100px-McMaster_University_coat_of_arms.svg.png' },
+      { name: 'University of Waterloo', location: 'Waterloo, Ontario', courses: '340+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/University_of_Waterloo_seal.svg/100px-University_of_Waterloo_seal.svg.png' },
+    ],
+    'Dubai': [
+      { name: 'American University in Dubai', location: 'Dubai, UAE', courses: '240+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/American_University_in_Dubai_logo.svg/120px-American_University_in_Dubai_logo.svg.png' },
+      { name: 'University of Dubai', location: 'Dubai, UAE', courses: '180+ Courses', logo: 'https://www.ud.ac.ae/images/UD_logo.png' },
+      { name: 'Heriot-Watt University Dubai', location: 'Dubai, UAE', courses: '220+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/78/Heriot-Watt_University_logo.svg/120px-Heriot-Watt_University_logo.svg.png' },
+      { name: 'Middlesex University Dubai', location: 'Dubai, UAE', courses: '200+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Middlesex_University_logo.svg/120px-Middlesex_University_logo.svg.png' },
+      { name: 'University of Wollongong in Dubai', location: 'Dubai, UAE', courses: '190+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/University_of_Wollongong_coat_of_arms.svg/100px-University_of_Wollongong_coat_of_arms.svg.png' },
+      { name: 'Manipal Academy Dubai', location: 'Dubai, UAE', courses: '160+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/Manipal_Academy_of_Higher_Education_logo.png/120px-Manipal_Academy_of_Higher_Education_logo.png' },
+    ],
+  };
 
   const roadmapSteps: RoadmapStep[] = [
     {
@@ -802,56 +854,278 @@ const StudentRoadmap: React.FC = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-primary to-accent text-white">
-          <div className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              Ready to Begin Your Study Abroad Journey?
-            </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Book a free counseling session with our experts today and take the first step towards your international education
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <button 
-                onClick={openModal}
-                className="bg-white text-primary px-10 py-5 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
-              >
-                Book Free Consultation
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Snippet */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-6">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-                Common Questions About the Process
+        {/* Testimonials Section */}
+        <section className="py-20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-100 via-indigo-100 via-purple-100 to-pink-100 opacity-60"></div>
+          
+          <div className="relative max-w-7xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <p className="text-gray-600 mb-2">Hundreds of students trust Codescholar Overseas</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Our happy clients say about us
               </h2>
-              <div className="space-y-6">
-                <div className="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-shadow">
-                  <h3 className="font-bold text-lg text-gray-800 mb-2">When should I start preparing?</h3>
-                  <p className="text-gray-600">
-                    Ideally, start 12-18 months before your intended intake. This gives you enough time for test prep, applications, and visa processing.
-                  </p>
+              <p className="text-gray-500 text-lg">Real stories from students who achieved their dreams</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {/* Testimonial 1 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="flex items-center mb-3">
+                  {[...Array(4)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  ))}
+                  <div className="relative">
+                    <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    <div className="absolute inset-0 overflow-hidden w-1/2">
+                      <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">4.5</span>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-shadow">
-                  <h3 className="font-bold text-lg text-gray-800 mb-2">Do you charge for counseling?</h3>
-                  <p className="text-gray-600">
-                    Our initial counseling session is completely free. We believe in helping students make informed decisions without any pressure.
-                  </p>
+                <blockquote className="text-gray-700 text-base leading-relaxed mb-6">
+                  "Codescholar Overseas made my study abroad dream come true. The team was supportive at every step!"
+                </blockquote>
+                <div className="flex items-center">
+                  <img src={arjunImage} alt="Arjun Sharma" className="w-12 h-12 rounded-full mr-4 flex-shrink-0 object-cover" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-lg">Arjun Sharma</h4>
+                    <p className="text-gray-600 text-sm">Masters from Berlin School of Business & Innovation</p>
+                  </div>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-shadow">
-                  <h3 className="font-bold text-lg text-gray-800 mb-2">What is your visa success rate?</h3>
-                  <p className="text-gray-600">
-                    We maintain a 95% visa success rate through thorough documentation support and expert guidance at every step.
-                  </p>
+              </div>
+
+              {/* Testimonial 2 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="flex items-center mb-3">
+                  {[...Array(4)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  ))}
+                  <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  <span className="ml-2 text-sm text-gray-600">4.0</span>
+                </div>
+                <blockquote className="text-gray-700 text-base leading-relaxed mb-6">
+                  "The guidance for my visa and accommodation was excellent. Highly recommend their services!"
+                </blockquote>
+                <div className="flex items-center">
+                  <img src={priyaImage} alt="Priya Patel" className="w-12 h-12 rounded-full mr-4 flex-shrink-0 object-cover" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-lg">Priya Patel</h4>
+                    <p className="text-gray-600 text-sm">Bachelors from University Of British Columbia</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 3 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="flex items-center mb-3">
+                  {[...Array(4)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  ))}
+                  <div className="relative">
+                    <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    <div className="absolute inset-0 overflow-hidden w-1/2">
+                      <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">4.5</span>
+                </div>
+                <blockquote className="text-gray-700 text-base leading-relaxed mb-6">
+                  "Thanks to Codescholar Overseas, I got admission to my dream university. The process was smooth and stress-free."
+                </blockquote>
+                <div className="flex items-center">
+                  <img src={rahulImage} alt="Rahul Verma" className="w-12 h-12 rounded-full mr-4 flex-shrink-0 object-cover" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-lg">Rahul Verma</h4>
+                    <p className="text-gray-600 text-sm">MBA from London Business School</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 4 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="flex items-center mb-3">
+                  {[...Array(3)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  ))}
+                  <div className="relative">
+                    <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    <div className="absolute inset-0 overflow-hidden w-1/2">
+                      <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  <span className="ml-2 text-sm text-gray-600">3.5</span>
+                </div>
+                <blockquote className="text-gray-700 text-base leading-relaxed mb-6">
+                  "Professional guidance and excellent support throughout my journey. Very satisfied with their service."
+                </blockquote>
+                <div className="flex items-center">
+                  <img src={snehaImage} alt="Sneha Das" className="w-12 h-12 rounded-full mr-4 flex-shrink-0 object-cover" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-lg">Sneha Das</h4>
+                    <p className="text-gray-600 text-sm">Masters in Data Science from University of Manchester</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 5 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="flex items-center mb-3">
+                  {[...Array(4)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  ))}
+                  <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  <span className="ml-2 text-sm text-gray-600">4.0</span>
+                </div>
+                <blockquote className="text-gray-700 text-base leading-relaxed mb-6">
+                  "From application to visa approval, everything was handled perfectly. Great team and amazing results!"
+                </blockquote>
+                <div className="flex items-center">
+                  <img src={vikashImage} alt="Vikash Kumar" className="w-12 h-12 rounded-full mr-4 flex-shrink-0 object-cover" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-lg">Vikash Kumar</h4>
+                    <p className="text-gray-600 text-sm">Engineering in Australia from University of Melbourne</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 6 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="flex items-center mb-3">
+                  {[...Array(4)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  ))}
+                  <div className="relative">
+                    <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    <div className="absolute inset-0 overflow-hidden w-1/2">
+                      <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">4.5</span>
+                </div>
+                <blockquote className="text-gray-700 text-base leading-relaxed mb-6">
+                  "Outstanding service from start to finish. They helped me secure admission and scholarship at my top choice university!"
+                </blockquote>
+                <div className="flex items-center">
+                  <img src={anitaImage} alt="Anita Singh" className="w-12 h-12 rounded-full mr-4 flex-shrink-0 object-cover" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-lg">Anita Singh</h4>
+                    <p className="text-gray-600 text-sm">PhD from University of California, Berkeley</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
+
+        {/* Top Universities Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
+              Top Universities to <span className="text-primary">Study Abroad</span>
+            </h2>
+
+            {/* Country Tabs */}
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              {[
+                { name: 'United Kingdom', flag: '🇬🇧' },
+                { name: 'USA', flag: '🇺🇸' },
+                { name: 'Germany', flag: '🇩🇪' },
+                { name: 'Canada', flag: '🇨🇦' },
+                { name: 'Dubai', flag: '🇦🇪' }
+              ].map((country) => (
+                <button
+                  key={country.name}
+                  onClick={() => setActiveCountry(country.name)}
+                  className={`flex items-center gap-2 px-6 py-3 bg-white font-semibold rounded-t-lg transition-all hover:bg-gray-50 ${
+                    activeCountry === country.name
+                      ? 'border-b-2 border-primary text-gray-900'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <span className="text-xl">{country.flag}</span>
+                  {country.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Universities Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {universitiesByCountry[activeCountry]?.map((university, index) => (
+                <div key={index} className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-all border border-gray-100">
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 bg-white border border-gray-200 rounded flex items-center justify-center flex-shrink-0 p-2">
+                      <img 
+                        src={university.logo} 
+                        alt={`${university.name} logo`}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          // Fallback to Building2 icon if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent && !parent.querySelector('svg')) {
+                            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                            svg.setAttribute('class', 'w-8 h-8 text-primary');
+                            svg.setAttribute('fill', 'none');
+                            svg.setAttribute('viewBox', '0 0 24 24');
+                            svg.setAttribute('stroke', 'currentColor');
+                            svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />';
+                            parent.appendChild(svg);
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">
+                        {university.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3">{university.location}</p>
+                      <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
+                        {university.courses}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
       </div>
 
       {/* Multi-Step Modal Form - COMPACT VERSION */}
