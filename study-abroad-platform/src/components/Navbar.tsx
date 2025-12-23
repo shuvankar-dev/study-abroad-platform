@@ -41,7 +41,11 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="relative flex items-center">
+          <div 
+            className="relative flex items-center"
+            onMouseEnter={() => setProductOpen(true)}
+            onMouseLeave={() => setProductOpen(false)}
+          >
             <a href="/" className="flex items-center group">
               <div className="flex items-center justify-center w-28 h-28 md:w-40 md:h-40 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
                 <img src={logo} alt="StudyAbroad logo" className="w-full h-full object-contain bg-white/0" />
@@ -51,31 +55,34 @@ const Navbar = () => {
             <button
               className="ml-1 mt-2 text-orange-500 hover:text-orange-600 focus:outline-none flex items-center"
               onClick={() => setProductOpen((s) => !s)}
-              onMouseEnter={() => setProductOpen(true)}
-              onMouseLeave={() => setProductOpen(false)}
               aria-label="Show products dropdown"
             >
               <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
             {/* Dropdown menu */}
             {productOpen && (
-              <div
-                className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg z-50 p-4"
-                onMouseEnter={() => setProductOpen(true)}
-                onMouseLeave={() => setProductOpen(false)}
-              >
+              <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg z-50 p-4">
                 <div className="text-xs font-semibold text-gray-500 mb-3 pl-1">PRODUCTS</div>
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
+                  <a 
+                    href="https://codescholaroverseas.com/consultants" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <span className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg">C</span>
                     <span className="font-medium text-gray-800">Codescholar Overseas</span>
-                  </div>
-                  <div className="flex items-center gap-3">
+                  </a>
+                  <a 
+                    href="https://codescholarwriters.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <span className="w-8 h-8 rounded bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg">C</span>
                     <span className="font-medium text-gray-800">Codescholar Writers</span>
-                  </div>
+                  </a>
                 </div>
-                <div className="mt-4 text-center text-sm text-gray-500 italic">Coming soon</div>
               </div>
             )}
           </div>

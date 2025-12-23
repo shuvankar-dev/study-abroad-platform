@@ -23,6 +23,38 @@ import snehaImage from '../assets/SuccessStories/Sneha Das.png';
 import vikashImage from '../assets/SuccessStories/Vikash Kumar.png';
 import anitaImage from '../assets/SuccessStories/Anita Singh.png';
 
+// University logos
+import universityBirminghamLogo from '../assets/university_logo/university-of-birmingham-logo.png';
+import queenMaryLogo from '../assets/university_logo/Queen_Mary_University_of_London.png';
+import universityEssexLogo from '../assets/university_logo/University_of_Essex_logo.png';
+import coventryLogo from '../assets/university_logo/Coventry_University.png';
+import nottinghamTrentLogo from '../assets/university_logo/Nottingham_Trent_University.png';
+import universityEastLondonLogo from '../assets/university_logo/University-of-East-London.png';
+import harvardLogo from '../assets/university_logo/Harvard_University.png';
+import stanfordLogo from '../assets/university_logo/Stanford-University-Logo.png';
+import mitLogo from '../assets/university_logo/mit-logo.png';
+import ucBerkeleyLogo from '../assets/university_logo/University-of-California-Berk.png';
+import columbiaLogo from '../assets/university_logo/Columbia_University.png';
+import technicalMunichLogo from '../assets/university_logo/Technical_University_of_Munich.png';
+import ludwigMaximilianLogo from '../assets/university_logo/Ludwig_Maximilian_University.png';
+import heidelbergLogo from '../assets/university_logo/Heidelberg_University.png';
+import humboldtLogo from '../assets/university_logo/Humboldt_University_of_Berlin.png';
+import freeBerlinLogo from '../assets/university_logo/Freie_University_of_Berlin.png';
+import rwthAachenLogo from '../assets/university_logo/RWTH_Aachen_University.png';
+import torontoLogo from '../assets/university_logo/University_of_Toronto.png';
+import ubcLogo from '../assets/university_logo/University_of_British_Columbia.png';
+import mcgillLogo from '../assets/university_logo/McGill_University.png';
+import albertaLogo from '../assets/university_logo/University_of_Alberta.png';
+import mcmasterLogo from '../assets/university_logo/McMaster_University.png';
+import waterlooLogo from '../assets/university_logo/University_of_Waterloo_seal.png';
+import americanDubaiLogo from '../assets/university_logo/American_University_in_Dubai.png';
+import dubaiUniversityLogo from '../assets/university_logo/dubai-university_logo.png';
+import heriotWattLogo from '../assets/university_logo/Heriot-Watt_University_Dubai.png';
+import middlesexDubaiLogo from '../assets/university_logo/Middlesex_University_Dubai.png';
+import wollongongLogo from '../assets/university_logo/University_of_Wollongong_in_Dubai.png';
+import manipalLogo from '../assets/university_logo/Manipal_Academy_Dubai.png';
+import yaleUniversityLogo from '../assets/university_logo/Yale_University.png';
+
 interface RoadmapStep {
   step: number;
   icon: React.ReactNode;
@@ -56,7 +88,6 @@ const StudentRoadmap: React.FC = () => {
   const navigate = useNavigate();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -81,44 +112,44 @@ const StudentRoadmap: React.FC = () => {
   // University data by country
   const universitiesByCountry: Record<string, University[]> = {
     'United Kingdom': [
-      { name: 'University of Birmingham', location: 'Birmingham, United Kingdom', courses: '497+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/University_of_Birmingham_coat_of_arms.svg/120px-University_of_Birmingham_coat_of_arms.svg.png' },
-      { name: 'Queen Mary University of London', location: 'London, United Kingdom', courses: '579+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Queen_Mary_University_of_London_logo.svg/120px-Queen_Mary_University_of_London_logo.svg.png' },
-      { name: 'University of Essex', location: 'Colchester, United Kingdom', courses: '450+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/2a/University_of_Essex.svg/120px-University_of_Essex.svg.png' },
-      { name: 'Coventry University', location: 'Coventry, United Kingdom', courses: '503+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Coventry_University_Logo.svg/120px-Coventry_University_Logo.svg.png' },
-      { name: 'Nottingham Trent University', location: 'Nottingham, United Kingdom', courses: '335+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e7/Nottingham_Trent_University_shield.svg/100px-Nottingham_Trent_University_shield.svg.png' },
-      { name: 'University of East London', location: 'London, United Kingdom', courses: '373+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/University_of_East_London_logo.svg/120px-University_of_East_London_logo.svg.png' },
+      { name: 'University of Birmingham', location: 'Birmingham, United Kingdom', courses: '497+ Courses', logo: universityBirminghamLogo },
+      { name: 'Queen Mary University of London', location: 'London, United Kingdom', courses: '579+ Courses', logo: queenMaryLogo },
+      { name: 'University of Essex', location: 'Colchester, United Kingdom', courses: '450+ Courses', logo: universityEssexLogo },
+      { name: 'Coventry University', location: 'Coventry, United Kingdom', courses: '503+ Courses', logo: coventryLogo },
+      { name: 'Nottingham Trent University', location: 'Nottingham, United Kingdom', courses: '335+ Courses', logo: nottinghamTrentLogo },
+      { name: 'University of East London', location: 'London, United Kingdom', courses: '373+ Courses', logo: universityEastLondonLogo },
     ],
     'USA': [
-      { name: 'Harvard University', location: 'Cambridge, Massachusetts', courses: '450+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Harvard_shield_wreath.svg/100px-Harvard_shield_wreath.svg.png' },
-      { name: 'Stanford University', location: 'Stanford, California', courses: '380+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Seal_of_Leland_Stanford_Junior_University.svg/100px-Seal_of_Leland_Stanford_Junior_University.svg.png' },
-      { name: 'MIT', location: 'Cambridge, Massachusetts', courses: '320+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/MIT_logo.svg/120px-MIT_logo.svg.png' },
-      { name: 'University of California, Berkeley', location: 'Berkeley, California', courses: '420+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Seal_of_University_of_California%2C_Berkeley.svg/100px-Seal_of_University_of_California%2C_Berkeley.svg.png' },
-      { name: 'Columbia University', location: 'New York, New York', courses: '390+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/09/Columbia_University_Shield.svg/100px-Columbia_University_Shield.svg.png' },
-      { name: 'Yale University', location: 'New Haven, Connecticut', courses: '360+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Yale_University_Shield_1.svg/100px-Yale_University_Shield_1.svg.png' },
+      { name: 'Harvard University', location: 'Cambridge, Massachusetts', courses: '450+ Courses', logo: harvardLogo },
+      { name: 'Stanford University', location: 'Stanford, California', courses: '380+ Courses', logo: stanfordLogo },
+      { name: 'MIT', location: 'Cambridge, Massachusetts', courses: '320+ Courses', logo: mitLogo },
+      { name: 'University of California, Berkeley', location: 'Berkeley, California', courses: '420+ Courses', logo: ucBerkeleyLogo },
+      { name: 'Columbia University', location: 'New York, New York', courses: '390+ Courses', logo: columbiaLogo },
+      { name: 'Yale University', location: 'New Haven, Connecticut', courses: '360+ Courses', logo: yaleUniversityLogo },
     ],
     'Germany': [
-      { name: 'Technical University of Munich', location: 'Munich, Germany', courses: '340+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Logo_of_the_Technical_University_of_Munich.svg/120px-Logo_of_the_Technical_University_of_Munich.svg.png' },
-      { name: 'Ludwig Maximilian University', location: 'Munich, Germany', courses: '380+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/LMU_Muenchen_Logo.svg/120px-LMU_Muenchen_Logo.svg.png' },
-      { name: 'Heidelberg University', location: 'Heidelberg, Germany', courses: '310+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Ruprecht-Karls-Universit%C3%A4t_Heidelberg_logo.svg/100px-Ruprecht-Karls-Universit%C3%A4t_Heidelberg_logo.svg.png' },
-      { name: 'Humboldt University of Berlin', location: 'Berlin, Germany', courses: '350+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Humboldt-Universit%C3%A4t_zu_Berlin_Logo.svg/120px-Humboldt-Universit%C3%A4t_zu_Berlin_Logo.svg.png' },
-      { name: 'Free University of Berlin', location: 'Berlin, Germany', courses: '320+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Logo_FU_Berlin.svg/120px-Logo_FU_Berlin.svg.png' },
-      { name: 'RWTH Aachen University', location: 'Aachen, Germany', courses: '290+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/RWTH_Aachen_Logo.svg/120px-RWTH_Aachen_Logo.svg.png' },
+      { name: 'Technical University of Munich', location: 'Munich, Germany', courses: '340+ Courses', logo: technicalMunichLogo },
+      { name: 'Ludwig Maximilian University', location: 'Munich, Germany', courses: '380+ Courses', logo: ludwigMaximilianLogo },
+      { name: 'Heidelberg University', location: 'Heidelberg, Germany', courses: '310+ Courses', logo: heidelbergLogo },
+      { name: 'Humboldt University of Berlin', location: 'Berlin, Germany', courses: '350+ Courses', logo: humboldtLogo },
+      { name: 'Free University of Berlin', location: 'Berlin, Germany', courses: '320+ Courses', logo: freeBerlinLogo },
+      { name: 'RWTH Aachen University', location: 'Aachen, Germany', courses: '290+ Courses', logo: rwthAachenLogo },
     ],
     'Canada': [
-      { name: 'University of Toronto', location: 'Toronto, Ontario', courses: '440+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/University_of_Toronto_coat_of_arms.svg/100px-University_of_Toronto_coat_of_arms.svg.png' },
-      { name: 'University of British Columbia', location: 'Vancouver, British Columbia', courses: '410+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Coat_of_arms_of_the_University_of_British_Columbia.svg/100px-Coat_of_arms_of_the_University_of_British_Columbia.svg.png' },
-      { name: 'McGill University', location: 'Montreal, Quebec', courses: '380+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/29/McGill_University_CoA.svg/100px-McGill_University_CoA.svg.png' },
-      { name: 'University of Alberta', location: 'Edmonton, Alberta', courses: '350+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/University_of_Alberta_coat_of_arms.svg/100px-University_of_Alberta_coat_of_arms.svg.png' },
-      { name: 'McMaster University', location: 'Hamilton, Ontario', courses: '320+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/McMaster_University_coat_of_arms.svg/100px-McMaster_University_coat_of_arms.svg.png' },
-      { name: 'University of Waterloo', location: 'Waterloo, Ontario', courses: '340+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/University_of_Waterloo_seal.svg/100px-University_of_Waterloo_seal.svg.png' },
+      { name: 'University of Toronto', location: 'Toronto, Ontario', courses: '440+ Courses', logo: torontoLogo },
+      { name: 'University of British Columbia', location: 'Vancouver, British Columbia', courses: '410+ Courses', logo: ubcLogo },
+      { name: 'McGill University', location: 'Montreal, Quebec', courses: '380+ Courses', logo: mcgillLogo },
+      { name: 'University of Alberta', location: 'Edmonton, Alberta', courses: '350+ Courses', logo: albertaLogo },
+      { name: 'McMaster University', location: 'Hamilton, Ontario', courses: '320+ Courses', logo: mcmasterLogo },
+      { name: 'University of Waterloo', location: 'Waterloo, Ontario', courses: '340+ Courses', logo: waterlooLogo },
     ],
     'Dubai': [
-      { name: 'American University in Dubai', location: 'Dubai, UAE', courses: '240+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/American_University_in_Dubai_logo.svg/120px-American_University_in_Dubai_logo.svg.png' },
-      { name: 'University of Dubai', location: 'Dubai, UAE', courses: '180+ Courses', logo: 'https://www.ud.ac.ae/images/UD_logo.png' },
-      { name: 'Heriot-Watt University Dubai', location: 'Dubai, UAE', courses: '220+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/78/Heriot-Watt_University_logo.svg/120px-Heriot-Watt_University_logo.svg.png' },
-      { name: 'Middlesex University Dubai', location: 'Dubai, UAE', courses: '200+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Middlesex_University_logo.svg/120px-Middlesex_University_logo.svg.png' },
-      { name: 'University of Wollongong in Dubai', location: 'Dubai, UAE', courses: '190+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/University_of_Wollongong_coat_of_arms.svg/100px-University_of_Wollongong_coat_of_arms.svg.png' },
-      { name: 'Manipal Academy Dubai', location: 'Dubai, UAE', courses: '160+ Courses', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/Manipal_Academy_of_Higher_Education_logo.png/120px-Manipal_Academy_of_Higher_Education_logo.png' },
+      { name: 'American University in Dubai', location: 'Dubai, UAE', courses: '240+ Courses', logo: americanDubaiLogo },
+      { name: 'University of Dubai', location: 'Dubai, UAE', courses: '180+ Courses', logo: dubaiUniversityLogo },
+      { name: 'Heriot-Watt University Dubai', location: 'Dubai, UAE', courses: '220+ Courses', logo: heriotWattLogo },
+      { name: 'Middlesex University Dubai', location: 'Dubai, UAE', courses: '200+ Courses', logo: middlesexDubaiLogo },
+      { name: 'University of Wollongong in Dubai', location: 'Dubai, UAE', courses: '190+ Courses', logo: wollongongLogo },
+      { name: 'Manipal Academy Dubai', location: 'Dubai, UAE', courses: '160+ Courses', logo: manipalLogo },
     ],
   };
 
@@ -215,7 +246,7 @@ const StudentRoadmap: React.FC = () => {
     },
     {
       icon: <Trophy className="w-6 h-6" />,
-      text: "10,000+ Success Stories",
+      text: "1500+ Success Stories",
       color: "from-yellow-500 to-orange-600"
     },
     {
@@ -256,14 +287,12 @@ const StudentRoadmap: React.FC = () => {
 
   const openModal = () => {
     setIsModalOpen(true);
-    setCurrentStep(1);
     setSubmitSuccess(false);
     document.body.style.overflow = 'hidden';
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentStep(1);
     setFormData({
       name: '',
       email: '',
@@ -276,17 +305,6 @@ const StudentRoadmap: React.FC = () => {
     document.body.style.overflow = 'unset';
   };
 
-  const nextStep = () => {
-    if (currentStep < 3) {
-      setCurrentStep(prev => prev + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -375,18 +393,6 @@ const StudentRoadmap: React.FC = () => {
     }
   };
 
-  const isStepValid = () => {
-    switch (currentStep) {
-      case 1:
-        return formData.dreamCountry && formData.preferredIntake;
-      case 2:
-        return formData.educationLevel && formData.currentCity;
-      case 3:
-        return formData.name && formData.email && formData.phone;
-      default:
-        return false;
-    }
-  };
 
   return (
     <>
@@ -434,21 +440,21 @@ const StudentRoadmap: React.FC = () => {
               {/* Left: Content */}
               <div className="w-full lg:w-1/2 text-left space-y-6">
                 <h1 className="text-3xl md:text-5xl lg:text-5xl font-bold text-white leading-tight">
-                  Take the First Step to STUDY ABROAD
+                  Start Your Study Abroad Journey Today!
                 </h1>
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-white">
                     <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-                    <span className="text-lg">Courses starting from ₹8 Lakhs*</span>
+                    <span className="text-lg">Courses starting from ₹6 Lakhs*</span>
                   </div>
                   <div className="flex items-center gap-3 text-white">
                     <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-                    <span className="text-lg">Scholarship worth ₹10,00,000*</span>
+                    <span className="text-lg">Scholarship upto 30% of tuition fees*</span>
                   </div>
                   <div className="flex items-center gap-3 text-white">
                     <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-                    <span className="text-lg">Offer letter in less than 48 hours*</span>
+                    <span className="text-lg">100% visa guidance by expert advisors*</span>
                   </div>
                 </div>
               </div>
@@ -1152,10 +1158,10 @@ const StudentRoadmap: React.FC = () => {
         
       </div>
 
-      {/* Multi-Step Modal Form - COMPACT VERSION */}
+      {/* Single Form Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
             {/* Close Button */}
             <button
               onClick={closeModal}
@@ -1166,273 +1172,153 @@ const StudentRoadmap: React.FC = () => {
 
             {!submitSuccess ? (
               <div className="p-6">
-                {/* Progress Indicator - Compact */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between">
-                    {[1, 2, 3].map((step) => (
-                      <React.Fragment key={step}>
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                              currentStep >= step
-                                ? 'bg-gradient-to-r from-primary to-accent text-white shadow-md'
-                                : 'bg-gray-200 text-gray-500'
-                            }`}
-                          >
-                            {step}
-                          </div>
-                          <span className="text-[10px] mt-1 text-gray-600 hidden sm:block">
-                            {step === 1 && 'Study Plans'}
-                            {step === 2 && 'Background'}
-                            {step === 3 && 'Contact Info'}
-                          </span>
-                        </div>
-                        {step < 3 && (
-                          <div
-                            className={`flex-1 h-0.5 mx-2 transition-all ${
-                              currentStep > step ? 'bg-primary' : 'bg-gray-200'
-                            }`}
-                          />
-                        )}
-                      </React.Fragment>
-                    ))}
+                <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
+                  Start your Study Abroad Journey
+                </h2>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Enter Full Name*"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                      required
+                    />
                   </div>
-                </div>
 
-                <form onSubmit={handleSubmit}>
-                  {/* Step 1: Choose Dream Country & Intake */}
-                  {currentStep === 1 && (
-                    <div className="space-y-6 animate-fade-in">
-                      <div className="text-center mb-4">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-1">
-                          Start your study abroad journey
-                        </h2>
-                        <p className="text-sm text-gray-600">Let's begin by understanding your preferences</p>
-                      </div>
-
-                      <div>
-                        <label className="block text-base font-semibold text-gray-800 mb-3">
-                          Choose your dream country
-                        </label>
-                        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-                          {countries.map((country) => (
-                            <button
-                              key={country.name}
-                              type="button"
-                              onClick={() => handleSelectChange('dreamCountry', country.name)}
-                              className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${
-                                formData.dreamCountry === country.name
-                                  ? 'border-primary bg-primary/5 shadow-md'
-                                  : 'border-gray-200 hover:border-primary/50'
-                              }`}
-                            >
-                              <span className="text-2xl mb-1" style={{ fontFamily: 'Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif', fontFeatureSettings: '"liga"' }}>{country.flag}</span>
-                              <span className="text-xs font-medium text-gray-700">{country.name}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-base font-semibold text-gray-800 mb-3">
-                          What's your preferred intake?
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {intakes.map((intake) => (
-                            <button
-                              key={intake}
-                              type="button"
-                              onClick={() => handleSelectChange('preferredIntake', intake)}
-                              className={`p-3 rounded-lg border-2 font-medium transition-all text-sm ${
-                                formData.preferredIntake === intake
-                                  ? 'border-primary bg-primary/5 text-primary shadow-md'
-                                  : 'border-gray-200 text-gray-700 hover:border-primary/50'
-                              }`}
-                            >
-                              {intake}
-                              {intake === 'Jan 2026' && (
-                                <span className="block text-[10px] text-green-600 mt-0.5">Recommended</span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 2: Education Level & Current City */}
-                  {currentStep === 2 && (
-                    <div className="space-y-6 animate-fade-in">
-                      <div className="text-center mb-4">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-1">
-                          Are you ready for your study abroad journey?
-                        </h2>
-                        <p className="text-sm text-gray-600">Tell us about your educational background</p>
-                      </div>
-
-                      <div>
-                        <label className="block text-base font-semibold text-gray-800 mb-3">
-                          What's the highest education you've completed (or are currently pursuing)?
-                        </label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {educationLevels.map((level) => (
-                            <button
-                              key={level}
-                              type="button"
-                              onClick={() => handleSelectChange('educationLevel', level)}
-                              className={`p-3 rounded-lg border-2 font-medium transition-all text-sm ${
-                                formData.educationLevel === level
-                                  ? 'border-primary bg-primary/5 text-primary shadow-md'
-                                  : 'border-gray-200 text-gray-700 hover:border-primary/50'
-                              }`}
-                            >
-                              {level}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-base font-semibold text-gray-800 mb-3">
-                          Select your current city
-                        </label>
-                        <input
-                          type="text"
-                          name="currentCity"
-                          value={formData.currentCity}
-                          onChange={handleInputChange}
-                          placeholder="e.g., Ludhiana, Punjab"
-                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 3: Contact Information */}
-                  {currentStep === 3 && (
-                    <div className="space-y-5 animate-fade-in">
-                      <div className="text-center mb-4">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-1">
-                          Just one last step!
-                        </h2>
-                        <p className="text-sm text-gray-600">Share your contact details so we can reach you</p>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-800 mb-2">
-                          Your name
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          placeholder="Name"
-                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-800 mb-2">
-                          Your email
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          placeholder="Email"
-                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-800 mb-2">
-                          Your Phone
-                        </label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          placeholder="Phone"
-                          className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors text-sm"
-                          required
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Navigation Buttons - Compact */}
-                  <div className="flex justify-between mt-8 pt-4 border-t border-gray-200">
-                    {currentStep > 1 && (
-                      <button
-                        type="button"
-                        onClick={prevStep}
-                        className="px-6 py-2.5 rounded-full border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all text-sm"
-                      >
-                        Back
-                      </button>
-                    )}
-                    
-                    {currentStep < 3 ? (
-                      <button
-                        type="button"
-                        onClick={nextStep}
-                        disabled={!isStepValid()}
-                        className={`ml-auto px-6 py-2.5 rounded-full font-semibold transition-all text-sm ${
-                          isStepValid()
-                            ? 'bg-gradient-to-r from-primary to-accent text-white hover:shadow-lg'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                      >
-                        Next
-                      </button>
-                    ) : (
-                      <button
-                        type="submit"
-                        disabled={!isStepValid() || isSubmitting}
-                        className={`ml-auto px-6 py-2.5 rounded-full font-semibold transition-all text-sm ${
-                          isStepValid() && !isSubmitting
-                            ? 'bg-gradient-to-r from-primary to-accent text-white hover:shadow-lg'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                      >
-                        {isSubmitting ? 'Submitting...' : 'Submit'}
-                      </button>
-                    )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Enter Email Address*</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter Email Address*"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                      required
+                    />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Mobile number*</label>
+                    <div className="flex gap-2">
+                      <div className="w-16 flex items-center justify-center border border-gray-300 rounded-lg bg-gray-50">
+                        <span className="text-sm">🇮🇳 +91</span>
+                      </div>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="+91"
+                        className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Dream Country*</label>
+                    <select
+                      value={formData.dreamCountry}
+                      onChange={(e) => handleSelectChange('dreamCountry', e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                      required
+                    >
+                      <option value="">Select Country</option>
+                      {countries.map((country) => (
+                        <option key={country.name} value={country.name}>{country.flag} {country.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Intake*</label>
+                    <select
+                      value={formData.preferredIntake}
+                      onChange={(e) => handleSelectChange('preferredIntake', e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                      required
+                    >
+                      <option value="">Select Intake</option>
+                      {intakes.map((intake) => (
+                        <option key={intake} value={intake}>{intake}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Education Level*</label>
+                    <select
+                      value={formData.educationLevel}
+                      onChange={(e) => handleSelectChange('educationLevel', e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                      required
+                    >
+                      <option value="">Select Education Level</option>
+                      {educationLevels.map((level) => (
+                        <option key={level} value={level}>{level}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Current City*</label>
+                    <input
+                      type="text"
+                      name="currentCity"
+                      value={formData.currentCity}
+                      onChange={handleInputChange}
+                      placeholder="Enter your city"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex items-start gap-2 mt-4">
+                    <input
+                      type="checkbox"
+                      id="terms-modal"
+                      required
+                      className="mt-1"
+                    />
+                    <label htmlFor="terms-modal" className="text-xs text-gray-600">
+                      I have read and agreed to <a href="/terms-conditions" className="text-primary hover:underline">terms</a> & <a href="/privacy-policy" className="text-primary hover:underline">privacy policy</a>
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full py-3 rounded-lg font-semibold text-white transition-all ${
+                      isSubmitting
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-primary to-accent hover:shadow-lg'
+                    }`}
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Book your free consultation'}
+                  </button>
                 </form>
               </div>
             ) : (
-              <div className="p-10 text-center">
-                <div className="mb-6">
-                  <CheckCircle className="w-20 h-20 text-green-500 mx-auto" />
-                </div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                  🚀 Journey Started Successfully!
+              <div className="p-8 text-center">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  🚀 Journey Started!
                 </h2>
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
-                  <p className="text-lg font-semibold text-green-800 mb-2">
-                    Welcome to your study abroad adventure!
-                  </p>
-                  <p className="text-gray-700 mb-3">
-                    Your journey form has been successfully submitted and our expert team is reviewing your profile.
-                  </p>
-                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                    <p className="text-blue-800 font-medium">
-                      📞 We will contact you within 12-24 hours
-                    </p>
-                    <p className="text-sm text-blue-600 mt-1">
-                      Our certified study abroad counselors will reach out to create your personalized roadmap and guide you through each step of the process.
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500">
-                  Get ready to turn your dreams into reality! Your future starts now. 🌟
+                <p className="text-gray-600 mb-4">
+                  We will contact you within 12-24 hours
                 </p>
+                <button
+                  onClick={closeModal}
+                  className="bg-gradient-to-r from-primary to-accent text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all"
+                >
+                  Close
+                </button>
               </div>
             )}
           </div>
