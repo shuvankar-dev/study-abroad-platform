@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { MenuIcon, XIcon } from 'lucide-react'
-import RegistrationModal from './RegistrationModal'
+import ConsultationModal from './ConsultationModal'
 
 import logo from '../assets/logo.png'
 
@@ -10,7 +10,7 @@ const Navbar = () => {
   const [destOpen, setDestOpen] = useState(false)
   const [mobileDestOpen, setMobileDestOpen] = useState(false)
   const [productOpen, setProductOpen] = useState(false)
-  const [isRegOpen, setIsRegOpen] = useState(false)
+  const [isConsultationOpen, setIsConsultationOpen] = useState(false)
   const navigate = useNavigate()
 
   const countries = [
@@ -124,7 +124,7 @@ const Navbar = () => {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
             <button 
-              onClick={() => setIsRegOpen(true)}
+              onClick={() => setIsConsultationOpen(true)}
               className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white px-6 py-2 rounded-lg text-base font-medium transition-all"
             >
               Get Started
@@ -176,7 +176,7 @@ const Navbar = () => {
               </div>
               <div className="px-3 py-2">
                 <button 
-                  onClick={() => {setIsRegOpen(true); setIsOpen(false)}}
+                  onClick={() => {setIsConsultationOpen(true); setIsOpen(false)}}
                   className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   Get Started
@@ -186,7 +186,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
-      <RegistrationModal isOpen={isRegOpen} onClose={() => setIsRegOpen(false)} source="other" />
+      <ConsultationModal isOpen={isConsultationOpen} onClose={() => setIsConsultationOpen(false)} />
     </nav>
   )
 }
