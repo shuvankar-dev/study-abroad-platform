@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useScrollToTop } from '../hooks/useScrollToTop'
 
 const services = [
   { title: 'Visa Guidance', desc: 'Complete support with visa documentation, application and tracking.' },
@@ -12,6 +13,8 @@ const services = [
 ]
 
 export default function Services() {
+  useScrollToTop()
+  
   const handleWhatsAppConsult = (serviceName: string) => {
     const phoneNumber = "918777841275" 
     const message = `Hi! I'm interested in booking a consultation for ${serviceName}. Could you please provide more details about this service?`

@@ -59,7 +59,7 @@ const UserBubble: React.FC<UserBubbleProps> = ({ onOpenRegistration }) => {
                 <button onClick={() => { onOpenRegistration && onOpenRegistration(); setOpen(false) }} className="w-full bg-gray-900 text-white py-2 rounded-lg font-medium shadow-sm">Register Now for Getting More Discount</button>
               </div>
 
-              <div className="mt-3 text-xs text-gray-400 text-center">2,30,502 students booked and succeeded</div>
+              <div className="mt-3 text-xs text-gray-400 text-center">1500+ students booked and succeeded</div>
             </div>
           </div>
         )}

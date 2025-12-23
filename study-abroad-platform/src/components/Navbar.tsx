@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { MenuIcon, XIcon } from 'lucide-react'
 import ConsultationModal from './ConsultationModal'
@@ -12,6 +12,34 @@ const Navbar = () => {
   const [productOpen, setProductOpen] = useState(false)
   const [isConsultationOpen, setIsConsultationOpen] = useState(false)
   const navigate = useNavigate()
+  const destTimeoutRef = useRef<number | null>(null)
+  const productTimeoutRef = useRef<number | null>(null)
+
+  const handleDestMouseEnter = () => {
+    if (destTimeoutRef.current) {
+      clearTimeout(destTimeoutRef.current)
+    }
+    setDestOpen(true)
+  }
+
+  const handleDestMouseLeave = () => {
+    destTimeoutRef.current = setTimeout(() => {
+      setDestOpen(false)
+    }, 300)
+  }
+
+  const handleProductMouseEnter = () => {
+    if (productTimeoutRef.current) {
+      clearTimeout(productTimeoutRef.current)
+    }
+    setProductOpen(true)
+  }
+
+  const handleProductMouseLeave = () => {
+    productTimeoutRef.current = setTimeout(() => {
+      setProductOpen(false)
+    }, 300)
+  }
 
   const countries = [
     'Australia',
@@ -43,8 +71,8 @@ const Navbar = () => {
           {/* Logo */}
           <div 
             className="relative flex items-center"
-            onMouseEnter={() => setProductOpen(true)}
-            onMouseLeave={() => setProductOpen(false)}
+            onMouseEnter={handleProductMouseEnter}
+            onMouseLeave={handleProductMouseLeave}
           >
             <a href="/" className="flex items-center group">
               <div className="flex items-center justify-center w-28 h-28 md:w-40 md:h-40 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
@@ -89,7 +117,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <div className="relative" onMouseEnter={() => setDestOpen(true)} onMouseLeave={() => setDestOpen(false)}>
+            <div className="relative" onMouseEnter={handleDestMouseEnter} onMouseLeave={handleDestMouseLeave}>
               <button onClick={() => setDestOpen((s) => !s)} className="text-gray-700 hover:text-gray-900 px-3 py-2 text-base lg:text-lg font-medium transition-colors flex items-center gap-2">
                 Destinations
                 <svg className="w-3 h-3 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" /></svg>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useScrollToTop } from '../hooks/useScrollToTop'
 
 const destinations = [
   {
@@ -175,6 +176,7 @@ const programs = [
 const Explore = () => {
   const [selectedTab, setSelectedTab] = useState<'destinations' | 'programs'>('destinations')
   const navigate = useNavigate()
+  useScrollToTop()
 
   const searchByCountry = (country: string) => {
     const params = new URLSearchParams()

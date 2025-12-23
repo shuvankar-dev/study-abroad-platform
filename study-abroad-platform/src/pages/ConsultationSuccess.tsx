@@ -57,7 +57,7 @@ const ConsultationSuccess: React.FC = () => {
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-green-800 font-medium text-sm">
-                  ✓ Free Consultation ✓ Expert Guidance ✓ 95% Visa Success Rate
+                  ✓ Free Consultation ✓ Expert Guidance ✓ 98% Visa Success Rate
                 </p>
               </div>
             </div>

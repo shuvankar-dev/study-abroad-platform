@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { cities } from '../data/cities';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 // Import hero section images
 import consultantBackground from '../assets/consultant_background.png';
@@ -23,6 +24,7 @@ interface FormData {
 const ConsultantsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  useScrollToTop();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -379,7 +381,7 @@ const ConsultantsPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-600">
+      {/* <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-600">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -403,7 +405,7 @@ const ConsultantsPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Multi-Step Modal Form */}
       {isModalOpen && (

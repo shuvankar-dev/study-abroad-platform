@@ -95,7 +95,7 @@ export default function TopBanner() {
                 <div className="grid grid-cols-2 gap-1 sm:gap-3 mb-3 sm:mb-6">
                   {[
                     ['✅ 35+ Countries', '920+ Universities'],
-                    ['🎯 100% Visa Success', 'Expert Counselling'],
+                    ['🎯 98% Visa Success', 'Expert Counselling'],
                     ['💰 Scholarship Help', 'Loan Assistance'],
                     ['🏠 Accommodation', 'Post-arrival Support'],
                   ].map(([left, right], idx) => (
@@ -146,7 +146,7 @@ export default function TopBanner() {
                 {/* Trust indicators */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 pt-1 sm:pt-2 text-[10px] sm:text-xs text-gray-500">
                   <span className="flex items-center gap-1">
-                    ✅ Trusted by 50,000+ students
+                    ✅ Trusted by 1500+ students
                   </span>
                   <span className="flex items-center gap-1">
                     ⚡ Quick response in 24hrs

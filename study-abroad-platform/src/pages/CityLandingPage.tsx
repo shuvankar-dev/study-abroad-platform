@@ -324,12 +324,12 @@ const CityLandingPage: React.FC = () => {
                 {
                   icon: GlobeAltIcon,
                   title: "Global Network",
-                  description: `Direct partnerships with 500+ universities across USA, UK, Canada, Australia, and more.`
+                  description: `Direct partnerships with 920+ universities across USA, UK, Canada, Australia, and more.`
                 },
                 {
                   icon: CheckCircleIcon,
                   title: "High Success Rate",
-                  description: `95% visa approval rate and 100% admission success for eligible students from ${city.name}.`
+                  description: `98% visa approval rate and 100% admission success for eligible students from ${city.name}.`
                 }
               ].map((feature, index) => (
                 <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow">
