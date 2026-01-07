@@ -1,5 +1,12 @@
 RewriteEngine On
 
+# Ensure proper MIME types for favicons
+<IfModule mod_mime.c>
+    AddType image/x-icon .ico
+    AddType image/png .png
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
 # Handle React Router client-side routing
 # Redirect all requests to index.html unless the file exists
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -35,4 +42,6 @@ Header always set X-XSS-Protection "1; mode=block"
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresByType application/manifest+json "access plus 1 week"
 </IfModule>
