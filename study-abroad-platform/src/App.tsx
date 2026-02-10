@@ -29,6 +29,10 @@ import BlogDetail from './pages/BlogDetail'
 import AuthorDetail from './pages/AuthorDetail';
 import StudentRoadmap from './pages/StudentRoadmap'
 import ConsultationSuccess from './pages/ConsultationSuccess'
+import EdupartnerLogin from './pages/edupartner/login'
+import EdupartnerSignup from './pages/edupartner/Signup'
+import EdupartnerDashboard from './pages/edupartner/Dashboard'
+import EdupartnerProfileEdit from './pages/edupartner/profile_edit'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -118,8 +122,16 @@ function AppContent() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogDetail />} /> 
           <Route path="/author/:name" element={<AuthorDetail />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
           <Route path="/best-study-abroad-platform" element={<StudentRoadmap />} />
+          
+          {/* Edupartner Routes */}
+          <Route path="/edupartner" element={<EdupartnerLogin />} />
+          <Route path="/edupartner/login" element={<EdupartnerLogin />} />
+          <Route path="/edupartner/signup" element={<EdupartnerSignup />} />
+          <Route path="/edupartner/dashboard" element={<EdupartnerDashboard />} />
+          <Route path="/edupartner/profile-edit" element={<EdupartnerProfileEdit />} />
+          
+          <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
       </div>

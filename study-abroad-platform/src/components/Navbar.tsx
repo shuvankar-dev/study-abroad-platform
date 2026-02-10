@@ -70,7 +70,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div 
-            className="relative flex items-center"
+            className="relative flex items-center -ml-4"
             onMouseEnter={handleProductMouseEnter}
             onMouseLeave={handleProductMouseLeave}
           >
@@ -150,10 +150,16 @@ const Navbar = () => {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 ml-8">
+            <button 
+              onClick={() => navigate('/edupartner')}
+              className="bg-gradient-to-r from-[#1f3c88] via-[#2f6db3] to-[#4ba3a6] hover:from-[#1a3270] hover:via-[#2a5fa0] hover:to-[#429390] text-white px-6 py-2 rounded-lg text-base font-medium transition-all shadow-md hover:shadow-lg"
+            >
+              EduPartner
+            </button>
             <button 
               onClick={() => setIsConsultationOpen(true)}
-              className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white px-6 py-2 rounded-lg text-base font-medium transition-all"
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary-700 hover:to-accent text-white px-6 py-2 rounded-lg text-base font-medium transition-all whitespace-nowrap"
             >
               Get Started
             </button>
@@ -202,7 +208,13 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-              <div className="px-3 py-2">
+              <div className="px-3 py-2 space-y-2">
+                <button 
+                  onClick={() => {navigate('/edupartner'); setIsOpen(false)}}
+                  className="w-full bg-gradient-to-r from-[#1f3c88] via-[#2f6db3] to-[#4ba3a6] text-white px-4 py-2 rounded-lg hover:from-[#1a3270] hover:via-[#2a5fa0] hover:to-[#429390] transition-all shadow-md"
+                >
+                  EduPartner
+                </button>
                 <button 
                   onClick={() => {setIsConsultationOpen(true); setIsOpen(false)}}
                   className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
