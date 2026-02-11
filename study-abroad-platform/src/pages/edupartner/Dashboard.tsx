@@ -1689,7 +1689,7 @@ useEffect(() => {
       </aside>
 
       {/* MAIN */}
-      <main className="main-content">
+      <main className="main-content" style={{ paddingTop: "20px" }}>
 
         {/* HEADER STRIP */}
         <div className="header-strip">
@@ -1791,12 +1791,43 @@ useEffect(() => {
         {activeSection === "dashboard" && (
           <>
             {/* TOP BAR */}
-            <div className="topbar">
-              <h2>Dashboard</h2>
+            <div className="topbar" style={{ 
+              padding: "24px", 
+              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+              borderRadius: "12px",
+              marginBottom: "24px",
+              border: "1px solid #e2e8f0"
+            }}>
+              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>Dashboard</h2>
 
-              <div className="top-actions">
-                <button className="outline-btn" onClick={() => setActiveSection("universities")}><Search size={16} /> Browse Universities</button>
-                {/* <button className="primary-btn">+ Add Student</button> universities */}
+              <div className="top-actions" style={{ display: "flex", gap: "12px" }}>
+                <button 
+                  className="outline-btn" 
+                  onClick={() => setActiveSection("universities")}
+                  style={{
+                    padding: "11px 20px",
+                    borderRadius: "10px",
+                    border: "2px solid #e2e8f0",
+                    background: "#fff",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    transition: "all 0.2s"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.background = "#f8fafc";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.background = "#fff";
+                  }}
+                >
+                  <Search size={16} /> Browse Universities
+                </button>
                 <button className="add-student-btn" onClick={() => setActiveSection("students")}>
                 <Plus size={18} />
                 <span>Add Student</span>
@@ -1805,27 +1836,71 @@ useEffect(() => {
             </div>
 
             {/* HEADER */}
-            <div className="welcome">
-              <h1>Welcome back, {userName}!</h1>
-              <p>Here's what's happening with your students today.</p>
+            <div className="welcome" style={{ marginBottom: "28px" }}>
+              <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 700, marginBottom: "8px" }}>Welcome back, {userName}!</h1>
+              <p style={{ color: "#64748b", fontSize: "16px", margin: 0 }}>Here's what's happening with your students today.</p>
             </div>
 
             {/* STATS */}
-            <div className="stats-grid">
-              <div className="stat-card">
-                <span style={{ float: "right", fontSize: 28, background: "#f1f5f9", borderRadius: 8, padding: 8 }}><Users size={24} /></span>
-                <div style={{ fontSize: 15, color: "#64748b", marginBottom: 6 }}>Total Students</div>
-                <h2 style={{ fontSize: 24, margin: 0 }}>{students.length}</h2>
+            <div className="stats-grid" style={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", 
+              gap: "20px",
+              marginBottom: "28px"
+            }}>
+              <div className="stat-card" style={{
+                padding: "24px",
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                position: "relative",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+              }}>
+                <div style={{ 
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  width: "48px",
+                  height: "48px",
+                  background: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <Users size={24} style={{ color: "#4f46e5" }} />
+                </div>
+                <div style={{ fontSize: 14, color: "#64748b", marginBottom: 8, fontWeight: 500 }}>Total Students</div>
+                <h2 style={{ fontSize: 32, margin: 0, fontWeight: 700, color: "#0f172a" }}>{students.length}</h2>
               </div>
 
-              <div className="stat-card">
-                <span style={{ float: "right", fontSize: 28, background: "#f1f5f9", borderRadius: 8, padding: 8 }}><FileText size={24} /></span>
-                <div style={{ fontSize: 15, color: "#64748b", marginBottom: 6 }}>Applications</div>
-                <h2 style={{ fontSize: 24, margin: 0 }}>{applications.length}</h2>
-                <span style={{ fontSize: 13, color: "#64748b" }}>
-                  {/* {applications.filter(
-                      (app) => app.status === "Submitted" || app.status === "Under Review"
-                    ).length}{" "} */}
+              <div className="stat-card" style={{
+                padding: "24px",
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                position: "relative",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+              }}>
+                <div style={{ 
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  width: "48px",
+                  height: "48px",
+                  background: "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <FileText size={24} style={{ color: "#2563eb" }} />
+                </div>
+                <div style={{ fontSize: 14, color: "#64748b", marginBottom: 8, fontWeight: 500 }}>Applications</div>
+                <h2 style={{ fontSize: 32, margin: 0, fontWeight: 700, color: "#0f172a" }}>{applications.length}</h2>
+                <span style={{ fontSize: 13, color: "#64748b", marginTop: 4, display: "block" }}>
                     {applications.filter(
                       (app) => app.status === "Submitted"
                     ).length}{" "}
@@ -1833,37 +1908,206 @@ useEffect(() => {
                 </span>
               </div>
 
-              <div className="stat-card">
-                <span style={{ float: "right", fontSize: 28, background: "#fef9c3", borderRadius: 8, padding: 8 }}><Clock size={24} /></span>
-                <div style={{ fontSize: 15, color: "#64748b", marginBottom: 6 }}>Commission Due</div>
-                <h2 style={{ fontSize: 24, margin: 0 }}>$0</h2>
+              <div className="stat-card" style={{
+                padding: "24px",
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                position: "relative",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+              }}>
+                <div style={{ 
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  width: "48px",
+                  height: "48px",
+                  background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <Clock size={24} style={{ color: "#d97706" }} />
+                </div>
+                <div style={{ fontSize: 14, color: "#64748b", marginBottom: 8, fontWeight: 500 }}>Commission Due</div>
+                <h2 style={{ fontSize: 32, margin: 0, fontWeight: 700, color: "#0f172a" }}>$0</h2>
               </div>
 
-              <div className="stat-card">
-                <span style={{ float: "right", fontSize: 28, background: "#dcfce7", borderRadius: 8, padding: 8 }}><DollarSign size={24} /></span>
-                <div style={{ fontSize: 15, color: "#64748b", marginBottom: 6 }}>Commission Paid</div>
-                <h2 style={{ fontSize: 24, margin: 0 }}>$0</h2>
+              <div className="stat-card" style={{
+                padding: "24px",
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                position: "relative",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+              }}>
+                <div style={{ 
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  width: "48px",
+                  height: "48px",
+                  background: "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <DollarSign size={24} style={{ color: "#16a34a" }} />
+                </div>
+                <div style={{ fontSize: 14, color: "#64748b", marginBottom: 8, fontWeight: 500 }}>Commission Paid</div>
+                <h2 style={{ fontSize: 32, margin: 0, fontWeight: 700, color: "#0f172a" }}>$0</h2>
               </div>
             </div>
 
             {/* CONTENT GRID */}
-            <div className="content-grid">
-              <div className="box">
-                <h3>Quick Actions</h3>
-                <button onClick={() => setActiveSection("students")}><Plus size={16} /> Add New Student</button>
-                <button onClick={() => setActiveSection("applications")}><FileText size={16} /> Submit Application</button>
-                <button onClick={() => setActiveSection("universities")}><Search size={16} /> Search Universities</button>
-                <button onClick={() => setActiveSection("commissions")}><DollarSign size={16} /> View Commissions</button>
+            <div className="content-grid" style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 2fr",
+              gap: "20px",
+              marginBottom: "28px"
+            }}>
+              <div className="box" style={{
+                padding: "24px",
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+              }}>
+                <h3 style={{ margin: "0 0 20px 0", fontSize: "18px", fontWeight: 700 }}>Quick Actions</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <button 
+                    onClick={() => setActiveSection("students")}
+                    style={{
+                      padding: "12px 16px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      color: "#0f172a",
+                      transition: "all 0.2s",
+                      textAlign: "left"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#f1f5f9";
+                      e.currentTarget.style.borderColor = "#cbd5e1";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#f8fafc";
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                    }}
+                  >
+                    <Plus size={16} /> Add New Student
+                  </button>
+                  <button 
+                    onClick={() => setActiveSection("applications")}
+                    style={{
+                      padding: "12px 16px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      color: "#0f172a",
+                      transition: "all 0.2s",
+                      textAlign: "left"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#f1f5f9";
+                      e.currentTarget.style.borderColor = "#cbd5e1";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#f8fafc";
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                    }}
+                  >
+                    <FileText size={16} /> Submit Application
+                  </button>
+                  <button 
+                    onClick={() => setActiveSection("universities")}
+                    style={{
+                      padding: "12px 16px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      color: "#0f172a",
+                      transition: "all 0.2s",
+                      textAlign: "left"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#f1f5f9";
+                      e.currentTarget.style.borderColor = "#cbd5e1";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#f8fafc";
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                    }}
+                  >
+                    <Search size={16} /> Search Universities
+                  </button>
+                  <button 
+                    onClick={() => setActiveSection("commissions")}
+                    style={{
+                      padding: "12px 16px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      color: "#0f172a",
+                      transition: "all 0.2s",
+                      textAlign: "left"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#f1f5f9";
+                      e.currentTarget.style.borderColor = "#cbd5e1";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#f8fafc";
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                    }}
+                  >
+                    <DollarSign size={16} /> View Commissions
+                  </button>
+                </div>
               </div>
 
-              <div className="box">
-                <div className="box-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3>Recent Applications</h3>
+              <div className="box" style={{
+                padding: "24px",
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+              }}>
+                <div className="box-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "20px" }}>
+                  <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>Recent Applications</h3>
                   <span
   className="view"
   role="button"
   tabIndex={0}
-  style={{ color: '#64748b', fontSize: 14, cursor: 'pointer' }}
+  style={{ color: '#667eea', fontSize: 14, cursor: 'pointer', fontWeight: 600 }}
   onClick={() => setActiveSection("applications")}
   onKeyDown={(e) => e.key === 'Enter' && setActiveSection("applications")}
 >
@@ -1872,17 +2116,34 @@ useEffect(() => {
 
                 </div>
 
-                <div className="empty" style={{ textAlign: 'center', color: '#94a3b8', marginTop: 30 }}>
-                  <div style={{ fontSize: 40, marginBottom: 8 }}><FileText size={40} /></div>
-                  <div>No applications yet</div>
+                <div className="empty" style={{ textAlign: 'center', color: '#94a3b8', padding: "40px 20px" }}>
+                  <div style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    background: "#f1f5f9",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 16px",
+                  }}>
+                    <FileText size={32} style={{ color: "#cbd5e1" }} />
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>No applications yet</div>
                   <a
   href="#applications"
   onClick={(e) => {
     e.preventDefault();
     setActiveSection("applications");
   }}
+  style={{
+    color: "#667eea",
+    textDecoration: "none",
+    fontSize: 14,
+    fontWeight: 600
+  }}
 >
-  Submit your first application
+  Submit your first application →
 </a>
 
                 </div>
@@ -1890,30 +2151,66 @@ useEffect(() => {
             </div>
 
             {/* STATUS */}
-            <div className="status-grid">
-              <div className="status-card blue">
-                <div style={{ fontSize: 28, marginBottom: 6 }}><AlertCircle size={28} /></div>
-                <h2>{applications.filter(
-                      (app) => app.status === "Submitted"
-                    ).length}{" "}</h2>
-                <p>Pending Review</p>
+            <div className="status-grid" style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "20px"
+            }}>
+              <div className="status-card blue" style={{
+                padding: "24px",
+                background: "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+                borderRadius: "12px",
+                border: "1px solid #93c5fd",
+                textAlign: "center"
+              }}>
+                <div style={{ marginBottom: 12 }}>
+                  <AlertCircle size={32} style={{ color: "#1e40af" }} />
+                </div>
+                <h2 style={{ fontSize: 36, margin: "0 0 8px 0", fontWeight: 700, color: "#1e3a8a" }}>
+                  {applications.filter((app) => app.status === "Submitted").length}
+                </h2>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#1e40af" }}>Pending Review</p>
               </div>
-              <div className="status-card green">
-                <div style={{ fontSize: 28, marginBottom: 6 }}><CheckCircle size={28} /></div>
-                <h2>{applications.filter(
-                      (app) => app.status === "Accepted"
-                    ).length}{" "}</h2>
-                <p>Accepted</p>
+              <div className="status-card green" style={{
+                padding: "24px",
+                background: "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)",
+                borderRadius: "12px",
+                border: "1px solid #86efac",
+                textAlign: "center"
+              }}>
+                <div style={{ marginBottom: 12 }}>
+                  <CheckCircle size={32} style={{ color: "#15803d" }} />
+                </div>
+                <h2 style={{ fontSize: 36, margin: "0 0 8px 0", fontWeight: 700, color: "#14532d" }}>
+                  {applications.filter((app) => app.status === "Accepted").length}
+                </h2>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#15803d" }}>Accepted</p>
               </div>
-              <div className="status-card gray">
-                <div style={{ fontSize: 28, marginBottom: 6 }}><TrendingUp size={28} /></div>
-                <h2>0%</h2>
-                <p>Success Rate</p>
+              <div className="status-card gray" style={{
+                padding: "24px",
+                background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
+                borderRadius: "12px",
+                border: "1px solid #cbd5e1",
+                textAlign: "center"
+              }}>
+                <div style={{ marginBottom: 12 }}>
+                  <TrendingUp size={32} style={{ color: "#475569" }} />
+                </div>
+                <h2 style={{ fontSize: 36, margin: "0 0 8px 0", fontWeight: 700, color: "#1e293b" }}>0%</h2>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#475569" }}>Success Rate</p>
               </div>
-              <div className="status-card teal">
-                <div style={{ fontSize: 28, marginBottom: 6 }}><GraduationCap size={28} /></div>
-                <h2>{students.length}</h2>
-                <p>Active Students</p>
+              <div className="status-card teal" style={{
+                padding: "24px",
+                background: "linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)",
+                borderRadius: "12px",
+                border: "1px solid #5eead4",
+                textAlign: "center"
+              }}>
+                <div style={{ marginBottom: 12 }}>
+                  <GraduationCap size={32} style={{ color: "#0f766e" }} />
+                </div>
+                <h2 style={{ fontSize: 36, margin: "0 0 8px 0", fontWeight: 700, color: "#134e4a" }}>{students.length}</h2>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#0f766e" }}>Active Students</p>
               </div>
             </div>
           </>
