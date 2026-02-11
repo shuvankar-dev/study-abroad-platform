@@ -6,7 +6,8 @@ import {
   Home, GraduationCap, Users, FileText, DollarSign, Building2, 
   CreditCard, BookOpen, MessageSquare, Shield, User, 
   LogOut, Plus, Search, Filter, Clock,
-  TrendingUp, CheckCircle, AlertCircle
+  TrendingUp, CheckCircle, AlertCircle, Mail, Phone, Globe, 
+  Calendar, Edit2, Trash2, X
 } from "lucide-react";
 
 const API_BASE = window.location.hostname === 'localhost'
@@ -451,6 +452,8 @@ const confirmDeleteLoan = async () => {
 
 const fetchAccommodationRequests = async () => {
   try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    
     const res = await fetch(
       `${API_BASE}/edupartner/get_accommodation.php`,
       {
@@ -464,12 +467,15 @@ const fetchAccommodationRequests = async () => {
     );
 
     const data = await res.json();
+    console.log("Accommodation response:", data);
 
     if (data.success) {
       setAccommodationRequests(data.accommodations);
+    } else {
+      console.error("Accommodation fetch failed:", data);
     }
   } catch (err) {
-    console.error("Failed to fetch accommodation requests");
+    console.error("Failed to fetch accommodation requests:", err);
   }
 };
 
@@ -1918,48 +1924,95 @@ useEffect(() => {
         <div style={{ padding: "24px" }}>
 
             {/* HEADER */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
             <div>
-                <h1 style={{ marginBottom: 4 }}>University Search</h1>
-                <p style={{ color: "#64748b" }}>
+                <h1 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>University Search</h1>
+                <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
                 Find the perfect course for your students
                 </p>
             </div>
 
-            <button className="outline-btn" onClick={() => setShowFilters((prev) => !prev)}><Filter size={16} /> Filters</button>
+            <button 
+              className="outline-btn" 
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{
+                padding: "11px 20px",
+                borderRadius: "10px",
+                border: "2px solid #e2e8f0",
+                background: showFilters ? "#f8fafc" : "#fff",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.background = "#f8fafc";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#e2e8f0";
+                e.currentTarget.style.background = showFilters ? "#f8fafc" : "#fff";
+              }}
+            >
+              <Filter size={16} /> Filters
+            </button>
             </div>
 
             {/* SEARCH BOX */}
             <div
             style={{
-                marginTop: 24,
-                padding: 20,
+                padding: 24,
                 border: "1px solid #e2e8f0",
                 borderRadius: 12,
                 background: "#fff",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
             }}
             >
-            <input
-                type="text"
-                placeholder="Search universities or courses..."
-                value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                    width: "98%",
-                    padding: "12px 14px",
-                    borderRadius: 8,
-                    border: "1px solid #e2e8f0",
-                    outline: "none",
-                    fontSize: 14,
-                    background: "#ffffff",
-                    color: "#0f172a",
-                }}
-                />
-        
+            <div style={{ position: "relative" }}>
+              <Search 
+                size={20} 
+                style={{ 
+                  position: "absolute", 
+                  left: "14px", 
+                  top: "50%", 
+                  transform: "translateY(-50%)",
+                  color: "#94a3b8"
+                }} 
+              />
+              <input
+                  type="text"
+                  placeholder="Search universities or courses..."
+                  value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                      width: "100%",
+                      padding: "12px 14px 12px 44px",
+                      borderRadius: 10,
+                      border: "2px solid #e2e8f0",
+                      outline: "none",
+                      fontSize: 14,
+                      background: "#ffffff",
+                      color: "#0f172a",
+                      transition: "all 0.2s",
+                      boxSizing: "border-box"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  />
+            </div>
 
 
-{/* Divider line */}
 {showFilters && (
+  <>
   <div
     style={{
       marginTop: 20,
@@ -1968,12 +2021,9 @@ useEffect(() => {
       backgroundColor: "#e2e8f0",
     }}
   />
-)}
 
-  {showFilters && (
   <div
     style={{
-      marginTop: 16,
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr",
       gap: 20,
@@ -1985,10 +2035,10 @@ useEffect(() => {
       <label
         style={{
           display: "block",
-          marginBottom: 6,
-          fontSize: 13,
-          fontWeight: 500,
-          color: "#0f172a",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#334155",
         }}
       >
         Country
@@ -1998,16 +2048,26 @@ useEffect(() => {
           onChange={(e) => setFilterCountry(e.target.value)}
         style={{
           width: "100%",
-          padding: "10px 12px",
-          borderRadius: 8,
-          border: "1px solid #cbd5e1",
+          padding: "12px 14px",
+          borderRadius: 10,
+          border: "2px solid #e2e8f0",
           background: "#ffffff",
           fontSize: 14,
           color: "#0f172a",
           outline: "none",
+          cursor: "pointer",
+          transition: "all 0.2s"
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.boxShadow = "none";
         }}
       >
-        <option value="">All Countries</option>  {/* <-- value is "" */}
+        <option value="">All Countries</option>
   <option value="Australia">Australia</option>
   <option value="Canada">Canada</option>
   <option value="France">France</option>
@@ -2027,10 +2087,10 @@ useEffect(() => {
       <label
         style={{
           display: "block",
-          marginBottom: 6,
-          fontSize: 13,
-          fontWeight: 500,
-          color: "#0f172a",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#334155",
         }}
       >
         Level
@@ -2040,16 +2100,26 @@ useEffect(() => {
           onChange={(e) => setFilterLevel(e.target.value)}
         style={{
           width: "100%",
-          padding: "10px 12px",
-          borderRadius: 8,
-          border: "1px solid #cbd5e1",
+          padding: "12px 14px",
+          borderRadius: 10,
+          border: "2px solid #e2e8f0",
           background: "#ffffff",
           fontSize: 14,
           color: "#0f172a",
           outline: "none",
+          cursor: "pointer",
+          transition: "all 0.2s"
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.boxShadow = "none";
         }}
       >
-        <option value="">All Levels</option>  {/* <-- value is "" */}
+        <option value="">All Levels</option>
   <option value="Undergraduate">Undergraduate</option>
   <option value="Postgraduate">Postgraduate</option>
       </select>
@@ -2060,10 +2130,10 @@ useEffect(() => {
       <label
         style={{
           display: "block",
-          marginBottom: 6,
-          fontSize: 13,
-          fontWeight: 500,
-          color: "#0f172a",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#334155",
         }}
       >
         Intake Month
@@ -2073,16 +2143,26 @@ useEffect(() => {
           onChange={(e) => setFilterIntake(e.target.value)}
         style={{
           width: "100%",
-          padding: "10px 12px",
-          borderRadius: 8,
-          border: "1px solid #cbd5e1",
+          padding: "12px 14px",
+          borderRadius: 10,
+          border: "2px solid #e2e8f0",
           background: "#ffffff",
           fontSize: 14,
           color: "#0f172a",
           outline: "none",
+          cursor: "pointer",
+          transition: "all 0.2s"
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.boxShadow = "none";
         }}
       >
-        <option value="">All Intakes</option>  {/* <-- value is "" */}
+        <option value="">All Intakes</option>
   <option value="Jan">Jan</option>
   <option value="Feb">Feb</option>
   <option value="Mar">Mar</option>
@@ -2099,6 +2179,7 @@ useEffect(() => {
       </select>
     </div>
   </div>
+  </>
 )}
 
 
@@ -2106,60 +2187,73 @@ useEffect(() => {
 
 
             {/* COUNT */}
-            {/* <div style={{ marginTop: 16, color: "#64748b", fontSize: 14 }}>
-            Showing {paginatedUniversities.length} of {universities.length} courses
-            </div> */}
-
-            <div style={{ marginTop: 16, color: "#64748b", fontSize: 14 }}>
+            <div style={{ marginTop: 20, color: "#64748b", fontSize: 14, fontWeight: 500 }}>
   Showing {paginatedUniversities.length} of {filteredUniversities11.length} courses
 </div>
 
 
             {universities.length === 0 ? (
-  /* EMPTY STATE */
   <div
     style={{
       marginTop: 20,
-      padding: 60,
+      padding: 80,
       border: "1px solid #e2e8f0",
       borderRadius: 12,
       textAlign: "center",
       background: "#fff",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
     }}
   >
-    <div style={{ fontSize: 40, marginBottom: 10 }}>🎓</div>
-    <h3 style={{ marginBottom: 6 }}>No courses found</h3>
-    <p style={{ color: "#64748b" }}>
+    <div
+      style={{
+        width: 64,
+        height: 64,
+        borderRadius: "50%",
+        background: "#f1f5f9",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "0 auto 16px",
+      }}
+    >
+      <GraduationCap size={32} style={{ color: "#cbd5e1" }} />
+    </div>
+    <h3 style={{ marginBottom: 6, color: "#0f172a" }}>No courses found</h3>
+    <p style={{ color: "#64748b", margin: 0 }}>
       Try adjusting your search or filters
     </p>
   </div>
 ) : (
-  /* DATA TABLE */
    <div
   style={{
+    marginTop: 20,
     border: "1px solid #e2e8f0",
     borderRadius: 12,
     background: "#fff",
     overflow: "hidden",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
   }}
 >
   <table style={{ width: "100%", borderCollapse: "collapse" }}>
     <thead>
       <tr
         style={{
-          background: "#f8fafc",
+          background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
           textAlign: "left",
           fontSize: 13,
           color: "#64748b",
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.5px"
         }}
       >
-        <th style={{ padding: "14px 20px" }}>University</th>
-        <th style={{ padding: "14px 20px" }}>Course</th>
-        <th style={{ padding: "14px 20px" }}>Study Level</th>
-        <th style={{ padding: "14px 20px" }}>Campus</th>
-        <th style={{ padding: "14px 20px" }}>Country</th>
-        <th style={{ padding: "14px 20px" }}>Duration</th>
-        <th style={{ padding: "14px 20px" }}>Open Intakes</th>
+        <th style={{ padding: "16px 20px" }}>University</th>
+        <th style={{ padding: "16px 20px" }}>Course</th>
+        <th style={{ padding: "16px 20px" }}>Study Level</th>
+        <th style={{ padding: "16px 20px" }}>Campus</th>
+        <th style={{ padding: "16px 20px" }}>Country</th>
+        <th style={{ padding: "16px 20px" }}>Duration</th>
+        <th style={{ padding: "16px 20px" }}>Open Intakes</th>
       </tr>
     </thead>
 
@@ -2168,44 +2262,72 @@ useEffect(() => {
         <tr
           key={i}
           style={{
-            borderTop: "1px solid #e2e8f0",
+            borderTop: "1px solid #f1f5f9",
             fontSize: 14,
             color: "#0f172a",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f8fafc";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
           }}
         >
           {/* University */}
-          <td style={{ padding: "16px 20px", fontWeight: 600 }}>
-            🎓 {u.University}
+          <td style={{ padding: "18px 20px", fontWeight: 600 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <GraduationCap size={18} style={{ color: "#667eea" }} />
+              {u.University}
+            </div>
           </td>
 
           {/* Course */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
+          <td style={{ padding: "18px 20px", color: "#475569" }}>
             {u.Program_Name}
           </td>
 
           {/* Study Level */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
-            {u.Study_Level}
+          <td style={{ padding: "18px 20px" }}>
+            <span style={{
+              padding: "4px 10px",
+              borderRadius: 999,
+              background: "#eff6ff",
+              color: "#3b82f6",
+              fontSize: 12,
+              fontWeight: 600
+            }}>
+              {u.Study_Level}
+            </span>
           </td>
 
           {/* Campus */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
+          <td style={{ padding: "18px 20px", color: "#475569" }}>
             {u.Campus}
           </td>
 
           {/* Country */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
-            🌍 {u.Country}
+          <td style={{ padding: "18px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#475569" }}>
+              <Globe size={16} style={{ color: "#64748b" }} />
+              {u.Country}
+            </div>
           </td>
 
           {/* Duration */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
-            ⏳ {u.Duration}
+          <td style={{ padding: "18px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#475569" }}>
+              <Clock size={16} style={{ color: "#64748b" }} />
+              {u.Duration}
+            </div>
           </td>
 
           {/* Open Intakes */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
-            📅 {u.Open_Intakes}
+          <td style={{ padding: "18px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#475569" }}>
+              <Calendar size={16} style={{ color: "#64748b" }} />
+              {u.Open_Intakes}
+            </div>
           </td>
         </tr>
       ))}
@@ -2220,24 +2342,42 @@ useEffect(() => {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 16,
+    marginTop: 20,
   }}
 >
-  <span style={{ fontSize: 14, color: "#64748b" }}>
+  <span style={{ fontSize: 14, color: "#64748b", fontWeight: 500 }}>
     Page {currentPage} of {totalPages}
   </span>
 
-  <div style={{ display: "flex", gap: 8 }}>
+  <div style={{ display: "flex", gap: 10 }}>
     <button
       disabled={currentPage === 1}
       onClick={() => setCurrentPage((p) => p - 1)}
       style={{
-        padding: "8px 14px",
-        borderRadius: 8,
-        border: "1px solid #e2e8f0",
-        background: currentPage === 1 ? "#f1f5f9" : "#fff",
+        padding: "10px 18px",
+        borderRadius: 10,
+        border: "2px solid #e2e8f0",
+        background: currentPage === 1 ? "#f8fafc" : "#fff",
         cursor: currentPage === 1 ? "not-allowed" : "pointer",
         color: currentPage === 1 ? "#94a3b8" : "#0f172a",
+        fontWeight: 600,
+        fontSize: 14,
+        transition: "all 0.2s",
+        display: "flex",
+        alignItems: "center",
+        gap: 6
+      }}
+      onMouseEnter={(e) => {
+        if (currentPage !== 1) {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.background = "#f8fafc";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (currentPage !== 1) {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.background = "#fff";
+        }
       }}
     >
       ◀ Previous
@@ -2247,12 +2387,30 @@ useEffect(() => {
       disabled={currentPage === totalPages || totalPages === 0}
       onClick={() => setCurrentPage((p) => p + 1)}
       style={{
-        padding: "8px 14px",
-        borderRadius: 8,
-        border: "1px solid #e2e8f0",
-        background: currentPage === totalPages || totalPages === 0 ? "#f1f5f9" : "#fff",
+        padding: "10px 18px",
+        borderRadius: 10,
+        border: "2px solid #e2e8f0",
+        background: currentPage === totalPages || totalPages === 0 ? "#f8fafc" : "#fff",
         cursor: currentPage === totalPages || totalPages === 0 ? "not-allowed" : "pointer",
         color: currentPage === totalPages || totalPages === 0 ? "#94a3b8" : "#0f172a",
+        fontWeight: 600,
+        fontSize: 14,
+        transition: "all 0.2s",
+        display: "flex",
+        alignItems: "center",
+        gap: 6
+      }}
+      onMouseEnter={(e) => {
+        if (currentPage !== totalPages && totalPages !== 0) {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.background = "#f8fafc";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (currentPage !== totalPages && totalPages !== 0) {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.background = "#fff";
+        }
       }}
     >
       Next ▶
@@ -2513,7 +2671,7 @@ useEffect(() => {
                   fontSize: 16,
                 }}
               >
-                👤
+                <User size={18} />
               </div>
 
               <div>
@@ -2533,22 +2691,34 @@ useEffect(() => {
 
           {/* Email */}
           <td style={{ padding: "16px 20px", color: "#334155" }}>
-            📧 {s.email}
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Mail size={16} style={{ color: "#64748b" }} />
+              {s.email}
+            </span>
           </td>
 
           {/* Phone */}
           <td style={{ padding: "16px 20px", color: "#334155" }}>
-            📞 {s.phone}
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Phone size={16} style={{ color: "#64748b" }} />
+              {s.phone}
+            </span>
           </td>
 
           {/* Nationality */}
           <td style={{ padding: "16px 20px", color: "#334155" }}>
-            🌍 {s.nationality}
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Globe size={16} style={{ color: "#64748b" }} />
+              {s.nationality}
+            </span>
           </td>
 
           {/* Added */}
           <td style={{ padding: "16px 20px", color: "#334155" }}>
-            📅 {s.added}
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Calendar size={16} style={{ color: "#64748b" }} />
+              {s.added}
+            </span>
           </td>
 
           {/* Actions */}
@@ -2562,30 +2732,53 @@ useEffect(() => {
           >
            <button
            style={{
-              padding: "10px 10px",
-              textAlign: "right",
+              padding: "8px",
               cursor: "pointer",
-              fontSize: 16,
               border: "none",
-              background: "transparent"
+              background: "#eff6ff",
+              borderRadius: "6px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: "8px",
+              transition: "all 0.2s"
             }}
             onClick={() => handleEditClick(s.id)}
-           >✏️</button>
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#dbeafe";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#eff6ff";
+            }}
+           >
+             <Edit2 size={16} style={{ color: "#3b82f6" }} />
+           </button>
 
            <button
            style={{
-              padding: "10px 10px",
-              textAlign: "right",
+              padding: "8px",
               cursor: "pointer",
-              fontSize: 16,
               border: "none",
-              background: "transparent"
+              background: "#fef2f2",
+              borderRadius: "6px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.2s"
             }}
             onClick={() => {
     setDeleteStudentId(s.id);
     setShowDeleteConfirm(true);
   }}
-           >🗑️</button>
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#fee2e2";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#fef2f2";
+            }}
+           >
+             <Trash2 size={16} style={{ color: "#ef4444" }} />
+           </button>
           </td>
         </tr>
       ))}
@@ -2658,20 +2851,27 @@ useEffect(() => {
                     style={{
                     position: "fixed",
                     inset: 0,
-                    background: "rgba(0,0,0,0.5)",
+                    background: "rgba(0,0,0,0.6)",
+                    backdropFilter: "blur(4px)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     zIndex: 1000,
+                    padding: "20px"
                     }}
+                    onClick={() => setShowAddStudent(false)}
                 >
                     <div
                     style={{
                         background: "#fff",
-                        width: "760px",
-                        borderRadius: 12,
-                        padding: 24,
+                        width: "100%",
+                        maxWidth: "800px",
+                        borderRadius: 16,
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                        overflow: "hidden",
+                        animation: "slideUp 0.3s ease-out"
                     }}
+                    onClick={(e) => e.stopPropagation()}
                     >
                     {/* Header */}
                     <div
@@ -2679,25 +2879,43 @@ useEffect(() => {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: 24,
+                        padding: "24px 28px",
+                        borderBottom: "1px solid #e2e8f0",
+                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                         }}
                     >
-                        <h2 style={{ margin: 0 }}>Add New Student</h2>
+                        <div>
+                          <h2 style={{ margin: 0, color: "#fff", fontSize: "22px", fontWeight: 700 }}>Add New Student</h2>
+                          <p style={{ margin: "4px 0 0 0", color: "rgba(255,255,255,0.9)", fontSize: "14px" }}>Fill in the student details below</p>
+                        </div>
                         <button
                         onClick={() => setShowAddStudent(false)}
                         style={{
-                            background: "transparent",
+                            background: "rgba(255,255,255,0.2)",
                             border: "none",
-                            fontSize: 20,
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "8px",
                             cursor: "pointer",
-                            color: "#64748b",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transition: "all 0.2s"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.3)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.2)";
                         }}
                         >
-                        ✕
+                        <X size={20} />
                         </button>
                     </div>
 
                     {/* Form */}
+                    <div style={{ padding: "28px", maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}>
                     <div
                         style={{
                         display: "grid",
@@ -2707,85 +2925,261 @@ useEffect(() => {
                     >
                         {/* First Name */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
-                            First Name *
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
+                            First Name <span style={{ color: "#ef4444" }}>*</span>
                         </label>
-                        {/* <input
-                            style={inputStyle}
-                            value={userId}
-                            name="user_id"
-                            placeholder=""
-                            hidden
-                            onChange={handleChange}
-                        /> */}
                         <input
-                            style={inputStyle}
-                            placeholder=""
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
+                            placeholder="Enter first name"
                             name="first_name"
                             onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
                         />
                         </div>
 
                         {/* Last Name */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
-                            Last Name *
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
+                            Last Name <span style={{ color: "#ef4444" }}>*</span>
                         </label>
-                        <input style={inputStyle} name="last_name" onChange={handleChange}/>
+                        <input 
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
+                            placeholder="Enter last name"
+                            name="last_name" 
+                            onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
+                        />
                         </div>
 
                         {/* Email */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
-                            Email *
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
+                            Email <span style={{ color: "#ef4444" }}>*</span>
                         </label>
-                        <input style={inputStyle} name="email" onChange={handleChange}/>
+                        <input 
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
+                            placeholder="student@example.com"
+                            type="email"
+                            name="email" 
+                            onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
+                        />
                         </div>
 
                         {/* Phone */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
                             Phone
                         </label>
-                        <input style={inputStyle} name="phone" onChange={handleChange}/>
+                        <input 
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
+                            placeholder="+1 (555) 000-0000"
+                            name="phone" 
+                            onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
+                        />
                         </div>
 
                         {/* Date of Birth */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
                             Date of Birth
                         </label>
-                        <input type="date" style={inputStyle} name="dob" onChange={handleChange}/>
+                        <input 
+                            type="date" 
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
+                            name="dob" 
+                            onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
+                        />
                         </div>
 
                         {/* Nationality */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
                             Nationality
                         </label>
-                        <input style={inputStyle} name="nationality" onChange={handleChange}/>
+                        <input 
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
+                            placeholder="e.g., Indian"
+                            name="nationality" 
+                            onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
+                        />
                         </div>
 
                         {/* Passport Number */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
                             Passport Number
                         </label>
-                        <input style={inputStyle} name="passport_num" onChange={handleChange}/>
+                        <input 
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
+                            placeholder="Enter passport number"
+                            name="passport_num" 
+                            onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
+                        />
                         </div>
 
                         {/* Current Education */}
                         <div>
-                        <label style={{ fontSize: 14, fontWeight: 500 }}>
+                        <label style={{ 
+                          display: "block",
+                          fontSize: 14, 
+                          fontWeight: 600,
+                          color: "#334155",
+                          marginBottom: 8
+                        }}>
                             Current Education
                         </label>
                         <input
-                            style={inputStyle}
+                            style={{
+                              ...inputStyle,
+                              border: "2px solid #e2e8f0",
+                              transition: "all 0.2s",
+                              fontSize: 15
+                            }}
                             name="education"
-                            placeholder="eg., Bachelor's in Computer Science"
+                            placeholder="e.g., Bachelor's in Computer Science"
                             onChange={handleChange}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = "#667eea";
+                              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = "#e2e8f0";
+                              e.target.style.boxShadow = "none";
+                            }}
                         />
                         </div>
+                    </div>
                     </div>
 
                     {/* Actions */}
@@ -2794,54 +3188,61 @@ useEffect(() => {
                         display: "flex",
                         justifyContent: "flex-end",
                         gap: 12,
-                        marginTop: 28,
+                        padding: "20px 28px",
+                        borderTop: "1px solid #e2e8f0",
+                        background: "#f8fafc"
                         }}
                     >
                         <button
                         onClick={() => setShowAddStudent(false)}
                         style={{
-                            padding: "10px 18px",
-                            borderRadius: 8,
-                            border: "1px solid #e2e8f0",
+                            padding: "12px 24px",
+                            borderRadius: 10,
+                            border: "2px solid #e2e8f0",
                             background: "#fff",
                             cursor: "pointer",
-                            fontWeight: 500,
-                            color: "#374151",
+                            fontWeight: 600,
+                            color: "#64748b",
+                            fontSize: 15,
+                            transition: "all 0.2s"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#f1f5f9";
+                          e.currentTarget.style.borderColor = "#cbd5e1";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "#fff";
+                          e.currentTarget.style.borderColor = "#e2e8f0";
                         }}
                         >
                         Cancel
                         </button>
 
-                        {/* <button
-                        style={{
-                            padding: "10px 20px",
-                            borderRadius: 8,
-                            border: "none",
-                            background: "#1d4ed8",
-                            color: "#fff",
-                            cursor: "pointer",
-                            fontWeight: 600,
-                        }}
-                        >
-                        Add Student
-                        </button> */}
-
                         <button
                         onClick={handleAddStudent}
                         style={{
-                            padding: "10px 20px",
-                            borderRadius: 8,
+                            padding: "12px 28px",
+                            borderRadius: 10,
                             border: "none",
-                            background: "#1d4ed8",
+                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                             color: "#fff",
                             cursor: "pointer",
                             fontWeight: 600,
+                            fontSize: 15,
+                            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
+                            transition: "all 0.2s"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 6px 20px rgba(102, 126, 234, 0.5)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.4)";
                         }}
                         >
                         Add Student
                         </button>
-
-
                     </div>
                     </div>
                 </div>
@@ -3226,7 +3627,6 @@ useEffect(() => {
 
             {/* EMPTY STATE */}
             {filteredApplications.length === 0 ? (
-  /* EMPTY STATE */
   <div
     style={{
       padding: 80,
@@ -3236,8 +3636,14 @@ useEffect(() => {
       textAlign: "center",
     }}
   >
-    <div style={{ fontSize: 48, marginBottom: 16, color: "#94a3b8" }}>
-      📄
+    <div style={{ 
+      fontSize: 48, 
+      marginBottom: 16, 
+      color: "#94a3b8",
+      display: "flex",
+      justifyContent: "center"
+    }}>
+      <FileText size={64} style={{ color: "#cbd5e1" }} />
     </div>
 
     <h3 style={{ marginBottom: 8 }}>No applications found</h3>
@@ -3292,23 +3698,48 @@ useEffect(() => {
           }}
         >
           {/* Student */}
-          <td style={{ padding: "16px 20px", fontWeight: 600 }}>
-            👤 {app.student_name}
+          <td style={{ padding: "16px 20px" }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  background: "#e0e7ff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#4f46e5",
+                }}
+              >
+                <User size={18} />
+              </div>
+              <span style={{ fontWeight: 600 }}>{app.student_name}</span>
+            </div>
           </td>
 
           {/* University */}
-          <td style={{ padding: "16px 20px" }}>
-            🎓 {app.university_name}
+          <td style={{ padding: "16px 20px", color: "#334155" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <GraduationCap size={16} style={{ color: "#64748b" }} />
+              {app.university_name}
+            </span>
           </td>
 
           {/* Course */}
-          <td style={{ padding: "16px 20px" }}>
-            {app.course_name}
+          <td style={{ padding: "16px 20px", color: "#334155" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <BookOpen size={16} style={{ color: "#64748b" }} />
+              {app.course_name}
+            </span>
           </td>
 
           {/* Intake */}
-          <td style={{ padding: "16px 20px" }}>
-            📅 {app.pref_intake || "-"}
+          <td style={{ padding: "16px 20px", color: "#334155" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Calendar size={16} style={{ color: "#64748b" }} />
+              {app.pref_intake || "-"}
+            </span>
           </td>
 
           {/* Status */}
@@ -3337,33 +3768,52 @@ useEffect(() => {
           >
             <button
               style={{
-                padding: "6px",
+                padding: "8px",
                 cursor: "pointer",
-                fontSize: 16,
                 border: "none",
-                background: "transparent",
+                background: "#eff6ff",
+                borderRadius: "6px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: "8px",
+                transition: "all 0.2s"
               }}
               onClick={() => handleEditApplication(app)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#dbeafe";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#eff6ff";
+              }}
             >
-              ✏️
+              <Edit2 size={16} style={{ color: "#3b82f6" }} />
             </button>
             <button
-    style={{
-      padding: "6px",
-      cursor: "pointer",
-      fontSize: 16,
-      border: "none",
-      background: "transparent",
-    }}
-
-    onClick={() => {
-    setDeleteApplicationId(app.id);
-    setShowDeleteApplicationConfirm(true);
-  }}
-    
-  >
-    🗑️
-  </button>
+              style={{
+                padding: "8px",
+                cursor: "pointer",
+                border: "none",
+                background: "#fef2f2",
+                borderRadius: "6px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s"
+              }}
+              onClick={() => {
+                setDeleteApplicationId(app.id);
+                setShowDeleteApplicationConfirm(true);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#fee2e2";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#fef2f2";
+              }}
+            >
+              <Trash2 size={16} style={{ color: "#ef4444" }} />
+            </button>
           </td>
         </tr>
       ))}
@@ -3435,147 +3885,367 @@ useEffect(() => {
             {/* New Application Model */}
 
             {showApplicationModal && (
-  <div className="modal-overlay">
-    <div className="modal-card">
+  <div 
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.6)",
+      backdropFilter: "blur(4px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: "20px"
+    }}
+    onClick={() => {resetApplicationForm(); setShowApplicationModal(false)}}
+  >
+    <div 
+      style={{
+        background: "#fff",
+        width: "100%",
+        maxWidth: "600px",
+        borderRadius: 16,
+        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+        overflow: "hidden"
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
 
       {/* HEADER */}
-      <div className="modal-header">
-        <h3>Submit New Application</h3>
-        <button onClick={() => {resetApplicationForm(); setShowApplicationModal(false)}}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "24px 28px",
+        borderBottom: "1px solid #e2e8f0",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      }}>
+        <div>
+          <h3 style={{ margin: 0, color: "#fff", fontSize: "22px", fontWeight: 700 }}>Submit New Application</h3>
+          <p style={{ margin: "4px 0 0 0", color: "rgba(255,255,255,0.9)", fontSize: "14px" }}>Fill in the application details</p>
+        </div>
+        <button 
+          onClick={() => {resetApplicationForm(); setShowApplicationModal(false)}}
           style={{
-            background:"white",
-            color:"black"
+            background: "rgba(255,255,255,0.2)",
+            border: "none",
+            width: "36px",
+            height: "36px",
+            borderRadius: "8px",
+            cursor: "pointer",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.2s"
           }}
-          >✕</button>
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+          }}
+        >
+          <X size={20} />
+        </button>
       </div>
 
       {/* BODY */}
-      <div className="modal-body">
+      <div style={{ padding: "28px", maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}>
 
         {/* STUDENT */}
-        <label>Student *</label>
-        <select
-          value={applicationForm.student_id}
-          onChange={(e) =>
-            setApplicationForm({ ...applicationForm, student_id: e.target.value })
-          }
-          style={{
-            width:"100%"
-          }}
-        >
-          <option value="">Select a student</option>
-          {students.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ 
+            display: "block",
+            fontSize: 14, 
+            fontWeight: 600,
+            color: "#334155",
+            marginBottom: 8
+          }}>
+            Student <span style={{ color: "#ef4444" }}>*</span>
+          </label>
+          <select
+            value={applicationForm.student_id}
+            onChange={(e) =>
+              setApplicationForm({ ...applicationForm, student_id: e.target.value })
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: 8,
+              border: "2px solid #e2e8f0",
+              fontSize: 15,
+              outline: "none",
+              background: "#fff",
+              color: "#0f172a",
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "#667eea";
+              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.boxShadow = "none";
+            }}
+          >
+            <option value="">Select a student</option>
+            {students.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* COURSE */}
-        <label>Course *</label>
-        <select
-          value={applicationForm.course}
-          onChange={(e) =>
-            setApplicationForm({
-              ...applicationForm,
-              course: e.target.value,
-              university: "",
-            })
-          }
-
-          style={{
-            width:"100%"
-          }}
-        >
-          <option value="">Select a course</option>
-          {uniqueCourses.map((course, i) => (
-            <option key={i} value={course}>
-              {course}
-            </option>
-          ))}
-        </select>
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ 
+            display: "block",
+            fontSize: 14, 
+            fontWeight: 600,
+            color: "#334155",
+            marginBottom: 8
+          }}>
+            Course <span style={{ color: "#ef4444" }}>*</span>
+          </label>
+          <select
+            value={applicationForm.course}
+            onChange={(e) =>
+              setApplicationForm({
+                ...applicationForm,
+                course: e.target.value,
+                university: "",
+              })
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: 8,
+              border: "2px solid #e2e8f0",
+              fontSize: 15,
+              outline: "none",
+              background: "#fff",
+              color: "#0f172a",
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "#667eea";
+              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.boxShadow = "none";
+            }}
+          >
+            <option value="">Select a course</option>
+            {uniqueCourses.map((course, i) => (
+              <option key={i} value={course}>
+                {course}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* UNIVERSITY */}
-        <label>University *</label>
-        <select
-          value={applicationForm.university}
-          onChange={(e) =>
-            setApplicationForm({ ...applicationForm, university: e.target.value })
-          }
-          disabled={!applicationForm.course}
-          style={{
-            width:"100%"
-          }}
-        >
-          <option value="">Select a university</option>
-          {filteredUniversities.map((u, i) => (
-            <option key={i} value={u.University}>
-              {u.University}
-            </option>
-          ))}
-        </select>
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ 
+            display: "block",
+            fontSize: 14, 
+            fontWeight: 600,
+            color: "#334155",
+            marginBottom: 8
+          }}>
+            University <span style={{ color: "#ef4444" }}>*</span>
+          </label>
+          <select
+            value={applicationForm.university}
+            onChange={(e) =>
+              setApplicationForm({ ...applicationForm, university: e.target.value })
+            }
+            disabled={!applicationForm.course}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: 8,
+              border: "2px solid #e2e8f0",
+              fontSize: 15,
+              outline: "none",
+              background: applicationForm.course ? "#fff" : "#f1f5f9",
+              color: applicationForm.course ? "#0f172a" : "#94a3b8",
+              cursor: applicationForm.course ? "pointer" : "not-allowed",
+              transition: "all 0.2s"
+            }}
+            onFocus={(e) => {
+              if (applicationForm.course) {
+                e.target.style.borderColor = "#667eea";
+                e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.boxShadow = "none";
+            }}
+          >
+            <option value="">Select a university</option>
+            {filteredUniversities.map((u, i) => (
+              <option key={i} value={u.University}>
+                {u.University}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* INTAKE */}
-        <label>Preferred Intake</label>
-        <input
-          placeholder="e.g. September 2025"
-          value={applicationForm.preferred_intake}
-          onChange={(e) =>
-            setApplicationForm({
-              ...applicationForm,
-              preferred_intake: e.target.value,
-            })
-          }
-          style={{
-            width:"95%"
-          }}
-        />
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ 
+            display: "block",
+            fontSize: 14, 
+            fontWeight: 600,
+            color: "#334155",
+            marginBottom: 8
+          }}>
+            Preferred Intake
+          </label>
+          <input
+            placeholder="e.g. September 2025"
+            value={applicationForm.preferred_intake}
+            onChange={(e) =>
+              setApplicationForm({
+                ...applicationForm,
+                preferred_intake: e.target.value,
+              })
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: 8,
+              border: "2px solid #e2e8f0",
+              fontSize: 15,
+              outline: "none",
+              background: "#fff",
+              color: "#0f172a",
+              transition: "all 0.2s",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "#667eea";
+              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.boxShadow = "none";
+            }}
+          />
+        </div>
 
         {/* NOTES */}
-        <label>Additional Notes</label>
-        <textarea
-          placeholder="Any additional information..."
-          value={applicationForm.notes}
-          onChange={(e) =>
-            setApplicationForm({ ...applicationForm, notes: e.target.value })
-          }
-          style={{
-            width:"95%"
-          }}
-        />
+        <div style={{ marginBottom: 0 }}>
+          <label style={{ 
+            display: "block",
+            fontSize: 14, 
+            fontWeight: 600,
+            color: "#334155",
+            marginBottom: 8
+          }}>
+            Additional Notes
+          </label>
+          <textarea
+            placeholder="Any additional information..."
+            value={applicationForm.notes}
+            onChange={(e) =>
+              setApplicationForm({ ...applicationForm, notes: e.target.value })
+            }
+            rows={4}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: 8,
+              border: "2px solid #e2e8f0",
+              fontSize: 15,
+              outline: "none",
+              background: "#fff",
+              color: "#0f172a",
+              resize: "vertical",
+              fontFamily: "inherit",
+              transition: "all 0.2s",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "#667eea";
+              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.boxShadow = "none";
+            }}
+          />
+        </div>
 
       </div>
 
       {/* FOOTER */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 24 }}>
-        <button onClick={() => {resetApplicationForm(); setShowApplicationModal(false)}}
+      <div style={{ 
+        display: "flex", 
+        justifyContent: "flex-end", 
+        gap: 12, 
+        padding: "20px 28px",
+        borderTop: "1px solid #e2e8f0",
+        background: "#f8fafc"
+      }}>
+        <button 
+          onClick={() => {resetApplicationForm(); setShowApplicationModal(false)}}
           style={{
-                            padding: "10px 18px",
-                            borderRadius: 8,
-                            border: "1px solid #e2e8f0",
-                            background: "#fff",
-                            cursor: "pointer",
-                            fontWeight: 500,
-                            color: "#374151",
-                        }}
-          >
+            padding: "12px 24px",
+            borderRadius: 10,
+            border: "2px solid #e2e8f0",
+            background: "#fff",
+            cursor: "pointer",
+            fontWeight: 600,
+            color: "#64748b",
+            fontSize: 15,
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f1f5f9";
+            e.currentTarget.style.borderColor = "#cbd5e1";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.borderColor = "#e2e8f0";
+          }}
+        >
           Cancel
         </button>
 
-        <button style={{
-      background: "#1d4ed8",
-      color: "#fff",
-      padding: "10px 20px",
-      borderRadius: 8,
-      border: "none"
-    }}
-    onClick={submitApplication}
-    >
+        <button 
+          onClick={submitApplication}
+          style={{
+            padding: "12px 28px",
+            borderRadius: 10,
+            border: "none",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "#fff",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: 15,
+            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 6px 20px rgba(102, 126, 234, 0.5)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.4)";
+          }}
+        >
           Submit Application
         </button>
-        <br></br>
       </div>
-      <br></br>
     </div>
   </div>
 )}
@@ -3869,7 +4539,7 @@ useEffect(() => {
                 <h2>$0</h2>
                 </div>
                 <div style={{ ...iconBox, background: "#eef2ff", color: "#1d4ed8" }}>
-                📈
+                <TrendingUp size={20} />
                 </div>
             </div>
 
@@ -3880,7 +4550,7 @@ useEffect(() => {
                 <h2 style={{ color: "#16a34a" }}>$0</h2>
                 </div>
                 <div style={{ ...iconBox, background: "#ecfdf5", color: "#16a34a" }}>
-                ✅
+                <CheckCircle size={20} />
                 </div>
             </div>
 
@@ -3891,7 +4561,7 @@ useEffect(() => {
                 <h2 style={{ color: "#f97316" }}>$0</h2>
                 </div>
                 <div style={{ ...iconBox, background: "#fff7ed", color: "#f97316" }}>
-                ⏰
+                <Clock size={20} />
                 </div>
             </div>
             </div>
@@ -3927,8 +4597,14 @@ useEffect(() => {
 
             {/* EMPTY STATE */}
             <div style={{ textAlign: "center", padding: 80 }}>
-                <div style={{ fontSize: 42, color: "#94a3b8", marginBottom: 12 }}>
-                $
+                <div style={{ 
+                  fontSize: 42, 
+                  color: "#94a3b8", 
+                  marginBottom: 12,
+                  display: "flex",
+                  justifyContent: "center"
+                }}>
+                <DollarSign size={64} style={{ color: "#cbd5e1" }} />
                 </div>
 
                 <h3>No commissions found</h3>
@@ -3961,14 +4637,13 @@ useEffect(() => {
             }}
             >
             <div>
-                <h1 style={{ margin: 0 }}>Accommodation Services</h1>
+                <h1 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>Accommodation Services</h1>
                 <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
                 Find housing for your students
                 </p>
             </div>
-            {/* <button className="primary-btn">+ Request Accommodation</button> */}
             <button className="add-student-btn" onClick={() => setShowAccommodationModal(true)}>
-            <span style={{ fontSize: 18, lineHeight: 0 }}>+</span>
+            <Plus size={18} />
             <span>Request Accommodation</span>
             </button>
             </div>
@@ -3978,33 +4653,34 @@ useEffect(() => {
             style={{
                 display: "flex",
                 alignItems: "center",
-                padding: 20,
+                padding: 24,
                 border: "1px solid #e2e8f0",
                 borderRadius: 12,
-                background: "#f8fafc",
+                background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
                 marginBottom: 24,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
             }}
             >
             <div
                 style={{
-                width: 40,
-                height: 40,
-                borderRadius: 10,
-                background: "#e0e7ff",
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 16,
-                fontSize: 18,
+                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
                 }}
             >
-                🏠
+                <Building2 size={24} style={{ color: "#fff" }} />
             </div>
             <div>
-                <p style={{ fontWeight: 600, marginBottom: 6 }}>
+                <p style={{ fontWeight: 600, marginBottom: 6, fontSize: 16 }}>
                 Student Accommodation Support
                 </p>
-                <p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>
+                <p style={{ color: "#64748b", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
                 We help find safe, affordable, and convenient housing options for your
                 students near their universities. Submit a request and our team will
                 get back to you with tailored options.
@@ -4019,59 +4695,26 @@ useEffect(() => {
                 borderRadius: 12,
                 background: "#ffffff",
                 padding: 24,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
             }}
             >
-            <p style={{ fontWeight: 600, marginBottom: 16 }}>Your Requests</p>
-
-            {/* Empty State */}
-            {/* <div
-                style={{
-                padding: 80,
-                textAlign: "center",
-                color: "#64748b",
-                }}
-            >
-                <div
-                style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: "50%",
-                    border: "2px solid #e2e8f0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto 16px",
-                    fontSize: 22,
-                }}
-                >
-                🏠
-                </div>
-                <h3 style={{ color: "#0f172a", marginBottom: 6 }}>
-                No requests yet
-                </h3>
-                <p style={{ marginBottom: 0 }}>
-                Submit your first accommodation request
-                </p>
-            </div> */}
-
+            <p style={{ fontWeight: 700, marginBottom: 20, fontSize: 18 }}>Your Requests</p>
 
             {accommodationRequests.length === 0 ? (
-  /* EMPTY STATE */
   <div style={{ padding: 80, textAlign: "center", color: "#64748b" }}>
     <div
       style={{
-        width: 48,
-        height: 48,
+        width: 64,
+        height: 64,
         borderRadius: "50%",
-        border: "2px solid #e2e8f0",
+        background: "#f1f5f9",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         margin: "0 auto 16px",
-        fontSize: 22,
       }}
     >
-      🏠
+      <Building2 size={32} style={{ color: "#cbd5e1" }} />
     </div>
     <h3 style={{ color: "#0f172a", marginBottom: 6 }}>
       No requests yet
@@ -4081,9 +4724,9 @@ useEffect(() => {
 ) : (
   <div
   style={{
-    maxHeight: 520,              // 👈 fixed height
-    overflowY: "auto",           // 👈 scroll
-    paddingRight: 6,             // space for scrollbar
+    maxHeight: 520,
+    overflowY: "auto",
+    paddingRight: 6,
   }}
 >
    <div
@@ -4102,6 +4745,16 @@ useEffect(() => {
           padding: 20,
           background: "#fff",
           position: "relative",
+          transition: "all 0.2s",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+          e.currentTarget.style.transform = "translateY(0)";
         }}
       >
         
@@ -4112,7 +4765,7 @@ useEffect(() => {
     right: 16,
     display: "flex",
     alignItems: "center",
-    gap: 6, // space between span & buttons
+    gap: 8,
   }}
 >
   <span
@@ -4124,6 +4777,7 @@ useEffect(() => {
       borderRadius: 999,
       border: "1px solid #fed7aa",
       whiteSpace: "nowrap",
+      fontWeight: 600
     }}
   >
     {item.status}
@@ -4131,84 +4785,103 @@ useEffect(() => {
 
   <button
     style={{
-      padding: "6px",
+      padding: "8px",
       cursor: "pointer",
-      fontSize: 16,
       border: "none",
-      background: "transparent",
+      background: "#eff6ff",
+      borderRadius: "6px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s"
     }}
-
     onClick={() => {
     setEditAccommodation(item);
     setShowEditAccommodationModal(true);
   }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = "#dbeafe";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = "#eff6ff";
+    }}
   >
-    ✏️
+    <Edit2 size={16} style={{ color: "#3b82f6" }} />
   </button>
 
   <button
     style={{
-      padding: "6px",
+      padding: "8px",
       cursor: "pointer",
-      fontSize: 16,
       border: "none",
-      background: "transparent",
+      background: "#fef2f2",
+      borderRadius: "6px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s"
     }}
-
     onClick={() => {
     setDeleteAccommodationId(item.id);
     setShowDeleteAccommodationConfirm(true);
   }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = "#fee2e2";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = "#fef2f2";
+    }}
   >
-    🗑️
+    <Trash2 size={16} style={{ color: "#ef4444" }} />
   </button>
 </div>
 
-        
-
-        {/* <h4>{item.location}</h4>
-        <p>{item.student_name}</p>
-        <p>📅 Move-in: {item.move_in_date}</p>
-        <p>💰 Budget: {item.monthly_budget}</p>
-        <p style={{ color: "#64748b" }}>
-          Submitted: {new Date(item.submitted_at).toLocaleDateString()}
-        </p> */}
-
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
     <div
       style={{
-        width: 40,
-        height: 40,
-        borderRadius: 10,
-        background: "#eef2ff",
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        background: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 18,
-        color: "#1d4ed8",
+        color: "#4f46e5",
       }}
     >
-      🏠
+      <Building2 size={24} />
     </div>
 
-    <div>
-      <h4 style={{ margin: 0 }}>{item.location}</h4>
-      <p style={{ margin: 0, color: "#64748b", fontSize: 14 }}>
+    <div style={{ flex: 1 }}>
+      <h4 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{item.location}</h4>
+      <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <User size={14} />
         {item.student_name}
       </p>
     </div>
   </div>
 
-  {/* DETAILS */}
-  <div style={{ marginTop: 14, fontSize: 14 }}>
-    <p>📅 Move-in: {item.move_in_date}</p>
-    <p>💰 Budget: {item.monthly_budget}</p>
-    <p style={{ color: "#64748b" }}>
+  <div style={{ 
+    marginTop: 14, 
+    fontSize: 14,
+    display: "grid",
+    gap: 10,
+    paddingTop: 16,
+    borderTop: "1px solid #f1f5f9"
+  }}>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#475569" }}>
+      <Calendar size={16} style={{ color: "#64748b" }} />
+      <span>Move-in: <strong>{item.move_in_date}</strong></span>
+    </p>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#475569" }}>
+      <DollarSign size={16} style={{ color: "#64748b" }} />
+      <span>Budget: <strong>{item.monthly_budget}</strong></span>
+    </p>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#64748b", fontSize: 13 }}>
+      <Clock size={14} style={{ color: "#94a3b8" }} />
       Submitted: {new Date(item.submitted_at).toLocaleDateString()}
     </p>
   </div>
-
-
 
       </div>
     ))}
@@ -4218,13 +4891,23 @@ useEffect(() => {
         <button
           onClick={() => setVisibleCount((prev) => prev + LOAD_MORE_COUNT)}
           style={{
-            padding: "10px 22px",
-            borderRadius: 999,
-            border: "1px solid #e2e8f0",
+            padding: "12px 28px",
+            borderRadius: 10,
+            border: "2px solid #e2e8f0",
             background: "#fff",
             cursor: "pointer",
             fontWeight: 600,
-            color: "#1d4ed8",
+            color: "#667eea",
+            fontSize: 15,
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f8fafc";
+            e.currentTarget.style.borderColor = "#667eea";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.borderColor = "#e2e8f0";
           }}
         >
           Load more
@@ -4248,82 +4931,256 @@ useEffect(() => {
 
 
             {showAccommodationModal && (
-  <div className="modal-overlay">
-     <div className="modal-card accommodation-card">
-
-      {/* HEADER */}
-      <div className="modal-header">
-        <h3>Request Accommodation</h3>
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        resetForm();
+        setShowAccommodationModal(false);
+      }
+    }}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: "20px"
+    }}
+  >
+    <div 
+      className="modal-card accommodation-card"
+      style={{
+        background: "#fff",
+        borderRadius: "16px",
+        width: "100%",
+        maxWidth: "600px",
+        maxHeight: "90vh",
+        overflow: "hidden",
+        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+      {/* PREMIUM GRADIENT HEADER */}
+      <div 
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          padding: "24px 28px",
+          color: "#fff",
+          position: "relative"
+        }}
+      >
+        <h3 style={{ 
+          margin: 0, 
+          fontSize: "22px", 
+          fontWeight: 700,
+          marginBottom: "6px"
+        }}>
+          Request Accommodation
+        </h3>
+        <p style={{ 
+          margin: 0, 
+          fontSize: "14px", 
+          opacity: 0.95,
+          fontWeight: 400
+        }}>
+          Submit your accommodation requirements
+        </p>
         <button
-          className="close-btn"
-          
           onClick={() => {
-  resetForm();
-  setShowAccommodationModal(false);
-}}
-         style={{
-    color: "#000",
-    background: "transparent",
-    border: "none",
-    cursor: "pointer"
-  }}
+            resetForm();
+            setShowAccommodationModal(false);
+          }}
+          style={{
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            background: "rgba(255, 255, 255, 0.2)",
+            border: "none",
+            borderRadius: "8px",
+            width: "36px",
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            color: "#fff"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
+          }}
         >
-          ✕
+          <X size={20} />
         </button>
       </div>
 
-      {/* FORM */}
-      <div className="modal-body">
-
+      {/* SCROLLABLE FORM BODY */}
+      <div 
+        style={{
+          padding: "28px",
+          overflowY: "auto",
+          flex: 1
+        }}
+      >
         {/* STUDENT DROPDOWN */}
-        <label>Student (Optional)</label>
-        <select
-          value={form.student_name}
-          onChange={(e) =>
-            setForm({ ...form, student_name: e.target.value })
-          }
-          style={{
-    width: "101%",
-  }}
-        >
-          <option value="">Select a student</option>
-          {students.map((s) => (
-            <option key={s.id} value={s.name}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+        <div style={{ marginBottom: "20px" }}>
+          <label style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#374151"
+          }}>
+            Student (Optional)
+          </label>
+          <select
+            value={form.student_name}
+            onChange={(e) =>
+              setForm({ ...form, student_name: e.target.value })
+            }
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              border: "2px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "14px",
+              transition: "all 0.2s",
+              outline: "none",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "#667eea";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <option value="">Select a student</option>
+            {students.map((s) => (
+              <option key={s.id} value={s.name}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <div className="row">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
           <div>
-            <label>Location / City *</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Location / City <span style={{ color: "#ef4444" }}>*</span>
+            </label>
             <input
               placeholder="e.g. London, UK"
               onChange={(e) =>
                 setForm({ ...form, location: e.target.value })
               }
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
 
           <div>
-            <label>Move-in Date</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Move-in Date
+            </label>
             <input
               type="date"
               onChange={(e) =>
                 setForm({ ...form, move_in_date: e.target.value })
               }
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
         </div>
 
-        <div className="row">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
           <div>
-            <label>Duration</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Duration
+            </label>
             <select
               onChange={(e) =>
                 setForm({ ...form, duration: e.target.value })
               }
-                style={{ width: "102%" }}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
               <option value="">Select duration</option>
               <option>3 Months</option>
@@ -4334,73 +5191,144 @@ useEffect(() => {
           </div>
 
           <div>
-            <label>Monthly Budget</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Monthly Budget
+            </label>
             <input
               placeholder="e.g. $800-1200"
               onChange={(e) =>
                 setForm({ ...form, monthly_budget: e.target.value })
               }
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
         </div>
 
-        <label>Preferences & Requirements</label>
-        <textarea
-          placeholder="Any specific preferences..."
-          onChange={(e) =>
-            setForm({ ...form, preferences: e.target.value })
-          }
-          style={{
-            width: "95%"
-          }}
-        />
-
+        <div style={{ marginBottom: "20px" }}>
+          <label style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#374151"
+          }}>
+            Preferences & Requirements
+          </label>
+          <textarea
+            placeholder="Any specific preferences..."
+            onChange={(e) =>
+              setForm({ ...form, preferences: e.target.value })
+            }
+            rows={4}
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              border: "2px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "14px",
+              transition: "all 0.2s",
+              outline: "none",
+              resize: "vertical",
+              fontFamily: "inherit",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "#667eea";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          />
+        </div>
       </div>
 
       {/* FOOTER */}
       <div
-                        style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        gap: 12,
-                        marginTop: 28,
-                        }}
-                    >
-        <button onClick={() => {
-  resetForm();
-  setShowAccommodationModal(false);
-}}
- style={{
-                            padding: "10px 18px",
-                            borderRadius: 8,
-                            border: "1px solid #e2e8f0",
-                            background: "#fff",
-                            cursor: "pointer",
-                            fontWeight: 500,
-                            color: "#374151",
-                        }}>
+        style={{
+          padding: "20px 28px",
+          background: "#f9fafb",
+          borderTop: "1px solid #e5e7eb",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "12px"
+        }}
+      >
+        <button 
+          onClick={() => {
+            resetForm();
+            setShowAccommodationModal(false);
+          }}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "8px",
+            border: "1px solid #e2e8f0",
+            background: "#fff",
+            cursor: "pointer",
+            fontWeight: 500,
+            color: "#374151",
+            fontSize: "14px",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f9fafb";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#fff";
+          }}
+        >
           Cancel
         </button>
         <button
-            
-            onClick={submitAccommodation}
-            style={{
-                padding: "10px 20px",
-                borderRadius: 8,
-                border: "none",
-                background: "#1d4ed8",
-                color: "#fff",
-                cursor: "pointer",
-                fontWeight: 600,
-            }}
-            >
-            Submit Request
-            </button>
-        <br></br>
+          onClick={submitAccommodation}
+          style={{
+            padding: "10px 24px",
+            borderRadius: "8px",
+            border: "none",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "#fff",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: "14px",
+            transition: "all 0.2s",
+            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 6px 16px rgba(102, 126, 234, 0.4)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.3)";
+          }}
+        >
+          Submit Request
+        </button>
       </div>
-      <br></br>
-      
-
     </div>
   </div>
 )}
@@ -4410,78 +5338,203 @@ useEffect(() => {
 {/* Edit Accommodation Modal */}
 
 {showEditAccommodationModal && editAccommodation && (
-  <div className="modal-overlay">
-    <div className="modal-card accommodation-card">
-
-      {/* HEADER */}
-      <div className="modal-header">
-        <h3>Edit Accommodation Request</h3>
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowEditAccommodationModal(false);
+      }
+    }}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: "20px"
+    }}
+  >
+    <div 
+      className="modal-card accommodation-card"
+      style={{
+        background: "#fff",
+        borderRadius: "16px",
+        width: "100%",
+        maxWidth: "600px",
+        maxHeight: "90vh",
+        overflow: "hidden",
+        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+      {/* PREMIUM GRADIENT HEADER */}
+      <div 
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          padding: "24px 28px",
+          color: "#fff",
+          position: "relative"
+        }}
+      >
+        <h3 style={{ 
+          margin: 0, 
+          fontSize: "22px", 
+          fontWeight: 700,
+          marginBottom: "6px"
+        }}>
+          Edit Accommodation Request
+        </h3>
+        <p style={{ 
+          margin: 0, 
+          fontSize: "14px", 
+          opacity: 0.95,
+          fontWeight: 400
+        }}>
+          Update accommodation details
+        </p>
         <button
-          className="close-btn"
           onClick={() => setShowEditAccommodationModal(false)}
-          style={{ background: "transparent", border: "none", cursor: "pointer", color: "#000" }}
+          style={{
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            background: "rgba(255, 255, 255, 0.2)",
+            border: "none",
+            borderRadius: "8px",
+            width: "36px",
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            color: "#fff"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
+          }}
         >
-          ✕
+          <X size={20} />
         </button>
       </div>
 
-      {/* FORM */}
-      <div className="modal-body">
-
-        {/* STATUS (NEW) */}
-        <label>Status *</label>
-        <select
-          value={editAccommodation.status}
-          onChange={(e) =>
-            setEditAccommodation({
-              ...editAccommodation,
-              status: e.target.value,
-            })
-          }
-          style={{ width: "101%" }}
-        >
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Not Approved">Not Approved</option>
-        </select>
+      {/* SCROLLABLE FORM BODY */}
+      <div 
+        style={{
+          padding: "28px",
+          overflowY: "auto",
+          flex: 1
+        }}
+      >
+        {/* STATUS */}
+        <div style={{ marginBottom: "20px" }}>
+          <label style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#374151"
+          }}>
+            Status <span style={{ color: "#ef4444" }}>*</span>
+          </label>
+          <select
+            value={editAccommodation.status}
+            onChange={(e) =>
+              setEditAccommodation({
+                ...editAccommodation,
+                status: e.target.value,
+              })
+            }
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              border: "2px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "14px",
+              transition: "all 0.2s",
+              outline: "none",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "#667eea";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Not Approved">Not Approved</option>
+          </select>
+        </div>
 
         {/* STUDENT */}
-        <label>Student</label>
-        {/* <input
-          value={editAccommodation.student_name || ""}
-          onChange={(e) =>
-            setEditAccommodation({
-              ...editAccommodation,
-              student_name: e.target.value,
-            })
-          }
+        <div style={{ marginBottom: "20px" }}>
+          <label style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#374151"
+          }}>
+            Student
+          </label>
+          <select
+            value={editAccommodation.student_name || ""}
+            onChange={(e) =>
+              setEditAccommodation({
+                ...editAccommodation,
+                student_name: e.target.value,
+              })
+            }
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              border: "2px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "14px",
+              transition: "all 0.2s",
+              outline: "none",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "#667eea";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <option value="">Select a student</option>
+            {students.map((s) => (
+              <option key={s.id} value={s.name}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          style={{
-            width:"95%"
-          }}
-        /> */}
-
-        <select
-          value={editAccommodation.student_name || ""}
-          onChange={(e) =>
-            setEditAccommodation({
-              ...editAccommodation,
-              student_name: e.target.value,
-            })
-          }
-          style={{ width: "101%" }}
-        >
-          <option value="">Select a student</option>
-          {students.map((s) => (
-            <option key={s.id} value={s.name}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="row">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
           <div>
-            <label>Location / City *</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Location / City <span style={{ color: "#ef4444" }}>*</span>
+            </label>
             <input
               value={editAccommodation.location || ""}
               onChange={(e) =>
@@ -4490,11 +5543,37 @@ useEffect(() => {
                   location: e.target.value,
                 })
               }
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
 
           <div>
-            <label>Move-in Date</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Move-in Date
+            </label>
             <input
               type="date"
               value={editAccommodation.move_in_date || ""}
@@ -4504,13 +5583,39 @@ useEffect(() => {
                   move_in_date: e.target.value,
                 })
               }
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
         </div>
 
-        <div className="row">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
           <div>
-            <label>Duration</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Duration
+            </label>
             <select
               value={editAccommodation.duration || ""}
               onChange={(e) =>
@@ -4519,7 +5624,24 @@ useEffect(() => {
                   duration: e.target.value,
                 })
               }
-              style={{ width: "102%" }}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
               <option value="">Select duration</option>
               <option>3 Months</option>
@@ -4530,7 +5652,15 @@ useEffect(() => {
           </div>
 
           <div>
-            <label>Monthly Budget</label>
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#374151"
+            }}>
+              Monthly Budget
+            </label>
             <input
               value={editAccommodation.monthly_budget || ""}
               onChange={(e) =>
@@ -4539,41 +5669,100 @@ useEffect(() => {
                   monthly_budget: e.target.value,
                 })
               }
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                border: "2px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "all 0.2s",
+                outline: "none",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
         </div>
 
-        <label>Preferences & Requirements</label>
-        <textarea
-          value={editAccommodation.preferences || ""}
-          onChange={(e) =>
-            setEditAccommodation({
-              ...editAccommodation,
-              preferences: e.target.value,
-            })
-          }
-          style={{ width: "95%" }}
-        />
+        <div style={{ marginBottom: "20px" }}>
+          <label style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#374151"
+          }}>
+            Preferences & Requirements
+          </label>
+          <textarea
+            value={editAccommodation.preferences || ""}
+            onChange={(e) =>
+              setEditAccommodation({
+                ...editAccommodation,
+                preferences: e.target.value,
+              })
+            }
+            rows={4}
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              border: "2px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "14px",
+              transition: "all 0.2s",
+              outline: "none",
+              resize: "vertical",
+              fontFamily: "inherit",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "#667eea";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          />
+        </div>
       </div>
 
       {/* FOOTER */}
       <div
         style={{
+          padding: "20px 28px",
+          background: "#f9fafb",
+          borderTop: "1px solid #e5e7eb",
           display: "flex",
           justifyContent: "flex-end",
-          gap: 12,
-          marginTop: 28,
+          gap: "12px"
         }}
       >
         <button
           onClick={() => setShowEditAccommodationModal(false)}
           style={{
-            padding: "10px 18px",
-            borderRadius: 8,
+            padding: "10px 20px",
+            borderRadius: "8px",
             border: "1px solid #e2e8f0",
             background: "#fff",
             cursor: "pointer",
+            fontWeight: 500,
             color: "#374151",
+            fontSize: "14px",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f9fafb";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#fff";
           }}
         >
           Cancel
@@ -4582,22 +5771,29 @@ useEffect(() => {
         <button
           onClick={handleUpdateAccommodation}
           style={{
-            padding: "10px 20px",
-            borderRadius: 8,
+            padding: "10px 24px",
+            borderRadius: "8px",
             border: "none",
-            background: "#1d4ed8",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             color: "#fff",
             cursor: "pointer",
             fontWeight: 600,
+            fontSize: "14px",
+            transition: "all 0.2s",
+            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 6px 16px rgba(102, 126, 234, 0.4)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.3)";
           }}
         >
           Update Request
         </button>
-        <br></br>
       </div>
-
-      <br></br>
-
     </div>
   </div>
 )}
@@ -4711,14 +5907,13 @@ useEffect(() => {
             }}
             >
             <div>
-                <h1 style={{ margin: 0 }}>Loan Services</h1>
+                <h1 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>Loan Services</h1>
                 <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
                 Education financing support for students
                 </p>
             </div>
-            {/* <button className="primary-btn">+ Request Loan Service</button> */}
             <button className="add-student-btn" onClick={() => setShowLoanModal(true)}>
-            <span style={{ fontSize: 18, lineHeight: 0 }}>+</span>
+            <Plus size={18} />
             <span>Request Loan Service</span>
             </button>
             </div>
@@ -4728,33 +5923,34 @@ useEffect(() => {
             style={{
                 display: "flex",
                 alignItems: "center",
-                padding: 20,
+                padding: 24,
                 border: "1px solid #e2e8f0",
                 borderRadius: 12,
-                background: "#f8fafc",
+                background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
                 marginBottom: 24,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
             }}
             >
             <div
                 style={{
-                width: 40,
-                height: 40,
-                borderRadius: 10,
-                background: "#e6f6f6",
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 16,
-                fontSize: 18,
+                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
                 }}
             >
-                💳
+                <CreditCard size={24} style={{ color: "#fff" }} />
             </div>
             <div>
-                <p style={{ fontWeight: 600, marginBottom: 6 }}>
+                <p style={{ fontWeight: 600, marginBottom: 6, fontSize: 16 }}>
                 Education Loan Support
                 </p>
-                <p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>
+                <p style={{ color: "#64748b", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
                 We partner with leading financial institutions to help students secure
                 education loans with competitive rates. Our team will guide students
                 through the application process and documentation.
@@ -4769,74 +5965,33 @@ useEffect(() => {
                 borderRadius: 12,
                 background: "#ffffff",
                 padding: 24,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
             }}
             >
-            <p style={{ fontWeight: 600, marginBottom: 16 }}>Your Requests</p>
-
-            {/* Empty State */}
-            {/* <div
-                style={{
-                padding: 80,
-                textAlign: "center",
-                color: "#64748b",
-                }}
-            >
-                <div
-                style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: "50%",
-                    border: "2px solid #e2e8f0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto 16px",
-                    fontSize: 22,
-                }}
-                >
-                💳
-                </div>
-                <h3 style={{ color: "#0f172a", marginBottom: 6 }}>
-                No loan requests yet
-                </h3>
-                <p style={{ marginBottom: 0 }}>
-                Submit a loan service request for your students
-                </p>
-            </div> */}
+            <p style={{ fontWeight: 700, marginBottom: 20, fontSize: 18 }}>Your Requests</p>
 
             {loanRequests.length === 0 ? (
-  /* EMPTY STATE */
-  <div
-    style={{
-      padding: 80,
-      textAlign: "center",
-      color: "#64748b",
-    }}
-  >
+  <div style={{ padding: 80, textAlign: "center", color: "#64748b" }}>
     <div
       style={{
-        width: 48,
-        height: 48,
+        width: 64,
+        height: 64,
         borderRadius: "50%",
-        border: "2px solid #e2e8f0",
+        background: "#f1f5f9",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         margin: "0 auto 16px",
-        fontSize: 22,
       }}
     >
-      💳
+      <CreditCard size={32} style={{ color: "#cbd5e1" }} />
     </div>
     <h3 style={{ color: "#0f172a", marginBottom: 6 }}>
       No loan requests yet
     </h3>
-    <p style={{ marginBottom: 0 }}>
-      Submit a loan service request for your students
-    </p>
+    <p>Submit a loan service request for your students</p>
   </div>
 ) : (
-  /* DATA STATE */
   <div
       style={{
         maxHeight: 520,
@@ -4848,7 +6003,7 @@ useEffect(() => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))",
-          gap: 16,
+          gap: 20,
         }}
       >
     {visibleLoanRequests.map((item) => (
@@ -4859,71 +6014,57 @@ useEffect(() => {
           borderRadius: 12,
           padding: 20,
           background: "#fff",
+          position: "relative",
+          transition: "all 0.2s",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+          e.currentTarget.style.transform = "translateY(0)";
         }}
       >
-        {/* HEADER */}
+        
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 14,
-          }}
-        >
-          <div style={{ display: "flex", gap: 12 }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                background: "#ecfeff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 20,
-                color: "#0891b2",
-              }}
-            >
-              $
-            </div>
-
-            <div>
-              <div style={{ fontWeight: 600, color: "#0f172a" }}>
-                {item.student_name}
-              </div>
-              <div style={{ fontSize: 13, color: "#64748b" }}>
-                {item.loan_amount}
-              </div>
-            </div>
-          </div>
-
-
-
-          <div>
-
-          <span
-            style={{
-              fontSize: 12,
-              padding: "4px 10px",
-              borderRadius: 20,
-              background: "#fff7ed",
-              color: "#f97316",
-              border: "1px solid #fed7aa",
-              fontWeight: 500,
-            }}
-          >
-            {item.status}
-          </span>
-
-          <button
+  style={{
+    position: "absolute",
+    top: 16,
+    right: 16,
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  }}
+>
+  <span
     style={{
-      padding: "6px",
-      cursor: "pointer",
-      fontSize: 16,
-      border: "none",
-      background: "transparent",
+      background: "#fff7ed",
+      color: "#f97316",
+      fontSize: 12,
+      padding: "4px 10px",
+      borderRadius: 999,
+      border: "1px solid #fed7aa",
+      whiteSpace: "nowrap",
+      fontWeight: 600
     }}
+  >
+    {item.status}
+  </span>
 
+  <button
+    style={{
+      padding: "8px",
+      cursor: "pointer",
+      border: "none",
+      background: "#eff6ff",
+      borderRadius: "6px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s"
+    }}
     onClick={() => {
     setEditingLoanId(item.id);
     setEditLoanForm({
@@ -4936,48 +6077,90 @@ useEffect(() => {
     });
     setShowEditLoanModal(true);
   }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = "#dbeafe";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = "#eff6ff";
+    }}
   >
-    ✏️
+    <Edit2 size={16} style={{ color: "#3b82f6" }} />
   </button>
 
   <button
     style={{
-      padding: "6px",
+      padding: "8px",
       cursor: "pointer",
-      fontSize: 16,
       border: "none",
-      background: "transparent",
+      background: "#fef2f2",
+      borderRadius: "6px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s"
     }}
-
     onClick={() => {
     setLoanToDelete(item.id);
     setShowDeleteLoanModal(true);
   }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = "#fee2e2";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = "#fef2f2";
+    }}
   >
-    🗑️
+    <Trash2 size={16} style={{ color: "#ef4444" }} />
   </button>
 </div>
 
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+    <div
+      style={{
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        background: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#4f46e5",
+      }}
+    >
+      <User size={24} />
+    </div>
 
-        </div>
+    <div style={{ flex: 1 }}>
+      <h4 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{item.student_name}</h4>
+      <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <DollarSign size={14} />
+        {item.loan_amount}
+      </p>
+    </div>
+  </div>
 
-        {/* DETAILS */}
-        <div style={{ fontSize: 14, color: "#334155" }}>
-          <div style={{ marginBottom: 6 }}>
-            🎓 <strong>{item.purpose}</strong>
-          </div>
-          <div style={{ marginBottom: 6 }}>
-            🌍 <strong>Country:</strong> {item.study_country}
-          </div>
-          <div>
-            🕒 <strong>Submitted:</strong>{" "}
-            {new Date(item.submitted_at).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
-          </div>
-        </div>
+  <div style={{ 
+    marginTop: 14, 
+    fontSize: 14,
+    display: "grid",
+    gap: 10,
+    paddingTop: 16,
+    borderTop: "1px solid #f1f5f9"
+  }}>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#475569" }}>
+      <BookOpen size={16} style={{ color: "#64748b" }} />
+      <span>{item.purpose}</span>
+    </p>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#475569" }}>
+      <Globe size={16} style={{ color: "#64748b" }} />
+      <span>Country: <strong>{item.study_country}</strong></span>
+    </p>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#64748b", fontSize: 13 }}>
+      <Clock size={14} style={{ color: "#94a3b8" }} />
+      Submitted: {new Date(item.submitted_at).toLocaleDateString()}
+    </p>
+  </div>
+
       </div>
     ))}
   </div>
@@ -4990,13 +6173,23 @@ useEffect(() => {
             setVisibleLoanCount((prev) => prev + LOAD_MORE_LOANS)
           }
           style={{
-            padding: "10px 22px",
-            borderRadius: 999,
-            border: "1px solid #e2e8f0",
+            padding: "12px 28px",
+            borderRadius: 10,
+            border: "2px solid #e2e8f0",
             background: "#fff",
             cursor: "pointer",
             fontWeight: 600,
-            color: "#1d4ed8",
+            color: "#667eea",
+            fontSize: 15,
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f8fafc";
+            e.currentTarget.style.borderColor = "#667eea";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.borderColor = "#e2e8f0";
           }}
         >
           Load more
@@ -5012,40 +6205,140 @@ useEffect(() => {
             {/* LOAN MODAL */}
 
             {showLoanModal && (
-  <div className="modal-overlay">
-    <div className="modal-card accommodation-card">
-
-      {/* HEADER */}
-      <div className="modal-header">
-        <h3>Request Loan Service</h3>
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        resetLoanForm();
+        setShowLoanModal(false);
+      }
+    }}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: "20px"
+    }}
+  >
+    <div 
+      className="modal-card accommodation-card"
+      style={{
+        background: "#fff",
+        borderRadius: "16px",
+        width: "100%",
+        maxWidth: "600px",
+        maxHeight: "90vh",
+        overflow: "hidden",
+        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+      {/* PREMIUM GRADIENT HEADER */}
+      <div 
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          padding: "24px 28px",
+          color: "#fff",
+          position: "relative"
+        }}
+      >
+        <h3 style={{ 
+          margin: 0, 
+          fontSize: "22px", 
+          fontWeight: 700,
+          marginBottom: "6px"
+        }}>
+          Request Loan Service
+        </h3>
+        <p style={{ 
+          margin: 0, 
+          fontSize: "14px", 
+          opacity: 0.95,
+          fontWeight: 400
+        }}>
+          Submit your loan requirements
+        </p>
         <button
-          className="close-btn"
           onClick={() => {
             resetLoanForm();
             setShowLoanModal(false);
           }}
           style={{
-            color: "#000",
-            background: "transparent",
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            background: "rgba(255, 255, 255, 0.2)",
             border: "none",
+            borderRadius: "8px",
+            width: "36px",
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             cursor: "pointer",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
           }}
         >
-          ✕
+          <X size={20} style={{ color: "#fff" }} />
         </button>
       </div>
 
       {/* BODY */}
-      <div className="modal-body">
+      <div 
+        style={{
+          padding: "28px",
+          overflowY: "auto",
+          flex: 1
+        }}
+      >
 
         {/* STUDENT */}
-        <label>Student *</label>
+        <label style={{ 
+          display: "block", 
+          marginBottom: "8px", 
+          fontSize: "14px", 
+          fontWeight: 600, 
+          color: "#334155" 
+        }}>
+          Student <span style={{ color: "#ef4444" }}>*</span>
+        </label>
         <select
           value={loanForm.student_name}
           onChange={(e) =>
             setLoanForm({ ...loanForm, student_name: e.target.value })
           }
-          style={{ width: "101%" }}
+          style={{ 
+            width: "100%",
+            padding: "12px 14px",
+            marginBottom: "20px",
+            borderRadius: "10px",
+            border: "2px solid #e2e8f0",
+            fontSize: "14px",
+            outline: "none",
+            background: "#ffffff",
+            color: "#0f172a",
+            transition: "all 0.2s"
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "#667eea";
+            e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "#e2e8f0";
+            e.currentTarget.style.boxShadow = "none";
+          }}
         >
           <option value="">Select a student</option>
           {students.map((s) => (
@@ -5055,37 +6348,120 @@ useEffect(() => {
           ))}
         </select>
 
-        <div className="row">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
           <div>
-            <label>Loan Amount *</label>
+            <label style={{ 
+              display: "block", 
+              marginBottom: "8px", 
+              fontSize: "14px", 
+              fontWeight: 600, 
+              color: "#334155" 
+            }}>
+              Loan Amount <span style={{ color: "#ef4444" }}>*</span>
+            </label>
             <input
               placeholder="e.g. $25,000"
               value={loanForm.loan_amount}
               onChange={(e) =>
                 setLoanForm({ ...loanForm, loan_amount: e.target.value })
               }
+              style={{ 
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "2px solid #e2e8f0",
+                fontSize: "14px",
+                outline: "none",
+                background: "#ffffff",
+                color: "#0f172a",
+                transition: "all 0.2s",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e2e8f0";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
 
           <div>
-            <label>Study Country</label>
+            <label style={{ 
+              display: "block", 
+              marginBottom: "8px", 
+              fontSize: "14px", 
+              fontWeight: 600, 
+              color: "#334155" 
+            }}>
+              Study Country
+            </label>
             <input
               placeholder="e.g. United Kingdom"
               value={loanForm.study_country}
               onChange={(e) =>
                 setLoanForm({ ...loanForm, study_country: e.target.value })
               }
+              style={{ 
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                border: "2px solid #e2e8f0",
+                fontSize: "14px",
+                outline: "none",
+                background: "#ffffff",
+                color: "#0f172a",
+                transition: "all 0.2s",
+                boxSizing: "border-box"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#667eea";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#e2e8f0";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
           </div>
         </div>
 
-        <label>Purpose</label>
+        <label style={{ 
+          display: "block", 
+          marginBottom: "8px", 
+          fontSize: "14px", 
+          fontWeight: 600, 
+          color: "#334155" 
+        }}>
+          Purpose
+        </label>
         <select
           value={loanForm.purpose}
           onChange={(e) =>
             setLoanForm({ ...loanForm, purpose: e.target.value })
           }
-          style={{ width: "101%" }}
+          style={{ 
+            width: "100%",
+            padding: "12px 14px",
+            marginBottom: "20px",
+            borderRadius: "10px",
+            border: "2px solid #e2e8f0",
+            fontSize: "14px",
+            outline: "none",
+            background: "#ffffff",
+            color: "#0f172a",
+            transition: "all 0.2s"
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "#667eea";
+            e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "#e2e8f0";
+            e.currentTarget.style.boxShadow = "none";
+          }}
         >
           <option value="">Select purpose</option>
           <option value="Tuition Fees">Tuition Fees</option>
@@ -5093,24 +6469,56 @@ useEffect(() => {
           <option value="Tuition + Living">Tuition + Living</option>
         </select>
 
-        <label>Additional Notes</label>
+        <label style={{ 
+          display: "block", 
+          marginBottom: "8px", 
+          fontSize: "14px", 
+          fontWeight: 600, 
+          color: "#334155" 
+        }}>
+          Additional Notes
+        </label>
         <textarea
           placeholder="Any additional information..."
           value={loanForm.additional_notes}
           onChange={(e) =>
             setLoanForm({ ...loanForm, additional_notes: e.target.value })
           }
-          style={{ width: "95%" }}
+          rows={4}
+          style={{ 
+            width: "100%",
+            padding: "12px 14px",
+            borderRadius: "10px",
+            border: "2px solid #e2e8f0",
+            fontSize: "14px",
+            outline: "none",
+            background: "#ffffff",
+            color: "#0f172a",
+            transition: "all 0.2s",
+            resize: "vertical",
+            fontFamily: "inherit",
+            boxSizing: "border-box"
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "#667eea";
+            e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "#e2e8f0";
+            e.currentTarget.style.boxShadow = "none";
+          }}
         />
       </div>
 
       {/* FOOTER */}
       <div
         style={{
+          padding: "20px 28px",
+          background: "#f8fafc",
+          borderTop: "1px solid #e2e8f0",
           display: "flex",
           justifyContent: "flex-end",
           gap: 12,
-          marginTop: 28,
         }}
       >
         <button
@@ -5119,13 +6527,23 @@ useEffect(() => {
             setShowLoanModal(false);
           }}
           style={{
-            padding: "10px 18px",
-            borderRadius: 8,
-            border: "1px solid #e2e8f0",
+            padding: "11px 20px",
+            borderRadius: "10px",
+            border: "2px solid #e2e8f0",
             background: "#fff",
             cursor: "pointer",
-            color: "#374151",
-            fontWeight: 500,
+            color: "#64748b",
+            fontWeight: 600,
+            fontSize: "14px",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f8fafc";
+            e.currentTarget.style.borderColor = "#cbd5e1";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.borderColor = "#e2e8f0";
           }}
         >
           Cancel
@@ -5134,20 +6552,29 @@ useEffect(() => {
         <button
           onClick={submitLoanRequest}
           style={{
-            padding: "10px 20px",
-            borderRadius: 8,
+            padding: "11px 24px",
+            borderRadius: "10px",
             border: "none",
-            background: "#1d4ed8",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             color: "#fff",
             cursor: "pointer",
             fontWeight: 600,
+            fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 6px 16px rgba(102, 126, 234, 0.5)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.4)";
           }}
         >
           Submit Request
         </button>
-        <br></br>
       </div>
-      <br></br>
 
     </div>
   </div>
@@ -5406,14 +6833,13 @@ useEffect(() => {
             }}
             >
             <div>
-                <h1 style={{ margin: 0 }}>Test Preparation</h1>
+                <h1 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>Test Preparation</h1>
                 <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
                 IELTS, TOEFL, GRE, GMAT and more
                 </p>
             </div>
-            {/* <button className="primary-btn">+ Request Test Prep</button> */}
             <button className="add-student-btn" onClick={() => setShowTestPrepModal(true)}>
-            <span style={{ fontSize: 18, lineHeight: 0 }}>+</span>
+            <Plus size={18} />
             <span>Request Test Prep</span>
             </button>
             </div>
@@ -5423,33 +6849,34 @@ useEffect(() => {
             style={{
                 display: "flex",
                 alignItems: "center",
-                padding: 20,
-                border: "1px solid #fde6cf",
+                padding: 24,
+                border: "1px solid #e2e8f0",
                 borderRadius: 12,
-                background: "#fff7ed",
+                background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
                 marginBottom: 24,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
             }}
             >
             <div
                 style={{
-                width: 40,
-                height: 40,
-                borderRadius: 10,
-                background: "#ffedd5",
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 16,
-                fontSize: 18,
+                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
                 }}
             >
-                📖
+                <BookOpen size={24} style={{ color: "#fff" }} />
             </div>
             <div>
-                <p style={{ fontWeight: 600, marginBottom: 6 }}>
+                <p style={{ fontWeight: 600, marginBottom: 6, fontSize: 16 }}>
                 Expert Test Preparation
                 </p>
-                <p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>
+                <p style={{ color: "#64748b", fontSize: 14, margin: 0, lineHeight: 1.6 }}>
                 We offer comprehensive test preparation courses for IELTS, TOEFL,
                 PTE, GRE, GMAT, and more. Our experienced instructors help students
                 achieve their target scores with personalized coaching.
@@ -5483,21 +6910,34 @@ useEffect(() => {
       onClick={() => {
         setSelectedTestTypes((prev) =>
           prev.includes(test)
-            ? prev.filter((t) => t !== test) // unselect
-            : [...prev, test]                // select
+            ? prev.filter((t) => t !== test)
+            : [...prev, test]
         );
       }}
       style={{
         padding: "14px 12px",
-        border: "1px solid #e2e8f0",
+        border: isSelected ? "2px solid #667eea" : "2px solid #e2e8f0",
         borderRadius: 10,
-        background: isSelected ? "#1d4ed8" : "#ffffff",
+        background: isSelected ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "#ffffff",
         color: isSelected ? "#ffffff" : "#0f172a",
         textAlign: "center",
-        fontWeight: 500,
+        fontWeight: 600,
         fontSize: 14,
         cursor: "pointer",
-        transition: "all 0.15s ease",
+        transition: "all 0.2s ease",
+        boxShadow: isSelected ? "0 4px 12px rgba(102, 126, 234, 0.3)" : "none"
+      }}
+      onMouseEnter={(e) => {
+        if (!isSelected) {
+          e.currentTarget.style.borderColor = "#cbd5e1";
+          e.currentTarget.style.background = "#f8fafc";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isSelected) {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.background = "#ffffff";
+        }
       }}
     >
       {test}
@@ -5516,76 +6956,33 @@ useEffect(() => {
                 borderRadius: 12,
                 background: "#ffffff",
                 padding: 24,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
             }}
             >
-            <p style={{ fontWeight: 600, marginBottom: 16 }}>Your Requests</p>
-
-            {/* Empty State */}
-            {/* <div
-                style={{
-                padding: 80,
-                textAlign: "center",
-                color: "#64748b",
-                }}
-            >
-                <div
-                style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: "50%",
-                    border: "2px solid #e2e8f0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto 16px",
-                    fontSize: 22,
-                }}
-                >
-                📖
-                </div>
-                <h3 style={{ color: "#0f172a", marginBottom: 6 }}>
-                No test prep requests yet
-                </h3>
-                <p style={{ marginBottom: 0 }}>
-                Submit a test preparation request for your students
-                </p>
-            </div> */}
-
-
+            <p style={{ fontWeight: 700, marginBottom: 20, fontSize: 18 }}>Your Requests</p>
 
             {testPrepRequests.length === 0 ? (
-  /* EMPTY STATE */
-  <div
-    style={{
-      padding: 80,
-      textAlign: "center",
-      color: "#64748b",
-    }}
-  >
+  <div style={{ padding: 80, textAlign: "center", color: "#64748b" }}>
     <div
       style={{
-        width: 48,
-        height: 48,
+        width: 64,
+        height: 64,
         borderRadius: "50%",
-        border: "2px solid #e2e8f0",
+        background: "#f1f5f9",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         margin: "0 auto 16px",
-        fontSize: 22,
       }}
     >
-      📖
+      <BookOpen size={32} style={{ color: "#cbd5e1" }} />
     </div>
     <h3 style={{ color: "#0f172a", marginBottom: 6 }}>
       No test prep requests yet
     </h3>
-    <p style={{ marginBottom: 0 }}>
-      Submit a test preparation request for your students
-    </p>
+    <p>Submit a test preparation request for your students</p>
   </div>
 ) : (
-  /* DATA STATE */
   <div
       style={{
         maxHeight: 520,
@@ -5597,7 +6994,7 @@ useEffect(() => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))",
-          gap: 16,
+          gap: 20,
         }}
       >
     {visibleTestPrepRequests.map((item) => (
@@ -5608,69 +7005,57 @@ useEffect(() => {
           borderRadius: 12,
           padding: 20,
           background: "#fff",
+          position: "relative",
+          transition: "all 0.2s",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+          e.currentTarget.style.transform = "translateY(0)";
         }}
       >
-        {/* HEADER */}
+        
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 14,
-          }}
-        >
-          <div style={{ display: "flex", gap: 12 }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                background: "#fef3c7",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 20,
-              }}
-            >
-              📘
-            </div>
-
-            <div>
-              <div style={{ fontWeight: 600, color: "#0f172a" }}>
-                {item.student_name}
-              </div>
-              <div style={{ fontSize: 13, color: "#64748b" }}>
-                {item.test_type}
-              </div>
-            </div>
-          </div>
-
-
-          <div>
-
-          <span
-            style={{
-              fontSize: 12,
-              padding: "4px 10px",
-              borderRadius: 20,
-              background: "#fff7ed",
-              color: "#f97316",
-              border: "1px solid #fed7aa",
-              fontWeight: 500,
-            }}
-          >
-            {item.status}
-          </span>
-
-          <button
+  style={{
+    position: "absolute",
+    top: 16,
+    right: 16,
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  }}
+>
+  <span
     style={{
-      padding: "6px",
-      cursor: "pointer",
-      fontSize: 16,
-      border: "none",
-      background: "transparent",
+      background: "#fff7ed",
+      color: "#f97316",
+      fontSize: 12,
+      padding: "4px 10px",
+      borderRadius: 999,
+      border: "1px solid #fed7aa",
+      whiteSpace: "nowrap",
+      fontWeight: 600
     }}
+  >
+    {item.status}
+  </span>
 
+  <button
+    style={{
+      padding: "8px",
+      cursor: "pointer",
+      border: "none",
+      background: "#eff6ff",
+      borderRadius: "6px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s"
+    }}
     onClick={() => {
     setEditTestPrepForm({
       id: item.id,
@@ -5684,48 +7069,90 @@ useEffect(() => {
     });
     setShowEditTestPrepModal(true);
   }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = "#dbeafe";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = "#eff6ff";
+    }}
   >
-    ✏️
+    <Edit2 size={16} style={{ color: "#3b82f6" }} />
   </button>
 
   <button
     style={{
-      padding: "6px",
+      padding: "8px",
       cursor: "pointer",
-      fontSize: 16,
       border: "none",
-      background: "transparent",
+      background: "#fef2f2",
+      borderRadius: "6px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s"
     }}
     onClick={() => {
     setTestPrepToDelete(item.id);
     setShowDeleteTestPrepModal(true);
   }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = "#fee2e2";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = "#fef2f2";
+    }}
   >
-    🗑️
+    <Trash2 size={16} style={{ color: "#ef4444" }} />
   </button>
 </div>
 
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+    <div
+      style={{
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        background: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#4f46e5",
+      }}
+    >
+      <User size={24} />
+    </div>
 
+    <div style={{ flex: 1 }}>
+      <h4 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{item.student_name}</h4>
+      <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <BookOpen size={14} />
+        {item.test_type}
+      </p>
+    </div>
+  </div>
 
-        </div>
+  <div style={{ 
+    marginTop: 14, 
+    fontSize: 14,
+    display: "grid",
+    gap: 10,
+    paddingTop: 16,
+    borderTop: "1px solid #f1f5f9"
+  }}>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#475569" }}>
+      <AlertCircle size={16} style={{ color: "#64748b" }} />
+      <span>Target: <strong>{item.target_score || "-"}</strong></span>
+    </p>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#475569" }}>
+      <Calendar size={16} style={{ color: "#64748b" }} />
+      <span>Test Date: <strong>{item.expected_test_date}</strong></span>
+    </p>
+    <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, color: "#64748b", fontSize: 13 }}>
+      <Clock size={14} style={{ color: "#94a3b8" }} />
+      Submitted: {new Date(item.submitted_at).toLocaleDateString()}
+    </p>
+  </div>
 
-        {/* DETAILS */}
-        <div style={{ fontSize: 14, color: "#334155" }}>
-          <div style={{ marginBottom: 6 }}>
-            🎯 <strong>Target:</strong> {item.target_score || "-"}
-          </div>
-          <div style={{ marginBottom: 6 }}>
-            📅 <strong>Test Date:</strong> {item.expected_test_date}
-          </div>
-          <div>
-            🕒 <strong>Submitted:</strong>{" "}
-            {new Date(item.submitted_at).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
-          </div>
-        </div>
       </div>
     ))}
 
@@ -5739,13 +7166,23 @@ useEffect(() => {
             setVisibleTestPrepCount((prev) => prev + LOAD_MORE_COUNT1)
           }
           style={{
-            padding: "10px 22px",
-            borderRadius: 999,
-            border: "1px solid #e2e8f0",
+            padding: "12px 28px",
+            borderRadius: 10,
+            border: "2px solid #e2e8f0",
             background: "#fff",
             cursor: "pointer",
             fontWeight: 600,
-            color: "#1d4ed8",
+            color: "#667eea",
+            fontSize: 15,
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f8fafc";
+            e.currentTarget.style.borderColor = "#667eea";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.borderColor = "#e2e8f0";
           }}
         >
           Load more
