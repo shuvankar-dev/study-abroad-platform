@@ -7,7 +7,7 @@ import {
   CreditCard, BookOpen, MessageSquare, Shield, User, 
   LogOut, Plus, Search, Filter, Clock,
   TrendingUp, CheckCircle, AlertCircle, Mail, Phone, Globe, 
-  Calendar, Edit2, Trash2, X
+  Calendar, Edit2, Trash2, X, UserPlus
 } from "lucide-react";
 
 const API_BASE = window.location.hostname === 'localhost'
@@ -80,6 +80,20 @@ const Dashboard = () => {
   const [loanRequests, setLoanRequests] = useState<any[]>([]);
   const [accommodationRequests, setAccommodationRequests] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Agent Management States
+  const [agents, setAgents] = useState<any[]>([]);
+  const [showAddAgentModal, setShowAddAgentModal] = useState(false);
+  const [showEditAgentModal, setShowEditAgentModal] = useState(false);
+  const [showDeleteAgentModal, setShowDeleteAgentModal] = useState(false);
+  const [agentForm, setAgentForm] = useState({
+    company_name: "",
+    user_name: "",
+    email: "",
+    phone: ""
+  });
+  const [editingAgent, setEditingAgent] = useState<any>(null);
+  const [deletingAgentId, setDeletingAgentId] = useState<number | null>(null);
 
 
 
@@ -483,6 +497,79 @@ const fetchAccommodationRequests = async () => {
 useEffect(() => {
   fetchAccommodationRequests();
 }, []);
+
+
+// ================= AGENT MANAGEMENT FUNCTIONS =================
+
+const fetchAgents = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    console.log("Fetching agents for admin_id:", user.id);
+    
+    const res = await fetch(`${API_BASE}/edupartner/get_agents.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ admin_id: user.id }),
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    console.log("Agents response:", data);
+    
+    if (data.success) {
+      setAgents(data.agents || []);
+      console.log("Agents set:", data.agents);
+    } else {
+      console.error("API returned success: false", data.message);
+      setAgents([]);
+    }
+  } catch (err) {
+    console.error("Failed to fetch agents:", err);
+    setAgents([]);
+  }
+};
+
+const submitAgent = async () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  
+  const res = await fetch(`${API_BASE}/edupartner/add_agent.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...agentForm,
+      admin_id: user.id
+    }),
+  });
+
+  const data = await res.json();
+  
+  if (data.success) {
+    alert(data.email_sent ? "Agent created and email sent successfully!" : "Agent created but email failed to send");
+    setShowAddAgentModal(false);
+    setAgentForm({ company_name: "", user_name: "", email: "", phone: "" });
+    fetchAgents();
+  } else {
+    alert(data.message || "Failed to create agent");
+  }
+};
+
+useEffect(() => {
+  if (userRole === "Admin") {
+    fetchAgents();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
+// Fetch agents when Agents section is opened
+useEffect(() => {
+  if (activeSection === "agents" && userRole === "Admin") {
+    fetchAgents();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [activeSection]);
 
 
 const fetchStudents = async () => {
@@ -1625,6 +1712,16 @@ useEffect(() => {
             >
             <Users size={18} /> Students
           </li>
+
+          {userRole === "Admin" && (
+            <li
+              className={activeSection === "agents" ? "active" : ""}
+              onClick={() => setActiveSection("agents")}
+            >
+              <UserPlus size={18} /> Agents
+            </li>
+          )}
+
           <li
             className={activeSection === "applications" ? "active" : ""}
             onClick={() => setActiveSection("applications")}
@@ -1828,10 +1925,17 @@ useEffect(() => {
                 >
                   <Search size={16} /> Browse Universities
                 </button>
-                <button className="add-student-btn" onClick={() => setActiveSection("students")}>
-                <Plus size={18} />
-                <span>Add Student</span>
-                </button>
+                {userRole === "Admin" ? (
+                  <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
+                  <Plus size={18} />
+                  <span>Add Agent</span>
+                  </button>
+                ) : (
+                  <button className="add-student-btn" onClick={() => setActiveSection("students")}>
+                  <Plus size={18} />
+                  <span>Add Student</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -3825,6 +3929,126 @@ useEffect(() => {
 
         )}
 
+
+        {/* ================= AGENTS SECTION (ADMIN ONLY) ================= */}
+        {activeSection === "agents" && userRole === "Admin" && (
+          <div style={{ padding: "24px" }}>
+            {/* HEADER */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div>
+                <h1 style={{ marginBottom: 4 }}>Agents</h1>
+                <p style={{ color: "#64748b" }}>Manage your agent accounts ({agents.length} total)</p>
+              </div>
+              <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
+                <Plus size={18} />
+                <span>Add Agent</span>
+              </button>
+            </div>
+
+            {/* AGENTS TABLE */}
+            {!agents || agents.length === 0 ? (
+              <div style={{ padding: 80, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", textAlign: "center" }}>
+                <div style={{ fontSize: 42, marginBottom: 12, color: "#94a3b8" }}>
+                  <UserPlus size={48} style={{ margin: "0 auto" }} />
+                </div>
+                <h3 style={{ marginBottom: 6 }}>No agents found</h3>
+                <p style={{ color: "#64748b", marginBottom: 20 }}>Add your first agent to get started</p>
+                <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
+                  <Plus size={18} />
+                  <span>Add Agent</span>
+                </button>
+              </div>
+            ) : (
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", textAlign: "left", fontSize: 13, color: "#fff" }}>
+                      <th style={{ padding: "14px 20px" }}>Company Name</th>
+                      <th style={{ padding: "14px 20px" }}>Agent Name</th>
+                      <th style={{ padding: "14px 20px" }}>Email</th>
+                      <th style={{ padding: "14px 20px" }}>Phone</th>
+                      <th style={{ padding: "14px 20px" }}>Status</th>
+                      <th style={{ padding: "14px 20px" }}>Created</th>
+                      <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agents.map((agent: any) => (
+                      <tr key={agent.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 14, color: "#0f172a" }}>
+                        <td style={{ padding: "16px 20px" }}>
+                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#e0e7ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#4f46e5", fontSize: 16 }}>
+                              <Building2 size={18} />
+                            </div>
+                            <div style={{ fontWeight: 600 }}>{agent.company_name}</div>
+                          </div>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <User size={16} style={{ color: "#64748b" }} />
+                            {agent.user_name}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Mail size={16} style={{ color: "#64748b" }} />
+                            {agent.email}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Phone size={16} style={{ color: "#64748b" }} />
+                            {agent.phone}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px" }}>
+                          <span style={{ 
+                            padding: "4px 12px", 
+                            borderRadius: 20, 
+                            fontSize: 12, 
+                            fontWeight: 600,
+                            background: agent.status === "Active" ? "#dcfce7" : "#fee2e2",
+                            color: agent.status === "Active" ? "#166534" : "#991b1b"
+                          }}>
+                            {agent.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Calendar size={16} style={{ color: "#64748b" }} />
+                            {new Date(agent.created_at).toLocaleDateString()}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => {
+                                setEditingAgent(agent);
+                                setShowEditAgentModal(true);
+                              }}
+                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                            >
+                              <Edit2 size={16} style={{ color: "#667eea" }} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setDeletingAgentId(agent.id);
+                                setShowDeleteAgentModal(true);
+                              }}
+                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                            >
+                              <Trash2 size={16} style={{ color: "#ef4444" }} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
 
 
         {/* ================= APPLICATIONS SECTION (ADDED ONLY) ================= */}
@@ -8730,7 +8954,122 @@ useEffect(() => {
   </div>
 )}
 
+{/* ================= ADD AGENT MODAL ================= */}
+{showAddAgentModal && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowAddAgentModal(false);
+        setAgentForm({ company_name: "", user_name: "", email: "", phone: "" });
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "600px",
+      maxHeight: "90vh", overflow: "hidden", boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+      display: "flex", flexDirection: "column"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        padding: "24px 28px", color: "#fff", position: "relative"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>
+          Add New Agent
+        </h3>
+        <p style={{ margin: 0, fontSize: "14px", opacity: 0.95, fontWeight: 400 }}>
+          Create agent account and send credentials via email
+        </p>
+        <button
+          onClick={() => {
+            setShowAddAgentModal(false);
+            setAgentForm({ company_name: "", user_name: "", email: "", phone: "" });
+          }}
+          style={{
+            position: "absolute", top: "20px", right: "20px",
+            background: "rgba(255, 255, 255, 0.2)", border: "none",
+            borderRadius: "8px", width: "36px", height: "36px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer"
+          }}
+        >
+          <X size={20} style={{ color: "#fff" }} />
+        </button>
+      </div>
 
+      <div style={{ padding: "28px", overflowY: "auto", flex: 1 }}>
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Company Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter company name" value={agentForm.company_name}
+          onChange={(e) => setAgentForm({ ...agentForm, company_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Agent Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter agent name" value={agentForm.user_name}
+          onChange={(e) => setAgentForm({ ...agentForm, user_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Email <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="email" placeholder="agent@example.com" value={agentForm.email}
+          onChange={(e) => setAgentForm({ ...agentForm, email: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Phone <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="tel" placeholder="Enter phone number" value={agentForm.phone}
+          onChange={(e) => setAgentForm({ ...agentForm, phone: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <p style={{ marginTop: "16px", fontSize: "13px", color: "#64748b", background: "#f8fafc",
+          padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+          <strong>Note:</strong> A random password will be generated and sent to the agent's email.
+        </p>
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12 }}>
+        <button
+          onClick={() => {
+            setShowAddAgentModal(false);
+            setAgentForm({ company_name: "", user_name: "", email: "", phone: "" });
+          }}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={submitAgent}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)" }}
+        >
+          Create Agent
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 
       </main>
