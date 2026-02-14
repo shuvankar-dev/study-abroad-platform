@@ -95,7 +95,19 @@ const Dashboard = () => {
   const [editingAgent, setEditingAgent] = useState<any>(null);
   const [deletingAgentId, setDeletingAgentId] = useState<number | null>(null);
 
-
+  // Counselor Management States (for Agents)
+  const [counselors, setCounselors] = useState<any[]>([]);
+  const [showAddCounselorModal, setShowAddCounselorModal] = useState(false);
+  const [showEditCounselorModal, setShowEditCounselorModal] = useState(false);
+  const [showDeleteCounselorModal, setShowDeleteCounselorModal] = useState(false);
+  const [counselorForm, setCounselorForm] = useState({
+    company_name: "",
+    user_name: "",
+    email: "",
+    phone: ""
+  });
+  const [editingCounselor, setEditingCounselor] = useState<any>(null);
+  const [deletingCounselorId, setDeletingCounselorId] = useState<number | null>(null);
 
   const [showFilters, setShowFilters] = useState(false);
   
@@ -568,6 +580,118 @@ useEffect(() => {
 useEffect(() => {
   if (activeSection === "agents" && userRole === "Admin") {
     fetchAgents();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [activeSection]);
+
+// ================= COUNSELOR MANAGEMENT FUNCTIONS =================
+
+const fetchCounselors = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    console.log("Fetching counselors for agent_id:", user.id);
+    
+    const res = await fetch(`${API_BASE}/edupartner/get_counselors.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ agent_id: user.id }),
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    console.log("Counselors response:", data);
+    
+    if (data.success) {
+      setCounselors(data.counselors || []);
+      console.log("Counselors set:", data.counselors);
+    } else {
+      console.error("API returned success: false", data.message);
+      setCounselors([]);
+    }
+  } catch (err) {
+    console.error("Failed to fetch counselors:", err);
+    setCounselors([]);
+  }
+};
+
+const submitCounselor = async () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  
+  const res = await fetch(`${API_BASE}/edupartner/add_counselor.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...counselorForm,
+      agent_id: user.id
+    }),
+  });
+
+  const data = await res.json();
+  
+  if (data.success) {
+    alert(data.email_sent ? "Counselor created and email sent successfully!" : "Counselor created but email failed to send");
+    setShowAddCounselorModal(false);
+    setCounselorForm({ company_name: "", user_name: "", email: "", phone: "" });
+    fetchCounselors();
+  } else {
+    alert(data.message || "Failed to create counselor");
+  }
+};
+
+const updateCounselor = async () => {
+  if (!editingCounselor) return;
+
+  const res = await fetch(`${API_BASE}/edupartner/update_counselor.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(editingCounselor),
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    setShowEditCounselorModal(false);
+    setEditingCounselor(null);
+    fetchCounselors();
+  } else {
+    alert(data.error || "Failed to update counselor");
+  }
+};
+
+const deleteCounselor = async () => {
+  if (!deletingCounselorId) return;
+
+  const res = await fetch(`${API_BASE}/edupartner/delete_counselor.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: deletingCounselorId }),
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    setShowDeleteCounselorModal(false);
+    setDeletingCounselorId(null);
+    fetchCounselors();
+  } else {
+    alert(data.error || "Failed to delete counselor");
+  }
+};
+
+useEffect(() => {
+  if (userRole === "Agent") {
+    fetchCounselors();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
+// Fetch counselors when Counselors section is opened
+useEffect(() => {
+  if (activeSection === "counselors" && userRole === "Agent") {
+    fetchCounselors();
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [activeSection]);
@@ -1762,6 +1886,15 @@ useEffect(() => {
             </li>
           )}
 
+          {userRole === "Agent" && (
+            <li
+              className={activeSection === "counselors" ? "active" : ""}
+              onClick={() => setActiveSection("counselors")}
+            >
+              <UserPlus size={18} /> Counselors
+            </li>
+          )}
+
           <li
             className={activeSection === "applications" ? "active" : ""}
             onClick={() => setActiveSection("applications")}
@@ -1769,12 +1902,14 @@ useEffect(() => {
             <FileText size={18} /> Applications
             </li>
 
-          <li
-            className={activeSection === "commissions" ? "active" : ""}
-            onClick={() => setActiveSection("commissions")}
-            >
-            <DollarSign size={18} /> Commissions
-            </li>
+          {userRole !== "Counselor" && (
+            <li
+              className={activeSection === "commissions" ? "active" : ""}
+              onClick={() => setActiveSection("commissions")}
+              >
+              <DollarSign size={18} /> Commissions
+              </li>
+          )}
 
            <li
                 className={activeSection === "accommodation" ? "active" : ""}
@@ -4379,6 +4514,127 @@ useEffect(() => {
                               onClick={() => {
                                 setDeletingAgentId(agent.id);
                                 setShowDeleteAgentModal(true);
+                              }}
+                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                            >
+                              <Trash2 size={16} style={{ color: "#ef4444" }} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+
+        {/* ================= COUNSELORS SECTION (AGENT ONLY) ================= */}
+        {activeSection === "counselors" && userRole === "Agent" && (
+          <div style={{ padding: "24px" }}>
+            {/* HEADER */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div>
+                <h1 style={{ marginBottom: 4 }}>Counselors</h1>
+                <p style={{ color: "#64748b" }}>Manage your counselor accounts ({counselors.length} total)</p>
+              </div>
+              <button className="add-student-btn" onClick={() => setShowAddCounselorModal(true)}>
+                <Plus size={18} />
+                <span>Add Counselor</span>
+              </button>
+            </div>
+
+            {/* COUNSELORS TABLE */}
+            {!counselors || counselors.length === 0 ? (
+              <div style={{ padding: 80, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", textAlign: "center" }}>
+                <div style={{ fontSize: 42, marginBottom: 12, color: "#94a3b8" }}>
+                  <UserPlus size={48} style={{ margin: "0 auto" }} />
+                </div>
+                <h3 style={{ marginBottom: 6 }}>No counselors found</h3>
+                <p style={{ color: "#64748b", marginBottom: 20 }}>Add your first counselor to get started</p>
+                <button className="add-student-btn" onClick={() => setShowAddCounselorModal(true)}>
+                  <Plus size={18} />
+                  <span>Add Counselor</span>
+                </button>
+              </div>
+            ) : (
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", textAlign: "left", fontSize: 13, color: "#fff" }}>
+                      <th style={{ padding: "14px 20px" }}>Company Name</th>
+                      <th style={{ padding: "14px 20px" }}>Counselor Name</th>
+                      <th style={{ padding: "14px 20px" }}>Email</th>
+                      <th style={{ padding: "14px 20px" }}>Phone</th>
+                      <th style={{ padding: "14px 20px" }}>Status</th>
+                      <th style={{ padding: "14px 20px" }}>Created</th>
+                      <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {counselors.map((counselor: any) => (
+                      <tr key={counselor.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 14, color: "#0f172a" }}>
+                        <td style={{ padding: "16px 20px" }}>
+                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#d1fae5", display: "flex", alignItems: "center", justifyContent: "center", color: "#059669", fontSize: 16 }}>
+                              <Building2 size={18} />
+                            </div>
+                            <div style={{ fontWeight: 600 }}>{counselor.company_name}</div>
+                          </div>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <User size={16} style={{ color: "#64748b" }} />
+                            {counselor.user_name}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Mail size={16} style={{ color: "#64748b" }} />
+                            {counselor.email}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Phone size={16} style={{ color: "#64748b" }} />
+                            {counselor.phone}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px" }}>
+                          <span style={{ 
+                            padding: "4px 12px", 
+                            borderRadius: 20, 
+                            fontSize: 12, 
+                            fontWeight: 600,
+                            background: counselor.status === "Active" ? "#dcfce7" : "#fee2e2",
+                            color: counselor.status === "Active" ? "#166534" : "#991b1b"
+                          }}>
+                            {counselor.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Calendar size={16} style={{ color: "#64748b" }} />
+                            {counselor.created_at ? new Date(counselor.created_at).toLocaleDateString() : "N/A"}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => {
+                                setEditingCounselor(counselor);
+                                setShowEditCounselorModal(true);
+                              }}
+                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                            >
+                              <Edit2 size={16} style={{ color: "#10b981" }} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setDeletingCounselorId(counselor.id);
+                                setShowDeleteCounselorModal(true);
                               }}
                               style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
                             >
@@ -9630,11 +9886,284 @@ useEffect(() => {
 )}
 
 
+{/* ================= ADD COUNSELOR MODAL ================= */}
+{showAddCounselorModal && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowAddCounselorModal(false);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "550px",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+        padding: "24px 28px", color: "#fff", borderRadius: "16px 16px 0 0",
+        display: "flex", justifyContent: "space-between", alignItems: "center"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+          Add New Counselor
+        </h3>
+        <button
+          onClick={() => setShowAddCounselorModal(false)}
+          style={{ background: "transparent", border: "none", color: "#fff",
+            fontSize: "24px", cursor: "pointer", padding: 0, lineHeight: 1 }}
+        >
+          ×
+        </button>
+      </div>
+
+      <div style={{ padding: "28px" }}>
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Company Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter company name" value={counselorForm.company_name}
+          onChange={(e) => setCounselorForm({ ...counselorForm, company_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Counselor Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter counselor name" value={counselorForm.user_name}
+          onChange={(e) => setCounselorForm({ ...counselorForm, user_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Email <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="email" placeholder="Enter email address" value={counselorForm.email}
+          onChange={(e) => setCounselorForm({ ...counselorForm, email: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Phone <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="tel" placeholder="Enter phone number" value={counselorForm.phone}
+          onChange={(e) => setCounselorForm({ ...counselorForm, phone: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12 }}>
+        <button
+          onClick={() => setShowAddCounselorModal(false)}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={submitCounselor}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(16, 185, 129, 0.4)" }}
+        >
+          Add Counselor
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ================= EDIT COUNSELOR MODAL ================= */}
+{showEditCounselorModal && editingCounselor && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowEditCounselorModal(false);
+        setEditingCounselor(null);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "550px",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+        padding: "24px 28px", color: "#fff", borderRadius: "16px 16px 0 0",
+        display: "flex", justifyContent: "space-between", alignItems: "center"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+          Edit Counselor
+        </h3>
+        <button
+          onClick={() => {
+            setShowEditCounselorModal(false);
+            setEditingCounselor(null);
+          }}
+          style={{ background: "transparent", border: "none", color: "#fff",
+            fontSize: "24px", cursor: "pointer", padding: 0, lineHeight: 1 }}
+        >
+          ×
+        </button>
+      </div>
+
+      <div style={{ padding: "28px" }}>
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Company Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter company name" value={editingCounselor.company_name}
+          onChange={(e) => setEditingCounselor({ ...editingCounselor, company_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Counselor Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter counselor name" value={editingCounselor.user_name}
+          onChange={(e) => setEditingCounselor({ ...editingCounselor, user_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Email <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="email" placeholder="Enter email address" value={editingCounselor.email}
+          onChange={(e) => setEditingCounselor({ ...editingCounselor, email: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Phone <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="tel" placeholder="Enter phone number" value={editingCounselor.phone}
+          onChange={(e) => setEditingCounselor({ ...editingCounselor, phone: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Status <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <select value={editingCounselor.status}
+          onChange={(e) => setEditingCounselor({ ...editingCounselor, status: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        >
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12 }}>
+        <button
+          onClick={() => {
+            setShowEditCounselorModal(false);
+            setEditingCounselor(null);
+          }}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={updateCounselor}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(16, 185, 129, 0.4)" }}
+        >
+          Update Counselor
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ================= DELETE COUNSELOR MODAL ================= */}
+{showDeleteCounselorModal && deletingCounselorId && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowDeleteCounselorModal(false);
+        setDeletingCounselorId(null);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "450px",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+        padding: "24px 28px", color: "#fff", borderRadius: "16px 16px 0 0"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+          Delete Counselor
+        </h3>
+      </div>
+
+      <div style={{ padding: "28px" }}>
+        <p style={{ margin: 0, fontSize: "15px", color: "#334155", lineHeight: "1.6" }}>
+          Are you sure you want to delete this counselor? This action cannot be undone.
+        </p>
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12, borderRadius: "0 0 16px 16px" }}>
+        <button
+          onClick={() => {
+            setShowDeleteCounselorModal(false);
+            setDeletingCounselorId(null);
+          }}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={deleteCounselor}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(239, 68, 68, 0.4)" }}
+        >
+          Delete Counselor
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
       </main>
     </div>
   );
 };
 
 export default Dashboard;
-
-
