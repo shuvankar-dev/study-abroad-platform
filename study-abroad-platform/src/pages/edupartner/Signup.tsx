@@ -15,7 +15,7 @@ const Signup = () => {
     phone: "",
     password: "",
     confirmPassword: "",
-    role: ""
+    role: "Admin" // Fixed as Admin
   });
 
   const [error, setError] = useState("");
@@ -31,9 +31,9 @@ const Signup = () => {
     setError("");
     setSuccess("");
 
-    const { company_name, user_name, email, password, confirmPassword, role } = form;
+    const { company_name, user_name, email, password, confirmPassword } = form;
 
-    if (!company_name || !user_name || !email || !password || !confirmPassword || !role) {
+    if (!company_name || !user_name || !email || !password || !confirmPassword) {
       setError("Please fill all required fields");
       return;
     }
@@ -43,7 +43,7 @@ const Signup = () => {
       return;
     }
 
-    const status = role === "Admin" ? "Active" : "Inactive";
+    const status = "Active"; // Admin accounts are always Active
 
     try {
       const res = await fetch(`${API_BASE}/edupartner/signup.php`, {
@@ -51,6 +51,7 @@ const Signup = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          role: "Admin", // Always Admin
           status
         })
       });
@@ -66,7 +67,7 @@ const Signup = () => {
           phone: "",
           password: "",
           confirmPassword: "",
-          role: ""
+          role: "Admin"
         });
       } else {
         setError(data.message);
@@ -240,7 +241,7 @@ const Signup = () => {
               Create Account
             </CardTitle>
             <CardDescription style={{ fontSize: '15px', color: '#718096' }}>
-              Register as a partner to get started
+              Register as an Admin partner to get started
             </CardDescription>
           </CardHeader>
           
@@ -297,63 +298,8 @@ const Signup = () => {
               value={form.confirmPassword}
             />
 
-            {/* Role Select */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ 
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#2d3748',
-                marginBottom: '8px'
-              }}>
-                Role <span style={{ color: '#f56565' }}>*</span>
-              </label>
-              <div style={{
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center'
-              }}>
-                <User 
-                  size={18} 
-                  style={{ 
-                    position: 'absolute',
-                    left: '14px',
-                    color: '#a0aec0',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }} 
-                />
-                <select
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  style={{
-                    width: '100%',
-                    padding: '11px 11px 11px 44px',
-                    fontSize: '14px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '10px',
-                    outline: 'none',
-                    transition: 'all 0.2s',
-                    backgroundColor: '#f7fafc',
-                    cursor: 'pointer',
-                    appearance: 'none'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#667eea';
-                    e.target.style.backgroundColor = '#ffffff';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#e2e8f0';
-                    e.target.style.backgroundColor = '#f7fafc';
-                  }}
-                >
-                  <option value="">---Select Role---</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Agent">Agent</option>
-                </select>
-              </div>
-            </div>
+            {/* Hidden Role Field - Always Admin */}
+            <input type="hidden" name="role" value="Admin" />
 
             {/* Error Message */}
             {error && (
