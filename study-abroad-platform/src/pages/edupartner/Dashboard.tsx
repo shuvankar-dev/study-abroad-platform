@@ -278,8 +278,11 @@ const handleDeleteAccommodation = async (id: number) => {
     const companyName = user.company_name || "";
     const avatarLetter = userName ? userName.charAt(0).toUpperCase() : "U";
     
-    // Check if Super Admin (parent_admin_id is null or 0)
-    const isSuperAdmin = user.parent_admin_id === null || user.parent_admin_id === 0 || user.parent_admin_id === undefined;
+    // Check if Super Admin (parent_admin_id is null, 0, or undefined)
+    const isSuperAdmin = user.parent_admin_id === null || 
+                         user.parent_admin_id === 0 || 
+                         user.parent_admin_id === undefined ||
+                         user.parent_admin_id === '0';
 
     const [users, setUsers] = useState<any[]>([]);
 
@@ -718,7 +721,11 @@ useEffect(() => {
 const fetchAdmins = async () => {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("Fetching admins for super_admin_id:", user.id);
+    console.log("=== FETCH ADMINS DEBUG ===");
+    console.log("User object:", user);
+    console.log("User ID:", user.id);
+    console.log("Parent Admin ID:", user.parent_admin_id);
+    console.log("Is Super Admin:", isSuperAdmin);
     
     const res = await fetch(`${API_BASE}/edupartner/get_admins.php`, {
       method: "POST",
@@ -731,13 +738,16 @@ const fetchAdmins = async () => {
     }
     
     const data = await res.json();
-    console.log("Admins response:", data);
+    console.log("Admins API response:", data);
     
     if (data.success) {
       setAdmins(data.admins || []);
-      console.log("Admins set:", data.admins);
+      console.log("Admins set successfully:", data.admins);
     } else {
       console.error("API returned success: false", data.message);
+      if (data.debug) {
+        console.error("Debug info:", data.debug);
+      }
       setAdmins([]);
     }
   } catch (err) {
