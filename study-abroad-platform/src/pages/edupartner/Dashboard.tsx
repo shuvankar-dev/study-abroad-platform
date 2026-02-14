@@ -98,8 +98,9 @@ const Dashboard = () => {
 
 
   const [showFilters, setShowFilters] = useState(false);
-
   
+  // University Detail - Expandable Row
+  const [expandedUniversityId, setExpandedUniversityId] = useState<number | null>(null);
 
   const [showApplicationModal, setShowApplicationModal] = useState(false);
 
@@ -693,6 +694,10 @@ const [currentPage, setCurrentPage] = useState(1);
 const [filterCountry, setFilterCountry] = useState("");
 const [filterLevel, setFilterLevel] = useState("");
 const [filterIntake, setFilterIntake] = useState("");
+const [sortTuition, setSortTuition] = useState("");
+const [filterWaiver, setFilterWaiver] = useState("");
+const [filterTestRequired, setFilterTestRequired] = useState("");
+const [filterPunjabHaryana, setFilterPunjabHaryana] = useState("");
 
 const filteredUniversities11 = universities.filter((u) => {
   const matchesSearch =
@@ -704,12 +709,44 @@ const filteredUniversities11 = universities.filter((u) => {
   const matchesLevel = filterLevel === "" || u.Study_Level === filterLevel;
   const matchesIntake = filterIntake === "" || u.Open_Intakes.includes(filterIntake);
 
-  return matchesSearch && matchesCountry && matchesLevel && matchesIntake;
+  // English Proficiency Exam Waiver filter
+  const matchesWaiver = filterWaiver === "" || 
+    (filterWaiver === "yes" && u.English_Proficiency_Exam_Waiver && u.English_Proficiency_Exam_Waiver.toLowerCase() !== "no") ||
+    (filterWaiver === "no" && (!u.English_Proficiency_Exam_Waiver || u.English_Proficiency_Exam_Waiver.toLowerCase() === "no"));
+
+  // English Test Required filter
+  const matchesTestRequired = filterTestRequired === "" ||
+    (filterTestRequired === "required" && (u.IELTS_Score || u.TOEFL_Score || u.PTE_Score)) ||
+    (filterTestRequired === "not_required" && !u.IELTS_Score && !u.TOEFL_Score && !u.PTE_Score);
+
+  // No waiver for Punjab/Haryana filter
+  const matchesPunjabHaryana = filterPunjabHaryana === "" ||
+    (filterPunjabHaryana === "exclude" && u.Remarks && 
+      (u.Remarks.toLowerCase().includes("punjab") || u.Remarks.toLowerCase().includes("haryana")));
+
+  return matchesSearch && matchesCountry && matchesLevel && matchesIntake && 
+         matchesWaiver && matchesTestRequired && matchesPunjabHaryana;
 });
 
-const totalPages = Math.ceil(filteredUniversities11.length / ITEMS_PER_PAGE);
+// Sort by tuition fees
+let sortedUniversities = [...filteredUniversities11];
+if (sortTuition === "low_to_high") {
+  sortedUniversities.sort((a, b) => {
+    const feeA = parseFloat(a.Yearly_Tuition_Fees) || 0;
+    const feeB = parseFloat(b.Yearly_Tuition_Fees) || 0;
+    return feeA - feeB;
+  });
+} else if (sortTuition === "high_to_low") {
+  sortedUniversities.sort((a, b) => {
+    const feeA = parseFloat(a.Yearly_Tuition_Fees) || 0;
+    const feeB = parseFloat(b.Yearly_Tuition_Fees) || 0;
+    return feeB - feeA;
+  });
+}
 
-const paginatedUniversities = filteredUniversities11.slice(
+const totalPages = Math.ceil(sortedUniversities.length / ITEMS_PER_PAGE);
+
+const paginatedUniversities = sortedUniversities.slice(
   (currentPage - 1) * ITEMS_PER_PAGE,
   currentPage * ITEMS_PER_PAGE
 );
@@ -734,6 +771,9 @@ const fetchUniversities = async () => {
   }
 };
 
+const toggleUniversityDetails = (universityId: number) => {
+  setExpandedUniversityId(expandedUniversityId === universityId ? null : universityId);
+};
 
 useEffect(() => {
   if (activeSection === "universities") {
@@ -2579,6 +2619,177 @@ useEffect(() => {
   <option value="No Open Intakes">No Open Intakes</option>
       </select>
     </div>
+
+    {/* Sort by Tuition Fees */}
+    <div>
+      <label
+        style={{
+          display: "block",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#334155",
+        }}
+      >
+        Sort by Tuition Fees
+      </label>
+      <select
+        value={sortTuition}
+        onChange={(e) => setSortTuition(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "12px 14px",
+          borderRadius: 10,
+          border: "2px solid #e2e8f0",
+          background: "#ffffff",
+          fontSize: 14,
+          color: "#0f172a",
+          outline: "none",
+          cursor: "pointer",
+          transition: "all 0.2s"
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.boxShadow = "none";
+        }}
+      >
+        <option value="">Default</option>
+        <option value="low_to_high">Low to High</option>
+        <option value="high_to_low">High to Low</option>
+      </select>
+    </div>
+
+    {/* English Proficiency Exam Waiver */}
+    <div>
+      <label
+        style={{
+          display: "block",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#334155",
+        }}
+      >
+        English Exam Waiver
+      </label>
+      <select
+        value={filterWaiver}
+        onChange={(e) => setFilterWaiver(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "12px 14px",
+          borderRadius: 10,
+          border: "2px solid #e2e8f0",
+          background: "#ffffff",
+          fontSize: 14,
+          color: "#0f172a",
+          outline: "none",
+          cursor: "pointer",
+          transition: "all 0.2s"
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.boxShadow = "none";
+        }}
+      >
+        <option value="">All</option>
+        <option value="yes">Waiver Available</option>
+        <option value="no">No Waiver</option>
+      </select>
+    </div>
+
+    {/* English Test Required */}
+    <div>
+      <label
+        style={{
+          display: "block",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#334155",
+        }}
+      >
+        English Test Result
+      </label>
+      <select
+        value={filterTestRequired}
+        onChange={(e) => setFilterTestRequired(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "12px 14px",
+          borderRadius: 10,
+          border: "2px solid #e2e8f0",
+          background: "#ffffff",
+          fontSize: 14,
+          color: "#0f172a",
+          outline: "none",
+          cursor: "pointer",
+          transition: "all 0.2s"
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.boxShadow = "none";
+        }}
+      >
+        <option value="">All</option>
+        <option value="required">Required</option>
+        <option value="not_required">Not Required</option>
+      </select>
+    </div>
+
+    {/* No Waiver for Punjab/Haryana */}
+    <div>
+      <label
+        style={{
+          display: "block",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#334155",
+        }}
+      >
+        Punjab/Haryana Restriction
+      </label>
+      <select
+        value={filterPunjabHaryana}
+        onChange={(e) => setFilterPunjabHaryana(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "12px 14px",
+          borderRadius: 10,
+          border: "2px solid #e2e8f0",
+          background: "#ffffff",
+          fontSize: 14,
+          color: "#0f172a",
+          outline: "none",
+          cursor: "pointer",
+          transition: "all 0.2s"
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#667eea";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#e2e8f0";
+          e.currentTarget.style.boxShadow = "none";
+        }}
+      >
+        <option value="">All</option>
+        <option value="exclude">Exclude Punjab/Haryana Restrictions</option>
+      </select>
+    </div>
   </div>
   </>
 )}
@@ -2588,8 +2799,22 @@ useEffect(() => {
 
 
             {/* COUNT */}
-            <div style={{ marginTop: 20, color: "#64748b", fontSize: 14, fontWeight: 500 }}>
-  Showing {paginatedUniversities.length} of {filteredUniversities11.length} courses
+            <div style={{ marginTop: 20, color: "#64748b", fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 12 }}>
+  <span>Showing {paginatedUniversities.length} of {sortedUniversities.length} courses</span>
+  <span style={{ 
+    padding: "6px 12px", 
+    borderRadius: 6, 
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", 
+    color: "#fff", 
+    fontSize: 12, 
+    fontWeight: 600,
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    boxShadow: "0 2px 4px rgba(102, 126, 234, 0.3)"
+  }}>
+     Click any row to view full details
+  </span>
 </div>
 
 
@@ -2655,26 +2880,35 @@ useEffect(() => {
         <th style={{ padding: "16px 20px" }}>Country</th>
         <th style={{ padding: "16px 20px" }}>Duration</th>
         <th style={{ padding: "16px 20px" }}>Open Intakes</th>
+        <th style={{ padding: "16px 20px", textAlign: "center" }}>Actions</th>
       </tr>
     </thead>
 
     <tbody>
       {paginatedUniversities.map((u, i) => (
-        <tr
-          key={i}
-          style={{
-            borderTop: "1px solid #f1f5f9",
-            fontSize: 14,
-            color: "#0f172a",
-            transition: "all 0.2s"
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#f8fafc";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-          }}
-        >
+        <>
+          <tr
+            key={i}
+            onClick={() => toggleUniversityDetails(u.id)}
+            style={{
+              borderTop: "1px solid #f1f5f9",
+              fontSize: 14,
+              color: "#0f172a",
+              transition: "all 0.2s",
+              cursor: "pointer",
+              background: expandedUniversityId === u.id ? "#f8fafc" : "transparent"
+            }}
+            onMouseEnter={(e) => {
+              if (expandedUniversityId !== u.id) {
+                e.currentTarget.style.background = "#f8fafc";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (expandedUniversityId !== u.id) {
+                e.currentTarget.style.background = "transparent";
+              }
+            }}
+          >
           {/* University */}
           <td style={{ padding: "18px 20px", fontWeight: 600 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -2730,7 +2964,165 @@ useEffect(() => {
               {u.Open_Intakes}
             </div>
           </td>
+
+          {/* View Details Button */}
+          <td style={{ padding: "18px 20px", textAlign: "center" }}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleUniversityDetails(u.id);
+              }}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 8,
+                border: "2px solid #667eea",
+                background: expandedUniversityId === u.id ? "#667eea" : "#fff",
+                color: expandedUniversityId === u.id ? "#fff" : "#667eea",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "12px",
+                transition: "all 0.2s",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6
+              }}
+              onMouseEnter={(e) => {
+                if (expandedUniversityId !== u.id) {
+                  e.currentTarget.style.background = "#667eea";
+                  e.currentTarget.style.color = "#fff";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (expandedUniversityId !== u.id) {
+                  e.currentTarget.style.background = "#fff";
+                  e.currentTarget.style.color = "#667eea";
+                }
+              }}
+            >
+              {expandedUniversityId === u.id ? "Hide Details" : "View Details"}
+            </button>
+          </td>
         </tr>
+
+        {/* EXPANDABLE DETAIL ROW */}
+        {expandedUniversityId === u.id && (
+          <tr key={`detail-${i}`}>
+            <td colSpan={8} style={{ padding: 0, background: "#f8fafc" }}>
+              <div style={{ padding: "24px", borderTop: "2px solid #e2e8f0" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px" }}>
+                  
+                  {/* Column 1 */}
+                  <div>
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>University Ranking</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", lineHeight: "1.5" }}>{u.University_Ranking || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Website</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px" }}>
+                        {u.Website_URL ? (
+                          <a href={u.Website_URL} target="_blank" rel="noopener noreferrer" style={{ color: "#667eea", textDecoration: "none" }}>
+                            Visit Website →
+                          </a>
+                        ) : "N/A"}
+                      </p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Intake Year</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>{u.Intake_Year || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Application Deadline</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>{u.Application_Deadline || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Application Fee</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", fontWeight: 600 }}>{u.Application_Fee || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Yearly Tuition Fees</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", fontWeight: 600 }}>{u.Yearly_Tuition_Fees || "N/A"}</p>
+                    </div>
+                  </div>
+
+                  {/* Column 2 */}
+                  <div>
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Entry Requirements</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", lineHeight: "1.5" }}>{u.Entry_Requirements || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>IELTS Score</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>
+                        {u.IELTS_Score || "N/A"} {u.IELTS_No_Band_Less_Than && `(No band less than ${u.IELTS_No_Band_Less_Than})`}
+                      </p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>TOEFL Score</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>
+                        {u.TOEFL_Score || "N/A"} {u.TOEFL_No_Band_Less_Than && `(No band less than ${u.TOEFL_No_Band_Less_Than})`}
+                      </p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>PTE Score</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>
+                        {u.PTE_Score || "N/A"} {u.PTE_No_Band_Less_Than && `(No band less than ${u.PTE_No_Band_Less_Than})`}
+                      </p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>DET Score</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>{u.DET_Score || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Backlog Range</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>{u.Backlog_Range || "N/A"}</p>
+                    </div>
+                  </div>
+
+                  {/* Column 3 */}
+                  <div>
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Scholarship Available</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a" }}>{u.Scholarship_Available || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Scholarship Detail</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", lineHeight: "1.5" }}>{u.Scholarship_Detail || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Application Mode</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", lineHeight: "1.5" }}>{u.Application_Mode || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>English Proficiency Exam Waiver</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", lineHeight: "1.5" }}>{u.English_Proficiency_Exam_Waiver || "N/A"}</p>
+                    </div>
+
+                    <div style={{ marginBottom: "16px" }}>
+                      <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Remarks</label>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", lineHeight: "1.5" }}>{u.Remarks || "N/A"}</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </td>
+          </tr>
+        )}
+        </>
       ))}
     </tbody>
   </table>
@@ -2818,53 +3210,6 @@ useEffect(() => {
     </button>
   </div>
 </div>
-
-
-
-{/* <div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 16,
-  }}
->
-  <span style={{ fontSize: 14, color: "#64748b" }}>
-    Page {currentPage} of {totalPages}
-  </span>
-
-  <div style={{ display: "flex", gap: 8 }}>
-    <button
-      disabled={currentPage === 1}
-      onClick={() => setCurrentPage((p) => p - 1)}
-      style={{
-        padding: "8px 14px",
-        borderRadius: 8,
-        border: "1px solid #e2e8f0",
-        background: currentPage === 1 ? "#f1f5f9" : "#fff",
-        cursor: currentPage === 1 ? "not-allowed" : "pointer",
-        color: currentPage === 1 ? "#94a3b8" : "#0f172a",
-      }}
-    >
-      ◀ Previous
-    </button>
-
-    <button
-      disabled={currentPage === totalPages}
-      onClick={() => setCurrentPage((p) => p + 1)}
-      style={{
-        padding: "8px 14px",
-        borderRadius: 8,
-        border: "1px solid #e2e8f0",
-        background: currentPage === totalPages ? "#f1f5f9" : "#fff",
-        cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-        color: currentPage === totalPages ? "#94a3b8" : "#0f172a",
-      }}
-    >
-      Next ▶
-    </button>
-  </div>
-</div> */}
 
 
 
@@ -4016,7 +4361,7 @@ useEffect(() => {
                         <td style={{ padding: "16px 20px", color: "#334155" }}>
                           <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                             <Calendar size={16} style={{ color: "#64748b" }} />
-                            {new Date(agent.created_at).toLocaleDateString()}
+                            {agent.created_at ? new Date(agent.created_at).toLocaleDateString() : "N/A"}
                           </span>
                         </td>
                         <td style={{ padding: "16px 20px", textAlign: "right" }}>
@@ -9065,6 +9410,219 @@ useEffect(() => {
             boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)" }}
         >
           Create Agent
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ================= EDIT AGENT MODAL ================= */}
+{showEditAgentModal && editingAgent && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowEditAgentModal(false);
+        setEditingAgent(null);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "600px",
+      maxHeight: "90vh", overflow: "hidden", boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+      display: "flex", flexDirection: "column"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        padding: "24px 28px", color: "#fff", position: "relative"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>
+          Edit Agent
+        </h3>
+        <p style={{ margin: 0, fontSize: "14px", opacity: 0.95, fontWeight: 400 }}>
+          Update agent information
+        </p>
+        <button
+          onClick={() => {
+            setShowEditAgentModal(false);
+            setEditingAgent(null);
+          }}
+          style={{
+            position: "absolute", top: "20px", right: "20px",
+            background: "rgba(255, 255, 255, 0.2)", border: "none",
+            borderRadius: "8px", width: "36px", height: "36px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer"
+          }}
+        >
+          <X size={20} style={{ color: "#fff" }} />
+        </button>
+      </div>
+
+      <div style={{ padding: "28px", overflowY: "auto", flex: 1 }}>
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Company Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter company name" value={editingAgent.company_name}
+          onChange={(e) => setEditingAgent({ ...editingAgent, company_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Agent Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter agent name" value={editingAgent.user_name}
+          onChange={(e) => setEditingAgent({ ...editingAgent, user_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Email <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="email" placeholder="agent@example.com" value={editingAgent.email}
+          onChange={(e) => setEditingAgent({ ...editingAgent, email: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Phone <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="tel" placeholder="Enter phone number" value={editingAgent.phone}
+          onChange={(e) => setEditingAgent({ ...editingAgent, phone: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Status <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <select value={editingAgent.status}
+          onChange={(e) => setEditingAgent({ ...editingAgent, status: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        >
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12 }}>
+        <button
+          onClick={() => {
+            setShowEditAgentModal(false);
+            setEditingAgent(null);
+          }}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={async () => {
+          const res = await fetch(`${API_BASE}/edupartner/update_agent.php`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(editingAgent),
+          });
+          const data = await res.json();
+          if (data.success) {
+            setShowEditAgentModal(false);
+            setEditingAgent(null);
+            fetchAgents();
+          } else {
+            alert(data.error || "Failed to update agent");
+          }
+        }}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)" }}
+        >
+          Update Agent
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ================= DELETE AGENT MODAL ================= */}
+{showDeleteAgentModal && deletingAgentId && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowDeleteAgentModal(false);
+        setDeletingAgentId(null);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "450px",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+        padding: "24px 28px", color: "#fff", borderRadius: "16px 16px 0 0"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+          Delete Agent
+        </h3>
+      </div>
+
+      <div style={{ padding: "28px" }}>
+        <p style={{ margin: 0, fontSize: "15px", color: "#334155", lineHeight: "1.6" }}>
+          Are you sure you want to delete this agent? This action cannot be undone.
+        </p>
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12, borderRadius: "0 0 16px 16px" }}>
+        <button
+          onClick={() => {
+            setShowDeleteAgentModal(false);
+            setDeletingAgentId(null);
+          }}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={async () => {
+          const res = await fetch(`${API_BASE}/edupartner/delete_agent.php`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: deletingAgentId }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            setShowDeleteAgentModal(false);
+            setDeletingAgentId(null);
+            fetchAgents();
+          } else {
+            alert(data.error || "Failed to delete agent");
+          }
+        }}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(239, 68, 68, 0.4)" }}
+        >
+          Delete Agent
         </button>
       </div>
     </div>
