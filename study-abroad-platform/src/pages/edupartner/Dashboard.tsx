@@ -109,6 +109,20 @@ const Dashboard = () => {
   const [editingCounselor, setEditingCounselor] = useState<any>(null);
   const [deletingCounselorId, setDeletingCounselorId] = useState<number | null>(null);
 
+  // Admin Management States (for Super Admin)
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [showAddAdminModal, setShowAddAdminModal] = useState(false);
+  const [showEditAdminModal, setShowEditAdminModal] = useState(false);
+  const [showDeleteAdminModal, setShowDeleteAdminModal] = useState(false);
+  const [adminForm, setAdminForm] = useState({
+    company_name: "",
+    user_name: "",
+    email: "",
+    phone: ""
+  });
+  const [editingAdmin, setEditingAdmin] = useState<any>(null);
+  const [deletingAdminId, setDeletingAdminId] = useState<number | null>(null);
+
   const [showFilters, setShowFilters] = useState(false);
   
   // University Detail - Expandable Row
@@ -263,6 +277,9 @@ const handleDeleteAccommodation = async (id: number) => {
     const userId = user.id;
     const companyName = user.company_name || "";
     const avatarLetter = userName ? userName.charAt(0).toUpperCase() : "U";
+    
+    // Check if Super Admin (parent_admin_id is null or 0)
+    const isSuperAdmin = user.parent_admin_id === null || user.parent_admin_id === 0 || user.parent_admin_id === undefined;
 
     const [users, setUsers] = useState<any[]>([]);
 
@@ -692,6 +709,118 @@ useEffect(() => {
 useEffect(() => {
   if (activeSection === "counselors" && userRole === "Agent") {
     fetchCounselors();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [activeSection]);
+
+// ================= ADMIN MANAGEMENT FUNCTIONS (FOR SUPER ADMIN) =================
+
+const fetchAdmins = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    console.log("Fetching admins for super_admin_id:", user.id);
+    
+    const res = await fetch(`${API_BASE}/edupartner/get_admins.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ super_admin_id: user.id }),
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    console.log("Admins response:", data);
+    
+    if (data.success) {
+      setAdmins(data.admins || []);
+      console.log("Admins set:", data.admins);
+    } else {
+      console.error("API returned success: false", data.message);
+      setAdmins([]);
+    }
+  } catch (err) {
+    console.error("Failed to fetch admins:", err);
+    setAdmins([]);
+  }
+};
+
+const submitAdmin = async () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  
+  const res = await fetch(`${API_BASE}/edupartner/add_admin.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...adminForm,
+      super_admin_id: user.id
+    }),
+  });
+
+  const data = await res.json();
+  
+  if (data.success) {
+    alert(data.email_sent ? "Admin created and email sent successfully!" : "Admin created but email failed to send");
+    setShowAddAdminModal(false);
+    setAdminForm({ company_name: "", user_name: "", email: "", phone: "" });
+    fetchAdmins();
+  } else {
+    alert(data.message || "Failed to create admin");
+  }
+};
+
+const updateAdmin = async () => {
+  if (!editingAdmin) return;
+
+  const res = await fetch(`${API_BASE}/edupartner/update_admin.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(editingAdmin),
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    setShowEditAdminModal(false);
+    setEditingAdmin(null);
+    fetchAdmins();
+  } else {
+    alert(data.error || "Failed to update admin");
+  }
+};
+
+const deleteAdmin = async () => {
+  if (!deletingAdminId) return;
+
+  const res = await fetch(`${API_BASE}/edupartner/delete_admin.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: deletingAdminId }),
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    setShowDeleteAdminModal(false);
+    setDeletingAdminId(null);
+    fetchAdmins();
+  } else {
+    alert(data.error || "Failed to delete admin");
+  }
+};
+
+useEffect(() => {
+  if (isSuperAdmin) {
+    fetchAdmins();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
+// Fetch admins when Admins section is opened
+useEffect(() => {
+  if (activeSection === "admins" && isSuperAdmin) {
+    fetchAdmins();
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [activeSection]);
@@ -1877,12 +2006,21 @@ useEffect(() => {
             <Users size={18} /> Students
           </li>
 
-          {userRole === "Admin" && (
+          {userRole === "Admin" && !isSuperAdmin && (
             <li
               className={activeSection === "agents" ? "active" : ""}
               onClick={() => setActiveSection("agents")}
             >
               <UserPlus size={18} /> Agents
+            </li>
+          )}
+
+          {isSuperAdmin && (
+            <li
+              className={activeSection === "admins" ? "active" : ""}
+              onClick={() => setActiveSection("admins")}
+            >
+              <Shield size={18} /> Admins
             </li>
           )}
 
@@ -4514,6 +4652,140 @@ useEffect(() => {
                               onClick={() => {
                                 setDeletingAgentId(agent.id);
                                 setShowDeleteAgentModal(true);
+                              }}
+                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                            >
+                              <Trash2 size={16} style={{ color: "#ef4444" }} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+
+        {/* ================= ADMINS SECTION (SUPER ADMIN ONLY) ================= */}
+        {activeSection === "admins" && isSuperAdmin && (
+          <div style={{ padding: "24px" }}>
+            {/* HEADER */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div>
+                <h1 style={{ marginBottom: 4 }}>Admins</h1>
+                <p style={{ color: "#64748b" }}>Manage admin accounts ({admins.length} total)</p>
+              </div>
+              <button className="add-student-btn" onClick={() => setShowAddAdminModal(true)}>
+                <Plus size={18} />
+                <span>Add Admin</span>
+              </button>
+            </div>
+
+            {/* ADMINS TABLE */}
+            {!admins || admins.length === 0 ? (
+              <div style={{ padding: 80, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", textAlign: "center" }}>
+                <div style={{ fontSize: 42, marginBottom: 12, color: "#94a3b8" }}>
+                  <Shield size={48} style={{ margin: "0 auto" }} />
+                </div>
+                <h3 style={{ marginBottom: 6 }}>No admins found</h3>
+                <p style={{ color: "#64748b", marginBottom: 20 }}>Add your first admin to get started</p>
+                <button className="add-student-btn" onClick={() => setShowAddAdminModal(true)}>
+                  <Plus size={18} />
+                  <span>Add Admin</span>
+                </button>
+              </div>
+            ) : (
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", textAlign: "left", fontSize: 13, color: "#fff" }}>
+                      <th style={{ padding: "14px 20px" }}>Company Name</th>
+                      <th style={{ padding: "14px 20px" }}>Admin Name</th>
+                      <th style={{ padding: "14px 20px" }}>Email</th>
+                      <th style={{ padding: "14px 20px" }}>Phone</th>
+                      <th style={{ padding: "14px 20px" }}>Agents</th>
+                      <th style={{ padding: "14px 20px" }}>Status</th>
+                      <th style={{ padding: "14px 20px" }}>Created</th>
+                      <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {admins.map((admin: any) => (
+                      <tr key={admin.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 14, color: "#0f172a" }}>
+                        <td style={{ padding: "16px 20px" }}>
+                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#fef3c7", display: "flex", alignItems: "center", justifyContent: "center", color: "#d97706", fontSize: 16 }}>
+                              <Building2 size={18} />
+                            </div>
+                            <div style={{ fontWeight: 600 }}>{admin.company_name}</div>
+                          </div>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <User size={16} style={{ color: "#64748b" }} />
+                            {admin.user_name}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Mail size={16} style={{ color: "#64748b" }} />
+                            {admin.email}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Phone size={16} style={{ color: "#64748b" }} />
+                            {admin.phone}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px" }}>
+                          <span style={{ 
+                            padding: "4px 12px", 
+                            borderRadius: 20, 
+                            fontSize: 12, 
+                            fontWeight: 600,
+                            background: "#dbeafe",
+                            color: "#1e40af"
+                          }}>
+                            {admin.agent_count} Agents
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px" }}>
+                          <span style={{ 
+                            padding: "4px 12px", 
+                            borderRadius: 20, 
+                            fontSize: 12, 
+                            fontWeight: 600,
+                            background: admin.status === "Active" ? "#dcfce7" : "#fee2e2",
+                            color: admin.status === "Active" ? "#166534" : "#991b1b"
+                          }}>
+                            {admin.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", color: "#334155" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <Calendar size={16} style={{ color: "#64748b" }} />
+                            {admin.created_at ? new Date(admin.created_at).toLocaleDateString() : "N/A"}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => {
+                                setEditingAdmin(admin);
+                                setShowEditAdminModal(true);
+                              }}
+                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                            >
+                              <Edit2 size={16} style={{ color: "#f59e0b" }} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setDeletingAdminId(admin.id);
+                                setShowDeleteAdminModal(true);
                               }}
                               style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
                             >
@@ -10154,6 +10426,281 @@ useEffect(() => {
             boxShadow: "0 4px 12px rgba(239, 68, 68, 0.4)" }}
         >
           Delete Counselor
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+{/* ================= ADD ADMIN MODAL (SUPER ADMIN) ================= */}
+{showAddAdminModal && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowAddAdminModal(false);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "550px",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+        padding: "24px 28px", color: "#fff", borderRadius: "16px 16px 0 0",
+        display: "flex", justifyContent: "space-between", alignItems: "center"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+          Add New Admin
+        </h3>
+        <button
+          onClick={() => setShowAddAdminModal(false)}
+          style={{ background: "transparent", border: "none", color: "#fff",
+            fontSize: "24px", cursor: "pointer", padding: 0, lineHeight: 1 }}
+        >
+          ×
+        </button>
+      </div>
+
+      <div style={{ padding: "28px" }}>
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Company Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter company name" value={adminForm.company_name}
+          onChange={(e) => setAdminForm({ ...adminForm, company_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Admin Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter admin name" value={adminForm.user_name}
+          onChange={(e) => setAdminForm({ ...adminForm, user_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Email <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="email" placeholder="Enter email address" value={adminForm.email}
+          onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Phone <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="tel" placeholder="Enter phone number" value={adminForm.phone}
+          onChange={(e) => setAdminForm({ ...adminForm, phone: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12 }}>
+        <button
+          onClick={() => setShowAddAdminModal(false)}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={submitAdmin}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)" }}
+        >
+          Add Admin
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ================= EDIT ADMIN MODAL ================= */}
+{showEditAdminModal && editingAdmin && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowEditAdminModal(false);
+        setEditingAdmin(null);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "550px",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+        padding: "24px 28px", color: "#fff", borderRadius: "16px 16px 0 0",
+        display: "flex", justifyContent: "space-between", alignItems: "center"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+          Edit Admin
+        </h3>
+        <button
+          onClick={() => {
+            setShowEditAdminModal(false);
+            setEditingAdmin(null);
+          }}
+          style={{ background: "transparent", border: "none", color: "#fff",
+            fontSize: "24px", cursor: "pointer", padding: 0, lineHeight: 1 }}
+        >
+          ×
+        </button>
+      </div>
+
+      <div style={{ padding: "28px" }}>
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Company Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter company name" value={editingAdmin.company_name}
+          onChange={(e) => setEditingAdmin({ ...editingAdmin, company_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Admin Name <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="text" placeholder="Enter admin name" value={editingAdmin.user_name}
+          onChange={(e) => setEditingAdmin({ ...editingAdmin, user_name: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Email <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="email" placeholder="Enter email address" value={editingAdmin.email}
+          onChange={(e) => setEditingAdmin({ ...editingAdmin, email: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Phone <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <input type="tel" placeholder="Enter phone number" value={editingAdmin.phone}
+          onChange={(e) => setEditingAdmin({ ...editingAdmin, phone: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", marginBottom: "20px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+          Status <span style={{ color: "#ef4444" }}>*</span>
+        </label>
+        <select value={editingAdmin.status}
+          onChange={(e) => setEditingAdmin({ ...editingAdmin, status: e.target.value })}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
+            border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+        >
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12 }}>
+        <button
+          onClick={() => {
+            setShowEditAdminModal(false);
+            setEditingAdmin(null);
+          }}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={updateAdmin}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)" }}
+        >
+          Update Admin
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ================= DELETE ADMIN MODAL ================= */}
+{showDeleteAdminModal && deletingAdminId && (
+  <div 
+    className="modal-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowDeleteAdminModal(false);
+        setDeletingAdminId(null);
+      }
+    }}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
+      justifyContent: "center", zIndex: 1000, padding: "20px"
+    }}
+  >
+    <div style={{
+      background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "450px",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+    }}>
+      <div style={{
+        background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+        padding: "24px 28px", color: "#fff", borderRadius: "16px 16px 0 0"
+      }}>
+        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+          Delete Admin
+        </h3>
+      </div>
+
+      <div style={{ padding: "28px" }}>
+        <p style={{ margin: 0, fontSize: "15px", color: "#334155", lineHeight: "1.6" }}>
+          Are you sure you want to delete this admin? This action cannot be undone. All agents and counselors under this admin will also be affected.
+        </p>
+      </div>
+
+      <div style={{ padding: "20px 28px", background: "#f8fafc", borderTop: "1px solid #e2e8f0",
+        display: "flex", justifyContent: "flex-end", gap: 12, borderRadius: "0 0 16px 16px" }}>
+        <button
+          onClick={() => {
+            setShowDeleteAdminModal(false);
+            setDeletingAdminId(null);
+          }}
+          style={{ padding: "11px 20px", borderRadius: "10px", border: "2px solid #e2e8f0",
+            background: "#fff", cursor: "pointer", fontWeight: 600, fontSize: "14px" }}
+        >
+          Cancel
+        </button>
+
+        <button onClick={deleteAdmin}
+          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
+            background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", color: "#fff",
+            cursor: "pointer", fontWeight: 600, fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(239, 68, 68, 0.4)" }}
+        >
+          Delete Admin
         </button>
       </div>
     </div>
