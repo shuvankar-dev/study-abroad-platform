@@ -279,10 +279,12 @@ const handleDeleteAccommodation = async (id: number) => {
     const avatarLetter = userName ? userName.charAt(0).toUpperCase() : "U";
     
     // Check if Super Admin (parent_admin_id is null, 0, or undefined)
-    const isSuperAdmin = user.parent_admin_id === null || 
+    // AND email must be the Super Admin email for extra security
+    const isSuperAdmin = (user.parent_admin_id === null || 
                          user.parent_admin_id === 0 || 
                          user.parent_admin_id === undefined ||
-                         user.parent_admin_id === '0';
+                         user.parent_admin_id === '0') &&
+                         user.email === 'info@codescholaroverseas.com';
 
     const [users, setUsers] = useState<any[]>([]);
 
@@ -1406,6 +1408,7 @@ const submitApplication = async () => {
 
 
 const [applications, setApplications] = useState<any[]>([]);
+const [recentApplications, setRecentApplications] = useState<any[]>([]);
 
 const fetchApplications = async () => {
   try {
@@ -1431,6 +1434,30 @@ const fetchApplications = async () => {
   }
 };
 
+const fetchRecentApplications = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/edupartner/get_recent_applications.php`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: user.id,
+          role: user.role,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      setRecentApplications(data.applications);
+    }
+  } catch (err) {
+    console.error("Fetch recent applications error:", err);
+  }
+};
+
 
 
 // useEffect(() => {
@@ -1441,6 +1468,7 @@ const fetchApplications = async () => {
 
 useEffect(() => {
   fetchApplications(); // fetch once on mount
+  fetchRecentApplications(); // fetch recent applications
 }, []);
 
 
@@ -2543,21 +2571,22 @@ useEffect(() => {
 
                 </div>
 
-                <div className="empty" style={{ textAlign: 'center', color: '#94a3b8', padding: "40px 20px" }}>
-                  <div style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: "50%",
-                    background: "#f1f5f9",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto 16px",
-                  }}>
-                    <FileText size={32} style={{ color: "#cbd5e1" }} />
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>No applications yet</div>
-                  <a
+                {recentApplications.length === 0 ? (
+                  <div className="empty" style={{ textAlign: 'center', color: '#94a3b8', padding: "40px 20px" }}>
+                    <div style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: "50%",
+                      background: "#f1f5f9",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 16px",
+                    }}>
+                      <FileText size={32} style={{ color: "#cbd5e1" }} />
+                    </div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: "#64748b", marginBottom: 8 }}>No recent applications</div>
+                    <a
   href="#applications"
   onClick={(e) => {
     e.preventDefault();
@@ -2572,8 +2601,45 @@ useEffect(() => {
 >
   Submit your first application →
 </a>
-
-                </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {recentApplications.map((app) => (
+                      <div key={app.id} style={{
+                        padding: '16px',
+                        background: '#f8fafc',
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '14px', color: '#1e293b', marginBottom: '4px' }}>
+                            {app.student_name}
+                          </div>
+                          <div style={{ fontSize: '13px', color: '#64748b' }}>
+                            {app.university_name} • {app.course_name}
+                          </div>
+                        </div>
+                        <div style={{
+                          padding: '4px 12px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          background: app.status === 'Accepted' ? '#dcfce7' : 
+                                     app.status === 'Rejected' ? '#fee2e2' : 
+                                     app.status === 'Under Review' ? '#fef3c7' : '#dbeafe',
+                          color: app.status === 'Accepted' ? '#15803d' : 
+                                 app.status === 'Rejected' ? '#dc2626' : 
+                                 app.status === 'Under Review' ? '#ca8a04' : '#1e40af'
+                        }}>
+                          {app.status}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
