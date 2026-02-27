@@ -7,8 +7,9 @@ import {
   CreditCard, BookOpen, MessageSquare, Shield, User, 
   LogOut, Plus, Search, Filter, Clock,
   TrendingUp, CheckCircle, AlertCircle, Mail, Phone, Globe, 
-  Calendar, Edit2, Trash2, X, UserPlus
+  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame
 } from "lucide-react";
+import { findCommissionInfo, getTierColor } from "../../data/commissionData";
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
@@ -3224,6 +3225,7 @@ useEffect(() => {
       >
         <th style={{ padding: "16px 20px" }}>University</th>
         <th style={{ padding: "16px 20px" }}>Course</th>
+        <th style={{ padding: "16px 20px" }}>Commission</th>
         <th style={{ padding: "16px 20px" }}>Study Level</th>
         <th style={{ padding: "16px 20px" }}>Campus</th>
         <th style={{ padding: "16px 20px" }}>Country</th>
@@ -3269,6 +3271,36 @@ useEffect(() => {
           {/* Course */}
           <td style={{ padding: "18px 20px", color: "#475569" }}>
             {u.Program_Name}
+          </td>
+
+          {/* Commission */}
+          <td style={{ padding: "18px 20px" }}>
+            {(() => {
+              const commInfo = findCommissionInfo(u.University);
+              if (!commInfo) return <span style={{ color: "#94a3b8", fontSize: 12 }}>-</span>;
+              const tierColors = getTierColor(commInfo.tier);
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ 
+                    padding: "2px 8px", 
+                    borderRadius: 999, 
+                    background: tierColors.bg, 
+                    color: tierColors.text,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    width: "fit-content"
+                  }}>
+                    {commInfo.tier}
+                  </span>
+                  <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 600 }}>
+                    {commInfo.commissionType === "Amount" 
+                      ? `${commInfo.currency} ${commInfo.commissionLessThan20?.toLocaleString()}`
+                      : `${commInfo.commissionLessThan20}%`
+                    }
+                  </span>
+                </div>
+              );
+            })()}
           </td>
 
           {/* Study Level */}
@@ -3356,8 +3388,203 @@ useEffect(() => {
         {/* EXPANDABLE DETAIL ROW */}
         {expandedUniversityId === u.id && (
           <tr key={`detail-${i}`}>
-            <td colSpan={8} style={{ padding: 0, background: "#f8fafc" }}>
+            <td colSpan={9} style={{ padding: 0, background: "#f8fafc" }}>
               <div style={{ padding: "24px", borderTop: "2px solid #e2e8f0" }}>
+                
+                {/* SPECIAL FEATURE BADGES */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
+                  {/* Commission Bonus Badge */}
+                  {(() => {
+                    const commInfo = findCommissionInfo(u.University);
+                    if (commInfo?.remarks?.includes("LAKH")) {
+                      return (
+                        <span style={{
+                          padding: "8px 16px",
+                          borderRadius: "20px",
+                          background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                          color: "#fff",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          boxShadow: "0 2px 8px rgba(245, 158, 11, 0.4)"
+                        }}>
+                          <Gift size={14} /> {commInfo.remarks}
+                        </span>
+                      );
+                    }
+                    if (commInfo?.remarks?.includes("50K")) {
+                      return (
+                        <span style={{
+                          padding: "8px 16px",
+                          borderRadius: "20px",
+                          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                          color: "#fff",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          boxShadow: "0 2px 8px rgba(16, 185, 129, 0.4)"
+                        }}>
+                          <Gift size={14} /> {commInfo.remarks}
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
+                  {/* No Interview Badge */}
+                  {(() => {
+                    const commInfo = findCommissionInfo(u.University);
+                    if (commInfo?.remarks?.toLowerCase().includes("no interview")) {
+                      return (
+                        <span style={{
+                          padding: "8px 16px",
+                          borderRadius: "20px",
+                          background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+                          color: "#fff",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          boxShadow: "0 2px 8px rgba(139, 92, 246, 0.4)"
+                        }}>
+                          <CheckCircle size={14} /> No Interview Required
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
+                  {/* Scholarship Badge */}
+                  {u.Scholarship_Available?.toLowerCase() === "yes" && (
+                    <span style={{
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                      background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                      color: "#fff",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 2px 8px rgba(59, 130, 246, 0.4)"
+                    }}>
+                      <Award size={14} /> Scholarship Available
+                    </span>
+                  )}
+                  
+                  {/* Free Application Badge */}
+                  {(u.Application_Fee === 0 || u.Application_Fee === "0" || u.Application_Fee === "0.00" || parseFloat(u.Application_Fee) === 0) && (
+                    <span style={{
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                      background: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)",
+                      color: "#fff",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 2px 8px rgba(236, 72, 153, 0.4)"
+                    }}>
+                      <Zap size={14} /> Free Application
+                    </span>
+                  )}
+                  
+                  {/* English Waiver Badge */}
+                  {u.English_Proficiency_Exam_Waiver && u.English_Proficiency_Exam_Waiver !== "N/A" && u.English_Proficiency_Exam_Waiver !== "No" && u.English_Proficiency_Exam_Waiver.length > 3 && (
+                    <span style={{
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                      background: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
+                      color: "#fff",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 2px 8px rgba(20, 184, 166, 0.4)"
+                    }}>
+                      <FileCheck size={14} /> English Exam Waiver
+                    </span>
+                  )}
+                  
+                  {/* Backlog Friendly Badge */}
+                  {u.Backlog_Range && (
+                    (() => {
+                      const backlogMatch = u.Backlog_Range.match(/(\d+)\s*-\s*(\d+)/);
+                      if (backlogMatch) {
+                        const maxBacklog = parseInt(backlogMatch[2]);
+                        if (maxBacklog >= 10) {
+                          return (
+                            <span style={{
+                              padding: "8px 16px",
+                              borderRadius: "20px",
+                              background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+                              color: "#fff",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              boxShadow: "0 2px 8px rgba(249, 115, 22, 0.4)"
+                            }}>
+                              <BarChart3 size={14} /> Up to {maxBacklog} Backlogs Accepted
+                            </span>
+                          );
+                        }
+                      }
+                      return null;
+                    })()
+                  )}
+                  
+                  {/* Low IELTS Badge */}
+                  {u.IELTS_Score && parseFloat(u.IELTS_Score) > 0 && parseFloat(u.IELTS_Score) <= 5.5 && (
+                    <span style={{
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                      background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                      color: "#fff",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 2px 8px rgba(99, 102, 241, 0.4)"
+                    }}>
+                      <Languages size={14} /> Low IELTS ({u.IELTS_Score})
+                    </span>
+                  )}
+                  
+                  {/* High Commission Badge */}
+                  {(() => {
+                    const commInfo = findCommissionInfo(u.University);
+                    if (commInfo && commInfo.tier === "PRIMARY" && commInfo.commissionMoreThan20 && commInfo.commissionMoreThan20 >= 18) {
+                      return (
+                        <span style={{
+                          padding: "8px 16px",
+                          borderRadius: "20px",
+                          background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                          color: "#fff",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          boxShadow: "0 2px 8px rgba(34, 197, 94, 0.4)"
+                        }}>
+                          <Flame size={14} /> High Commission ({commInfo.commissionMoreThan20}%)
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px" }}>
                   
                   {/* Column 1 */}
@@ -3467,6 +3694,73 @@ useEffect(() => {
                   </div>
 
                 </div>
+
+                {/* COMMISSION INFO SECTION */}
+                {(() => {
+                  const commissionInfo = findCommissionInfo(u.University);
+                  if (!commissionInfo) return null;
+                  const tierColors = getTierColor(commissionInfo.tier);
+                  return (
+                    <div style={{ 
+                      marginTop: "20px", 
+                      padding: "16px", 
+                      background: "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)", 
+                      borderRadius: "12px",
+                      border: "1px solid #86efac"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                        <DollarSign size={20} style={{ color: "#16a34a" }} />
+                        <h4 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#166534" }}>Commission Information</h4>
+                        <span style={{ 
+                          padding: "4px 10px", 
+                          borderRadius: "999px", 
+                          background: tierColors.bg, 
+                          color: tierColors.text,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px"
+                        }}>
+                          {commissionInfo.tier}
+                        </span>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+                        <div>
+                          <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>Commission Type</label>
+                          <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#0f172a", fontWeight: 600 }}>
+                            {commissionInfo.commissionType || "N/A"}
+                            {commissionInfo.currency && ` (${commissionInfo.currency})`}
+                          </p>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>&gt;20 Students (82%)</label>
+                          <p style={{ margin: "4px 0 0 0", fontSize: "15px", color: "#16a34a", fontWeight: 700 }}>
+                            {commissionInfo.commissionType === "Amount" 
+                              ? `${commissionInfo.currency} ${commissionInfo.commissionMoreThan20?.toLocaleString()}`
+                              : `${commissionInfo.commissionMoreThan20}%`
+                            }
+                          </p>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>≤20 Students (75%)</label>
+                          <p style={{ margin: "4px 0 0 0", fontSize: "15px", color: "#059669", fontWeight: 700 }}>
+                            {commissionInfo.commissionType === "Amount" 
+                              ? `${commissionInfo.currency} ${commissionInfo.commissionLessThan20?.toLocaleString()}`
+                              : `${commissionInfo.commissionLessThan20}%`
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      {commissionInfo.remarks && (
+                        <div style={{ marginTop: "12px", padding: "10px", background: "#fef3c7", borderRadius: "8px", border: "1px solid #fcd34d" }}>
+                          <p style={{ margin: 0, fontSize: "12px", color: "#92400e", fontWeight: 500 }}>
+                            <strong>Note:</strong> {commissionInfo.remarks}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </td>
           </tr>
@@ -5151,6 +5445,7 @@ useEffect(() => {
         <th style={{ padding: "14px 20px" }}>Student</th>
         <th style={{ padding: "14px 20px" }}>University</th>
         <th style={{ padding: "14px 20px" }}>Course</th>
+        <th style={{ padding: "14px 20px" }}>Commission</th>
         <th style={{ padding: "14px 20px" }}>Preferred Intake</th>
         <th style={{ padding: "14px 20px" }}>Status</th>
         <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
@@ -5202,6 +5497,36 @@ useEffect(() => {
               <BookOpen size={16} style={{ color: "#64748b" }} />
               {app.course_name}
             </span>
+          </td>
+
+          {/* Commission */}
+          <td style={{ padding: "16px 20px" }}>
+            {(() => {
+              const commInfo = findCommissionInfo(app.university_name);
+              if (!commInfo) return <span style={{ color: "#94a3b8", fontSize: 12 }}>N/A</span>;
+              const tierColors = getTierColor(commInfo.tier);
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ 
+                    padding: "2px 8px", 
+                    borderRadius: 999, 
+                    background: tierColors.bg, 
+                    color: tierColors.text,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    width: "fit-content"
+                  }}>
+                    {commInfo.tier}
+                  </span>
+                  <span style={{ fontSize: 12, color: "#16a34a", fontWeight: 600 }}>
+                    {commInfo.commissionType === "Amount" 
+                      ? `${commInfo.currency} ${commInfo.commissionLessThan20?.toLocaleString()}`
+                      : `${commInfo.commissionLessThan20}%`
+                    }
+                  </span>
+                </div>
+              );
+            })()}
           </td>
 
           {/* Intake */}
