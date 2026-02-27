@@ -150,6 +150,17 @@ const Dashboard = () => {
 const [showEditStudent, setShowEditStudent] = useState(false);
 const [editStudent, setEditStudent] = useState<any>(null);
 
+// Validation helper functions
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePhone = (phone: string): boolean => {
+  const phoneRegex = /^[0-9]{10}$/;
+  return phoneRegex.test(phone);
+};
+
 
 const handleUpdateStudent = async () => {
   const res = await fetch(`${API_BASE}/edupartner/update_student.php`, {
@@ -570,6 +581,18 @@ const fetchAgents = async () => {
 };
 
 const submitAgent = async () => {
+  // Validate email
+  if (!validateEmail(agentForm.email)) {
+    alert("Please enter a valid email address");
+    return;
+  }
+  
+  // Validate phone
+  if (!validatePhone(agentForm.phone)) {
+    alert("Phone number must be exactly 10 digits");
+    return;
+  }
+  
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   
   const res = await fetch(`${API_BASE}/edupartner/add_agent.php`, {
@@ -642,6 +665,18 @@ const fetchCounselors = async () => {
 };
 
 const submitCounselor = async () => {
+  // Validate email
+  if (!validateEmail(counselorForm.email)) {
+    alert("Please enter a valid email address");
+    return;
+  }
+  
+  // Validate phone
+  if (!validatePhone(counselorForm.phone)) {
+    alert("Phone number must be exactly 10 digits");
+    return;
+  }
+  
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   
   const res = await fetch(`${API_BASE}/edupartner/add_counselor.php`, {
@@ -761,6 +796,18 @@ const fetchAdmins = async () => {
 };
 
 const submitAdmin = async () => {
+  // Validate email
+  if (!validateEmail(adminForm.email)) {
+    alert("Please enter a valid email address");
+    return;
+  }
+  
+  // Validate phone
+  if (!validatePhone(adminForm.phone)) {
+    alert("Phone number must be exactly 10 digits");
+    return;
+  }
+  
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   
   setIsSubmittingAdmin(true);
@@ -10408,8 +10455,16 @@ useEffect(() => {
         <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
           Phone <span style={{ color: "#ef4444" }}>*</span>
         </label>
-        <input type="tel" placeholder="Enter phone number" value={agentForm.phone}
-          onChange={(e) => setAgentForm({ ...agentForm, phone: e.target.value })}
+        <input 
+          type="tel" 
+          placeholder="Enter 10 digit phone number" 
+          value={agentForm.phone}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+            setAgentForm({ ...agentForm, phone: value });
+          }}
+          pattern="[0-9]{10}"
+          maxLength={10}
           style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
             border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
         />
@@ -10727,8 +10782,16 @@ useEffect(() => {
         <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
           Phone <span style={{ color: "#ef4444" }}>*</span>
         </label>
-        <input type="tel" placeholder="Enter phone number" value={counselorForm.phone}
-          onChange={(e) => setCounselorForm({ ...counselorForm, phone: e.target.value })}
+        <input 
+          type="tel" 
+          placeholder="Enter 10 digit phone number" 
+          value={counselorForm.phone}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+            setCounselorForm({ ...counselorForm, phone: value });
+          }}
+          pattern="[0-9]{10}"
+          maxLength={10}
           style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
             border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
         />
@@ -11002,8 +11065,16 @@ useEffect(() => {
         <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
           Phone <span style={{ color: "#ef4444" }}>*</span>
         </label>
-        <input type="tel" placeholder="Enter phone number" value={adminForm.phone}
-          onChange={(e) => setAdminForm({ ...adminForm, phone: e.target.value })}
+        <input 
+          type="tel" 
+          placeholder="Enter 10 digit phone number" 
+          value={adminForm.phone}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+            setAdminForm({ ...adminForm, phone: value });
+          }}
+          pattern="[0-9]{10}"
+          maxLength={10}
           style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
             border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
         />
