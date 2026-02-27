@@ -123,6 +123,7 @@ const Dashboard = () => {
   });
   const [editingAdmin, setEditingAdmin] = useState<any>(null);
   const [deletingAdminId, setDeletingAdminId] = useState<number | null>(null);
+  const [isSubmittingAdmin, setIsSubmittingAdmin] = useState(false);
 
   const [showFilters, setShowFilters] = useState(false);
   
@@ -762,24 +763,32 @@ const fetchAdmins = async () => {
 const submitAdmin = async () => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   
-  const res = await fetch(`${API_BASE}/edupartner/add_admin.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ...adminForm,
-      super_admin_id: user.id
-    }),
-  });
-
-  const data = await res.json();
+  setIsSubmittingAdmin(true);
   
-  if (data.success) {
-    alert(data.email_sent ? "Admin created and email sent successfully!" : "Admin created but email failed to send");
-    setShowAddAdminModal(false);
-    setAdminForm({ company_name: "", user_name: "", email: "", phone: "" });
-    fetchAdmins();
-  } else {
-    alert(data.message || "Failed to create admin");
+  try {
+    const res = await fetch(`${API_BASE}/edupartner/add_admin.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...adminForm,
+        super_admin_id: user.id
+      }),
+    });
+
+    const data = await res.json();
+    
+    if (data.success) {
+      alert(data.email_sent ? "Admin created and email sent successfully!" : "Admin created but email failed to send");
+      setShowAddAdminModal(false);
+      setAdminForm({ company_name: "", user_name: "", email: "", phone: "" });
+      fetchAdmins();
+    } else {
+      alert(data.message || "Failed to create admin");
+    }
+  } catch (error) {
+    alert("Error creating admin. Please try again.");
+  } finally {
+    setIsSubmittingAdmin(false);
   }
 };
 
@@ -2254,11 +2263,23 @@ useEffect(() => {
               background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
               borderRadius: "12px",
               marginBottom: "24px",
-              border: "1px solid #e2e8f0"
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "16px"
             }}>
-              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>Dashboard</h2>
+              <div style={{ flex: "1", minWidth: "300px" }}>
+                <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>
+                  Welcome back, {userName}!
+                </h2>
+                <p style={{ margin: "8px 0 0 0", fontSize: "15px", color: "#64748b" }}>
+                  Here's what's happening with your students today.
+                </p>
+              </div>
 
-              <div className="top-actions" style={{ display: "flex", gap: "12px" }}>
+              <div className="top-actions" style={{ display: "flex", gap: "12px", flexShrink: 0 }}>
                 <button 
                   className="outline-btn" 
                   onClick={() => setActiveSection("universities")}
@@ -2286,24 +2307,54 @@ useEffect(() => {
                 >
                   <Search size={16} /> Browse Universities
                 </button>
-                {userRole === "Admin" ? (
-                  <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
-                  <Plus size={18} />
-                  <span>Add Agent</span>
+                {userRole === "Admin" || userRole === "Super Admin" ? (
+                  <button 
+                    className="add-student-btn" 
+                    onClick={() => setShowAddAgentModal(true)}
+                    style={{
+                      padding: "11px 20px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "#fff",
+                      border: "none",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.2s",
+                      boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
+                    }}
+                  >
+                    <Plus size={18} />
+                    <span>Add Agent</span>
                   </button>
                 ) : (
-                  <button className="add-student-btn" onClick={() => setActiveSection("students")}>
-                  <Plus size={18} />
-                  <span>Add Student</span>
+                  <button 
+                    className="add-student-btn" 
+                    onClick={() => setActiveSection("students")}
+                    style={{
+                      padding: "11px 20px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "#fff",
+                      border: "none",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.2s",
+                      boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
+                    }}
+                  >
+                    <Plus size={18} />
+                    <span>Add Student</span>
                   </button>
                 )}
               </div>
-            </div>
-
-            {/* HEADER */}
-            <div className="welcome" style={{ marginBottom: "28px" }}>
-              <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 700, marginBottom: "8px" }}>Welcome back, {userName}!</h1>
-              <p style={{ color: "#64748b", fontSize: "16px", margin: 0 }}>Here's what's happening with your students today.</p>
             </div>
 
             {/* STATS */}
@@ -10968,13 +11019,42 @@ useEffect(() => {
           Cancel
         </button>
 
-        <button onClick={submitAdmin}
-          style={{ padding: "11px 24px", borderRadius: "10px", border: "none",
-            background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "#fff",
-            cursor: "pointer", fontWeight: 600, fontSize: "14px",
-            boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)" }}
+        <button 
+          onClick={submitAdmin}
+          disabled={isSubmittingAdmin}
+          style={{ 
+            padding: "11px 24px", 
+            borderRadius: "10px", 
+            border: "none",
+            background: isSubmittingAdmin 
+              ? "#d1d5db" 
+              : "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", 
+            color: "#fff",
+            cursor: isSubmittingAdmin ? "not-allowed" : "pointer", 
+            fontWeight: 600, 
+            fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }}
         >
-          Add Admin
+          {isSubmittingAdmin ? (
+            <>
+              <span style={{ 
+                display: "inline-block",
+                width: "14px",
+                height: "14px",
+                border: "2px solid #fff",
+                borderTopColor: "transparent",
+                borderRadius: "50%",
+                animation: "spin 0.6s linear infinite"
+              }}></span>
+              Creating...
+            </>
+          ) : (
+            "Add Admin"
+          )}
         </button>
       </div>
     </div>
