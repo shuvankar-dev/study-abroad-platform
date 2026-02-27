@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import "./dashboard.css";
 import { useNavigate } from "react-router-dom";
@@ -1412,6 +1412,11 @@ const [applications, setApplications] = useState<any[]>([]);
 const [recentApplications, setRecentApplications] = useState<any[]>([]);
 
 const fetchApplications = async () => {
+  console.log("=== FETCH APPLICATIONS DEBUG ===");
+  console.log("User:", user);
+  console.log("User ID:", user.id);
+  console.log("User Role:", user.role);
+  
   try {
     const res = await fetch(
       `${API_BASE}/edupartner/get_applications.php`,
@@ -1426,9 +1431,13 @@ const fetchApplications = async () => {
     );
 
     const data = await res.json();
+    console.log("Applications response:", data);
 
     if (data.success) {
       setApplications(data.applications);
+      console.log("Applications set:", data.applications);
+    } else {
+      console.error("Applications fetch failed:", data);
     }
   } catch (err) {
     console.error("Fetch applications error:", err);
@@ -1461,11 +1470,11 @@ const fetchRecentApplications = async () => {
 
 
 
-// useEffect(() => {
-//   if (activeSection === "applications") {
-//     fetchApplications();
-//   }
-// }, [activeSection]);
+useEffect(() => {
+  if (activeSection === "applications") {
+    fetchApplications();
+  }
+}, [activeSection]);
 
 useEffect(() => {
   fetchApplications(); // fetch once on mount
@@ -1640,7 +1649,7 @@ const paginatedStudents = filteredStudents.slice(
 
 useEffect(() => {
   setCurrentStudentPage(1);
-}, [filteredStudents]);
+}, [searchTerm]);
 
 
 
@@ -2605,8 +2614,8 @@ useEffect(() => {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {recentApplications.map((app) => (
-                      <div key={app.id} style={{
+                    {recentApplications.map((app, index) => (
+                      <div key={`recent-app-${app.id}-${index}`} style={{
                         padding: '16px',
                         background: '#f8fafc',
                         borderRadius: '8px',
@@ -3236,10 +3245,9 @@ useEffect(() => {
     </thead>
 
     <tbody>
-      {paginatedUniversities.map((u, i) => (
-        <>
+      {paginatedUniversities.map((u) => (
+        <React.Fragment key={`uni-fragment-${u.id}`}>
           <tr
-            key={i}
             onClick={() => toggleUniversityDetails(u.id)}
             style={{
               borderTop: "1px solid #f1f5f9",
@@ -3387,7 +3395,7 @@ useEffect(() => {
 
         {/* EXPANDABLE DETAIL ROW */}
         {expandedUniversityId === u.id && (
-          <tr key={`detail-${i}`}>
+          <tr key={`detail-${u.id}`}>
             <td colSpan={9} style={{ padding: 0, background: "#f8fafc" }}>
               <div style={{ padding: "24px", borderTop: "2px solid #e2e8f0" }}>
                 
@@ -3765,7 +3773,7 @@ useEffect(() => {
             </td>
           </tr>
         )}
-        </>
+        </React.Fragment>
       ))}
     </tbody>
   </table>
@@ -4027,6 +4035,7 @@ useEffect(() => {
         <th style={{ padding: "14px 20px" }}>Email</th>
         <th style={{ padding: "14px 20px" }}>Phone</th>
         <th style={{ padding: "14px 20px" }}>Nationality</th>
+        {isSuperAdmin && <th style={{ padding: "14px 20px" }}>Admin</th>}
         <th style={{ padding: "14px 20px" }}>Added</th>
         <th style={{ padding: "14px 20px", textAlign: "right" }}>
           Actions
@@ -4035,9 +4044,9 @@ useEffect(() => {
     </thead>
 
     <tbody>
-      {paginatedStudents.map((s, i) => (
+      {paginatedStudents.map((s, index) => (
         <tr
-          key={i}
+          key={`student-${s.id}-${index}`}
           style={{
             borderTop: "1px solid #e2e8f0",
             fontSize: 14,
@@ -4101,6 +4110,23 @@ useEffect(() => {
               {s.nationality}
             </span>
           </td>
+
+          {/* Admin (Super Admin only) */}
+          {isSuperAdmin && (
+            <td style={{ padding: "16px 20px", color: "#334155" }}>
+              <span style={{ 
+                display: "inline-block",
+                padding: "4px 12px",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "#fff",
+                borderRadius: "6px",
+                fontSize: "12px",
+                fontWeight: 600
+              }}>
+                {s.admin_name || 'Unknown'}
+              </span>
+            </td>
+          )}
 
           {/* Added */}
           <td style={{ padding: "16px 20px", color: "#334155" }}>
@@ -5447,6 +5473,7 @@ useEffect(() => {
         <th style={{ padding: "14px 20px" }}>Course</th>
         <th style={{ padding: "14px 20px" }}>Commission</th>
         <th style={{ padding: "14px 20px" }}>Preferred Intake</th>
+        {isSuperAdmin && <th style={{ padding: "14px 20px" }}>Admin</th>}
         <th style={{ padding: "14px 20px" }}>Status</th>
         <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
       </tr>
@@ -5536,6 +5563,29 @@ useEffect(() => {
               {app.pref_intake || "-"}
             </span>
           </td>
+
+          {/* Admin (Super Admin only) */}
+          {isSuperAdmin && (
+            <td style={{ padding: "16px 20px" }}>
+              {app.admin_name ? (
+                <span
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: 20,
+                    fontSize: 12,
+                    background: "#f3e8ff",
+                    color: "#7c3aed",
+                    border: "1px solid #e9d5ff",
+                    fontWeight: 500,
+                  }}
+                >
+                  {app.admin_name}
+                </span>
+              ) : (
+                <span style={{ color: "#94a3b8", fontSize: 12 }}>N/A</span>
+              )}
+            </td>
+          )}
 
           {/* Status */}
           <td style={{ padding: "16px 20px" }}>
@@ -6531,9 +6581,9 @@ useEffect(() => {
       gap: 20,
     }}
   >
-    {visibleAccommodationRequests.map((item) => (
+    {visibleAccommodationRequests.map((item, index) => (
       <div
-        key={item.id}
+        key={`accommodation-${item.id}-${index}`}
         style={{
           border: "1px solid #e2e8f0",
           borderRadius: 12,
@@ -7801,9 +7851,9 @@ useEffect(() => {
           gap: 20,
         }}
       >
-    {visibleLoanRequests.map((item) => (
+    {visibleLoanRequests.map((item, index) => (
       <div
-        key={item.id}
+        key={`loan-${item.id}-${index}`}
         style={{
           border: "1px solid #e2e8f0",
           borderRadius: 12,
@@ -8792,9 +8842,9 @@ useEffect(() => {
           gap: 20,
         }}
       >
-    {visibleTestPrepRequests.map((item) => (
+    {visibleTestPrepRequests.map((item, index) => (
       <div
-        key={item.id}
+        key={`testprep-${item.id}-${index}`}
         style={{
           border: "1px solid #e2e8f0",
           borderRadius: 12,
@@ -9858,7 +9908,7 @@ useEffect(() => {
                     <tbody>
                         {currentUsers.map((user, index) => (
                             <tr
-                            key={index}
+                            key={user.id}
                             style={{
                                 borderTop: "1px solid #e2e8f0",
                                 fontSize: 14,
