@@ -9,8 +9,15 @@ const AddStudent = () => {
   const [confirmStep1, setConfirmStep1] = useState(false);
   const [confirmStep2, setConfirmStep2] = useState(false);
   const [confirmStep3, setConfirmStep3] = useState(false);
+  const [studentId, setStudentId] = useState<number | null>(null);
+  const [studentCode, setStudentCode] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
   
   const [formData, setFormData] = useState({
+    // Contact Information
+    email: "",
+    mobile: "",
+    // Personal Information
     firstName: "",
     middleName: "",
     lastName: "",
@@ -130,7 +137,7 @@ const AddStudent = () => {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.firstName && formData.lastName && formData.dateOfBirth && 
+        return !!(formData.email && formData.firstName && formData.lastName && formData.dateOfBirth && 
           formData.firstLanguage && formData.countryOfCitizenship && formData.passportNumber && 
           formData.passportExpiryDate && formData.currentAddress && formData.currentState && 
           formData.currentPincode && formData.permanentAddress && formData.permanentState && 
@@ -169,7 +176,7 @@ const AddStudent = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (validateStep(currentStep)) {
       // Check if confirmation checkbox is checked for steps 1, 2, 3
       if (currentStep === 1 && !confirmStep1) {
@@ -185,15 +192,170 @@ const AddStudent = () => {
         return;
       }
       
-      // TODO: Save data to database here before moving to next step
-      console.log("Saving step", currentStep, "data:", formData);
+      setIsSaving(true);
       
-      setCurrentStep(prev => prev + 1);
+      try {
+        // Save Step 1 data
+        if (currentStep === 1) {
+          const user = JSON.parse(localStorage.getItem("user") || "{}");
+          
+          const step1Data = {
+            email: formData.email,
+            mobile: formData.mobile,
+            first_name: formData.firstName,
+            middle_name: formData.middleName,
+            last_name: formData.lastName,
+            date_of_birth: formData.dateOfBirth,
+            first_language: formData.firstLanguage,
+            country_of_citizenship: formData.countryOfCitizenship,
+            passport_number: formData.passportNumber,
+            passport_expiry_date: formData.passportExpiryDate,
+            passport_place_of_birth: formData.passportPlaceOfBirth,
+            marital_status: formData.maritalStatus,
+            gender: formData.gender,
+            current_address: formData.currentAddress,
+            current_state: formData.currentState,
+            current_pincode: formData.currentPincode,
+            permanent_address: formData.permanentAddress,
+            permanent_state: formData.permanentState,
+            permanent_pincode: formData.permanentPincode,
+            created_by_user_id: user.id,
+            created_by_role: user.role
+          };
+          
+          const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost/studyabroadplatform-api'
+            : '/studyabroadplatform-api';
+          
+          const response = await fetch(`${API_BASE}/edupartner/save_student_step1.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(step1Data)
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            setStudentId(result.student_id);
+            setStudentCode(result.student_code);
+            alert(`${result.message}\nStudent ID: ${result.student_code}`);
+            setCurrentStep(prev => prev + 1);
+            setConfirmStep1(false);
+          } else {
+            alert(result.message || 'Failed to save data');
+          }
+        }
+        
+        // TODO: Save Step 2 data
+        else if (currentStep === 2) {
+          if (!studentId) {
+            alert("Student ID not found. Please complete Step 1 first.");
+            return;
+          }
+          
+          const step2Data = {
+            student_id: studentId,
+            tenth_board: formData.tenth_board,
+            tenth_institution: formData.tenth_institution,
+            tenth_passoutYear: formData.tenth_passoutYear,
+            tenth_address: formData.tenth_address,
+            tenth_state: formData.tenth_state,
+            tenth_pincode: formData.tenth_pincode,
+            tenth_gradingScheme: formData.tenth_gradingScheme,
+            tenth_percentage: formData.tenth_percentage,
+            tenth_cgpa: formData.tenth_cgpa,
+            twelfth_board: formData.twelfth_board,
+            twelfth_institution: formData.twelfth_institution,
+            twelfth_passoutYear: formData.twelfth_passoutYear,
+            twelfth_address: formData.twelfth_address,
+            twelfth_state: formData.twelfth_state,
+            twelfth_pincode: formData.twelfth_pincode,
+            twelfth_gradingScheme: formData.twelfth_gradingScheme,
+            twelfth_percentage: formData.twelfth_percentage,
+            twelfth_cgpa: formData.twelfth_cgpa,
+            hasHigherDegree: formData.hasHigherDegree,
+            degree_name: formData.degree_name,
+            degree_board: formData.degree_board,
+            degree_institution: formData.degree_institution,
+            degree_passoutYear: formData.degree_passoutYear,
+            degree_address: formData.degree_address,
+            degree_state: formData.degree_state,
+            degree_pincode: formData.degree_pincode,
+            degree_gradingScheme: formData.degree_gradingScheme,
+            degree_percentage: formData.degree_percentage,
+            degree_cgpa: formData.degree_cgpa
+          };
+          
+          const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost/studyabroadplatform-api'
+            : '/studyabroadplatform-api';
+          
+          const response = await fetch(`${API_BASE}/edupartner/save_student_step2.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(step2Data)
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            alert(result.message);
+            setCurrentStep(prev => prev + 1);
+            setConfirmStep2(false);
+          } else {
+            alert(result.message || 'Failed to save education details');
+          }
+        }
+        
+        // TODO: Save Step 3 data
+        else if (currentStep === 3) {
+          if (!studentId) {
+            alert("Student ID not found. Please complete Step 1 first.");
+            return;
+          }
+          
+          const step3Data = {
+            student_id: studentId,
+            languageTestOption: formData.languageTestOption,
+            englishExamType: formData.englishExamType,
+            examDate: formData.examDate,
+            listening: formData.listening,
+            reading: formData.reading,
+            writing: formData.writing,
+            speaking: formData.speaking,
+            openToLanguageCourse: formData.openToLanguageCourse,
+            hasGRE: formData.hasGRE,
+            hasGMAT: formData.hasGMAT
+          };
+          
+          const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost/studyabroadplatform-api'
+            : '/studyabroadplatform-api';
+          
+          const response = await fetch(`${API_BASE}/edupartner/save_student_step3.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(step3Data)
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            alert(result.message);
+            setCurrentStep(prev => prev + 1);
+            setConfirmStep3(false);
+          } else {
+            alert(result.message || 'Failed to save test scores');
+          }
+        }
+        
+      } catch (error) {
+        console.error("Error saving data:", error);
+        alert("An error occurred while saving. Please try again.");
+      } finally {
+        setIsSaving(false);
+      }
       
-      // Reset confirmation for next step
-      if (currentStep === 1) setConfirmStep1(false);
-      if (currentStep === 2) setConfirmStep2(false);
-      if (currentStep === 3) setConfirmStep3(false);
     } else {
       alert("Please fill in all required fields");
     }
@@ -204,9 +366,71 @@ const AddStudent = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Form submitted:", formData);
-    alert("Student added successfully!");
-    navigate("/edupartner/dashboard");
+    if (!studentId) {
+      alert("Student ID not found. Please complete previous steps first.");
+      return;
+    }
+    
+    if (!validateStep(4)) {
+      alert("Please fill in all required fields");
+      return;
+    }
+    
+    setIsSaving(true);
+    
+    try {
+      // Create FormData for file upload
+      const submitData = new FormData();
+      submitData.append('student_id', studentId.toString());
+      submitData.append('differentNameOnDocuments', formData.differentNameOnDocuments);
+      submitData.append('visaRefused', formData.visaRefused);
+      submitData.append('hasStudyPermit', formData.hasStudyPermit || 'no');
+      
+      // Append document availability flags
+      submitData.append('hasGapCertificate', formData.hasGapCertificate || 'no');
+      submitData.append('hasWorkExperience', formData.hasWorkExperience || 'no');
+      submitData.append('hasBachelorDegree', formData.hasBachelorDegree || 'no');
+      submitData.append('hasMOI', formData.hasMOI || 'no');
+      submitData.append('hasLOR', formData.hasLOR || 'no');
+      submitData.append('hasEnglishTestScore', formData.hasEnglishTestScore || 'no');
+      
+      // Append files if they exist
+      if (formData.passportFile) submitData.append('passportFile', formData.passportFile);
+      if (formData.tenthMarksheetFile) submitData.append('tenthMarksheetFile', formData.tenthMarksheetFile);
+      if (formData.twelfthMarksheetFile) submitData.append('twelfthMarksheetFile', formData.twelfthMarksheetFile);
+      if (formData.sopFile) submitData.append('sopFile', formData.sopFile);
+      if (formData.cvFile) submitData.append('cvFile', formData.cvFile);
+      if (formData.gapCertificateFile) submitData.append('gapCertificateFile', formData.gapCertificateFile);
+      if (formData.workExperienceFile) submitData.append('workExperienceFile', formData.workExperienceFile);
+      if (formData.bachelorDegreeFile) submitData.append('bachelorDegreeFile', formData.bachelorDegreeFile);
+      if (formData.moiFile) submitData.append('moiFile', formData.moiFile);
+      if (formData.lorFile) submitData.append('lorFile', formData.lorFile);
+      if (formData.englishTestScoreFile) submitData.append('englishTestScoreFile', formData.englishTestScoreFile);
+      
+      const API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost/studyabroadplatform-api'
+        : '/studyabroadplatform-api';
+      
+      const response = await fetch(`${API_BASE}/edupartner/save_student_step4.php`, {
+        method: 'POST',
+        body: submitData // Don't set Content-Type header, browser will set it with boundary
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`${result.message}\nStudent ID: ${result.student_code}\nStatus: ${result.status}`);
+        navigate("/edupartner/dashboard");
+      } else {
+        alert(result.message || 'Failed to complete student profile');
+      }
+      
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      alert("An error occurred while submitting. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -278,21 +502,24 @@ const AddStudent = () => {
         {currentStep === 4 && <Step4AdditionalDetails formData={formData} onChange={handleInputChange} />}
       </div>
       <div className="form-navigation">
-        {currentStep > 1 && <button className="btn-secondary" onClick={handleBack}>Previous</button>}
+        {currentStep > 1 && <button className="btn-secondary" onClick={handleBack} disabled={isSaving}>Previous</button>}
         {currentStep < 4 ? (
           <button 
             className="btn-primary" 
             onClick={handleNext}
             disabled={
+              isSaving ||
               (currentStep === 1 && !confirmStep1) || 
               (currentStep === 2 && !confirmStep2) || 
               (currentStep === 3 && !confirmStep3)
             }
           >
-            Save & Next
+            {isSaving ? 'Saving...' : 'Save & Next'}
           </button>
         ) : (
-          <button className="btn-primary" onClick={handleSubmit}>Submit</button>
+          <button className="btn-primary" onClick={handleSubmit} disabled={isSaving}>
+            {isSaving ? 'Submitting...' : 'Submit'}
+          </button>
         )}
       </div>
     </div>
@@ -303,6 +530,36 @@ const Step1PersonalInfo = ({ formData, onChange }: any) => (
   <div className="form-step">
     <h2>Personal Information</h2>
     <p className="step-subtitle">(As indicated on the student's passport)</p>
+    
+    {/* Contact Information Section */}
+    <div className="education-section">
+      <h3 className="section-heading">Contact Information</h3>
+      <div className="form-grid">
+        <div className="form-group">
+          <label>Email Address <span className="required">*</span></label>
+          <input 
+            type="email" 
+            value={formData.email} 
+            onChange={(e) => onChange("email", e.target.value)} 
+            placeholder="Enter email address" 
+          />
+          <small style={{color: "#64748b", fontSize: "12px", marginTop: "4px", display: "block"}}>
+            This email will be used as unique student identifier
+          </small>
+        </div>
+        <div className="form-group">
+          <label>Mobile Number (Optional)</label>
+          <input 
+            type="tel" 
+            value={formData.mobile} 
+            onChange={(e) => onChange("mobile", e.target.value.replace(/\D/g, ""))} 
+            placeholder="Enter mobile number"
+            maxLength={10}
+          />
+        </div>
+      </div>
+    </div>
+    
     <div className="form-grid">
       <div className="form-group">
         <label>First Name <span className="required">*</span></label>
