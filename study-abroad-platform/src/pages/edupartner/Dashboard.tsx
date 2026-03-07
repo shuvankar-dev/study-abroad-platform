@@ -2073,7 +2073,7 @@ useEffect(() => {
 
           <li
             className={activeSection === "students" ? "active" : ""}
-            onClick={() => setActiveSection("students")}
+            onClick={() => navigate("/edupartner/students")}
             >
             <Users size={18} /> Students
           </li>
@@ -2316,7 +2316,7 @@ useEffect(() => {
                   <span>Add Agent</span>
                   </button>
                 ) : (
-                  <button className="add-student-btn" onClick={() => setActiveSection("students")}>
+                  <button className="add-student-btn" onClick={() => navigate("/edupartner/students")}>
                   <Plus size={18} />
                   <span>Add Student</span>
                   </button>
@@ -2469,7 +2469,7 @@ useEffect(() => {
                 <h3 style={{ margin: "0 0 20px 0", fontSize: "18px", fontWeight: 700 }}>Quick Actions</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <button 
-                    onClick={() => setActiveSection("students")}
+                    onClick={() => navigate("/edupartner/students")}
                     style={{
                       padding: "12px 16px",
                       background: "#f8fafc",

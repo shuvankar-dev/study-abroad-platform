@@ -1,17 +1,22 @@
-﻿import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+﻿import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Check } from "lucide-react";
 import "./addstudent.css";
 
 const AddStudent = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [searchParams] = useSearchParams();
+  const studentIdParam = searchParams.get('student_id');
+  const stepParam = searchParams.get('step');
+  
+  const [currentStep, setCurrentStep] = useState(stepParam ? parseInt(stepParam) : 1);
   const [confirmStep1, setConfirmStep1] = useState(false);
   const [confirmStep2, setConfirmStep2] = useState(false);
   const [confirmStep3, setConfirmStep3] = useState(false);
-  const [studentId, setStudentId] = useState<number | null>(null);
+  const [studentId, setStudentId] = useState<number | null>(studentIdParam ? parseInt(studentIdParam) : null);
   const [studentCode, setStudentCode] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!studentIdParam);
   
   const [formData, setFormData] = useState({
     // Contact Information
@@ -97,6 +102,147 @@ const AddStudent = () => {
     sopFile: null,
     cvFile: null
   });
+
+  // Load existing student data if editing
+  useEffect(() => {
+    const loadStudentData = async () => {
+      if (!studentIdParam) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const API_BASE = window.location.hostname === 'localhost'
+          ? 'http://localhost/studyabroadplatform-api'
+          : '/studyabroadplatform-api';
+
+        const response = await fetch(`${API_BASE}/edupartner/get_student_by_id.php?student_id=${studentIdParam}`);
+        const result = await response.json();
+
+        if (result.success && result.student) {
+          const { profile, personal_info, education, test_scores, additional_info } = result.student;
+
+          // Set student ID and code
+          setStudentId(profile.student_id);
+          setStudentCode(profile.student_code);
+
+          // Load personal info
+          if (personal_info) {
+            setFormData(prev => ({
+              ...prev,
+              email: profile.email || "",
+              mobile: profile.mobile || "",
+              firstName: personal_info.first_name || "",
+              middleName: personal_info.middle_name || "",
+              lastName: personal_info.last_name || "",
+              dateOfBirth: personal_info.date_of_birth || "",
+              firstLanguage: personal_info.first_language || "",
+              countryOfCitizenship: personal_info.country_of_citizenship || "",
+              passportNumber: personal_info.passport_number || "",
+              passportExpiryDate: personal_info.passport_expiry_date || "",
+              passportPlaceOfBirth: personal_info.passport_place_of_birth || "",
+              maritalStatus: personal_info.marital_status || "",
+              gender: personal_info.gender || "",
+              currentAddress: personal_info.current_address || "",
+              currentState: personal_info.current_state || "",
+              currentPincode: personal_info.current_pincode || "",
+              permanentAddress: personal_info.permanent_address || "",
+              permanentState: personal_info.permanent_state || "",
+              permanentPincode: personal_info.permanent_pincode || "",
+            }));
+          }
+
+          // Load education data
+          if (education) {
+            const updates: any = {};
+            
+            if (education['10th']) {
+              const tenth = education['10th'];
+              updates.tenth_board = tenth.board_university || "";
+              updates.tenth_institution = tenth.institution_name || "";
+              updates.tenth_passoutYear = tenth.passout_year || "";
+              updates.tenth_address = tenth.institution_address || "";
+              updates.tenth_state = tenth.institution_state || "";
+              updates.tenth_pincode = tenth.institution_pincode || "";
+              updates.tenth_gradingScheme = tenth.grading_scheme || "percentage";
+              updates.tenth_percentage = tenth.percentage || "";
+              updates.tenth_cgpa = tenth.cgpa || "";
+            }
+
+            if (education['12th']) {
+              const twelfth = education['12th'];
+              updates.twelfth_board = twelfth.board_university || "";
+              updates.twelfth_institution = twelfth.institution_name || "";
+              updates.twelfth_passoutYear = twelfth.passout_year || "";
+              updates.twelfth_address = twelfth.institution_address || "";
+              updates.twelfth_state = twelfth.institution_state || "";
+              updates.twelfth_pincode = twelfth.institution_pincode || "";
+              updates.twelfth_gradingScheme = twelfth.grading_scheme || "percentage";
+              updates.twelfth_percentage = twelfth.percentage || "";
+              updates.twelfth_cgpa = twelfth.cgpa || "";
+            }
+
+            if (education['bachelor']) {
+              const bachelor = education['bachelor'];
+              updates.hasHigherDegree = "yes";
+              updates.degree_name = bachelor.board_university || "";
+              updates.degree_board = bachelor.board_university || "";
+              updates.degree_institution = bachelor.institution_name || "";
+              updates.degree_passoutYear = bachelor.passout_year || "";
+              updates.degree_address = bachelor.institution_address || "";
+              updates.degree_state = bachelor.institution_state || "";
+              updates.degree_pincode = bachelor.institution_pincode || "";
+              updates.degree_gradingScheme = bachelor.grading_scheme || "percentage";
+              updates.degree_percentage = bachelor.percentage || "";
+              updates.degree_cgpa = bachelor.cgpa || "";
+            } else {
+              updates.hasHigherDegree = "no";
+            }
+
+            setFormData(prev => ({ ...prev, ...updates }));
+          }
+
+          // Load test scores
+          if (test_scores) {
+            setFormData(prev => ({
+              ...prev,
+              languageTestOption: test_scores.language_test_option || "",
+              englishExamType: test_scores.english_exam_type || "",
+              examDate: test_scores.exam_date || "",
+              listening: test_scores.listening_score || "",
+              reading: test_scores.reading_score || "",
+              writing: test_scores.writing_score || "",
+              speaking: test_scores.speaking_score || "",
+              openToLanguageCourse: test_scores.open_to_language_course === 1,
+              hasGRE: test_scores.has_gre === 1,
+              hasGMAT: test_scores.has_gmat === 1,
+            }));
+          }
+
+          // Load additional info
+          if (additional_info) {
+            setFormData(prev => ({
+              ...prev,
+              differentNameOnDocuments: additional_info.different_name_on_documents || "",
+              visaRefused: additional_info.visa_refused || "",
+              hasStudyPermit: additional_info.has_study_permit || "",
+            }));
+          }
+        } else {
+          alert("Failed to load student data: " + result.message);
+          navigate("/edupartner/students");
+        }
+      } catch (error) {
+        console.error("Error loading student data:", error);
+        alert("An error occurred while loading student data");
+        navigate("/edupartner/students");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadStudentData();
+  }, [studentIdParam, navigate]);
 
   const steps = [
     { number: 1, title: "Personal Information", completed: currentStep > 1 },
@@ -433,14 +579,25 @@ const AddStudent = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="add-student-container">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Loading student data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="add-student-container">
       <div className="add-student-header">
-        <button className="back-btn" onClick={() => navigate("/edupartner/dashboard")}>
+        <button className="back-btn" onClick={() => navigate("/edupartner/students")}>
           <ArrowLeft size={20} />
-          Back to Dashboard
+          Back to Students
         </button>
-        <h1>Add New Student</h1>
+        <h1>{studentIdParam ? `Edit Student - ${studentCode}` : 'Add New Student'}</h1>
       </div>
       <div className="progress-steps">
         {steps.map((step, index) => (
