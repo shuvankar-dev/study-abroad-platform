@@ -214,7 +214,7 @@ const Signup = () => {
         </div>
 
         <div style={{ fontSize: '14px', opacity: 0.8 }}>
-          © 2024 EduPartner. All rights reserved.
+          © 2024 EduPartner. Powered by <strong>CodeScholar Oversea</strong>. All rights reserved.
         </div>
       </div>
 
