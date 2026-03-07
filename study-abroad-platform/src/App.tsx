@@ -33,6 +33,7 @@ import EdupartnerLogin from './pages/edupartner/login'
 import EdupartnerSignup from './pages/edupartner/Signup'
 import EdupartnerDashboard from './pages/edupartner/Dashboard'
 import EdupartnerProfileEdit from './pages/edupartner/profile_edit'
+import EdupartnerAddStudent from './pages/edupartner/AddStudent'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -130,6 +131,7 @@ function AppContent() {
           <Route path="/edupartner/signup" element={<EdupartnerSignup />} />
           <Route path="/edupartner/dashboard" element={<EdupartnerDashboard />} />
           <Route path="/edupartner/profile-edit" element={<EdupartnerProfileEdit />} />
+          <Route path="/edupartner/add-student" element={<EdupartnerAddStudent />} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
 

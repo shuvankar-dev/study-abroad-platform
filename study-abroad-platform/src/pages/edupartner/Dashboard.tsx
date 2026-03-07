@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useEffect } from "react";
 import "./dashboard.css";
 import { useNavigate } from "react-router-dom";
@@ -581,18 +581,6 @@ const fetchAgents = async () => {
 };
 
 const submitAgent = async () => {
-  // Validate email
-  if (!validateEmail(agentForm.email)) {
-    alert("Please enter a valid email address");
-    return;
-  }
-  
-  // Validate phone
-  if (!validatePhone(agentForm.phone)) {
-    alert("Phone number must be exactly 10 digits");
-    return;
-  }
-  
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   
   const res = await fetch(`${API_BASE}/edupartner/add_agent.php`, {
@@ -665,18 +653,6 @@ const fetchCounselors = async () => {
 };
 
 const submitCounselor = async () => {
-  // Validate email
-  if (!validateEmail(counselorForm.email)) {
-    alert("Please enter a valid email address");
-    return;
-  }
-  
-  // Validate phone
-  if (!validatePhone(counselorForm.phone)) {
-    alert("Phone number must be exactly 10 digits");
-    return;
-  }
-  
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   
   const res = await fetch(`${API_BASE}/edupartner/add_counselor.php`, {
@@ -825,7 +801,7 @@ const submitAdmin = async () => {
     const data = await res.json();
     
     if (data.success) {
-      alert(data.email_sent ? "Admin created and email sent successfully!" : "Admin created but email failed to send");
+      alert(data.message || "Admin created successfully!");
       setShowAddAdminModal(false);
       setAdminForm({ company_name: "", user_name: "", email: "", phone: "" });
       fetchAdmins();
@@ -833,7 +809,8 @@ const submitAdmin = async () => {
       alert(data.message || "Failed to create admin");
     }
   } catch (error) {
-    alert("Error creating admin. Please try again.");
+    console.error("Error creating admin:", error);
+    alert("An error occurred while creating admin. Please try again.");
   } finally {
     setIsSubmittingAdmin(false);
   }
@@ -1468,11 +1445,6 @@ const [applications, setApplications] = useState<any[]>([]);
 const [recentApplications, setRecentApplications] = useState<any[]>([]);
 
 const fetchApplications = async () => {
-  console.log("=== FETCH APPLICATIONS DEBUG ===");
-  console.log("User:", user);
-  console.log("User ID:", user.id);
-  console.log("User Role:", user.role);
-  
   try {
     const res = await fetch(
       `${API_BASE}/edupartner/get_applications.php`,
@@ -1487,13 +1459,9 @@ const fetchApplications = async () => {
     );
 
     const data = await res.json();
-    console.log("Applications response:", data);
 
     if (data.success) {
       setApplications(data.applications);
-      console.log("Applications set:", data.applications);
-    } else {
-      console.error("Applications fetch failed:", data);
     }
   } catch (err) {
     console.error("Fetch applications error:", err);
@@ -1526,11 +1494,11 @@ const fetchRecentApplications = async () => {
 
 
 
-useEffect(() => {
-  if (activeSection === "applications") {
-    fetchApplications();
-  }
-}, [activeSection]);
+// useEffect(() => {
+//   if (activeSection === "applications") {
+//     fetchApplications();
+//   }
+// }, [activeSection]);
 
 useEffect(() => {
   fetchApplications(); // fetch once on mount
@@ -1705,7 +1673,7 @@ const paginatedStudents = filteredStudents.slice(
 
 useEffect(() => {
   setCurrentStudentPage(1);
-}, [searchTerm]);
+}, [filteredStudents]);
 
 
 
@@ -2310,23 +2278,11 @@ useEffect(() => {
               background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
               borderRadius: "12px",
               marginBottom: "24px",
-              border: "1px solid #e2e8f0",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "16px"
+              border: "1px solid #e2e8f0"
             }}>
-              <div style={{ flex: "1", minWidth: "300px" }}>
-                <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>
-                  Welcome back, {userName}!
-                </h2>
-                <p style={{ margin: "8px 0 0 0", fontSize: "15px", color: "#64748b" }}>
-                  Here's what's happening with your students today.
-                </p>
-              </div>
+              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>Dashboard</h2>
 
-              <div className="top-actions" style={{ display: "flex", gap: "12px", flexShrink: 0 }}>
+              <div className="top-actions" style={{ display: "flex", gap: "12px" }}>
                 <button 
                   className="outline-btn" 
                   onClick={() => setActiveSection("universities")}
@@ -2354,54 +2310,24 @@ useEffect(() => {
                 >
                   <Search size={16} /> Browse Universities
                 </button>
-                {userRole === "Admin" || userRole === "Super Admin" ? (
-                  <button 
-                    className="add-student-btn" 
-                    onClick={() => setShowAddAgentModal(true)}
-                    style={{
-                      padding: "11px 20px",
-                      borderRadius: "10px",
-                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      color: "#fff",
-                      border: "none",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      fontSize: "14px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      transition: "all 0.2s",
-                      boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
-                    }}
-                  >
-                    <Plus size={18} />
-                    <span>Add Agent</span>
+                {userRole === "Admin" ? (
+                  <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
+                  <Plus size={18} />
+                  <span>Add Agent</span>
                   </button>
                 ) : (
-                  <button 
-                    className="add-student-btn" 
-                    onClick={() => setActiveSection("students")}
-                    style={{
-                      padding: "11px 20px",
-                      borderRadius: "10px",
-                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      color: "#fff",
-                      border: "none",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      fontSize: "14px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      transition: "all 0.2s",
-                      boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)"
-                    }}
-                  >
-                    <Plus size={18} />
-                    <span>Add Student</span>
+                  <button className="add-student-btn" onClick={() => setActiveSection("students")}>
+                  <Plus size={18} />
+                  <span>Add Student</span>
                   </button>
                 )}
               </div>
+            </div>
+
+            {/* HEADER */}
+            <div className="welcome" style={{ marginBottom: "28px" }}>
+              <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 700, marginBottom: "8px" }}>Welcome back, {userName}!</h1>
+              <p style={{ color: "#64748b", fontSize: "16px", margin: 0 }}>Here's what's happening with your students today.</p>
             </div>
 
             {/* STATS */}
@@ -2712,8 +2638,8 @@ useEffect(() => {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {recentApplications.map((app, index) => (
-                      <div key={`recent-app-${app.id}-${index}`} style={{
+                    {recentApplications.map((app) => (
+                      <div key={app.id} style={{
                         padding: '16px',
                         background: '#f8fafc',
                         borderRadius: '8px',
@@ -3343,9 +3269,10 @@ useEffect(() => {
     </thead>
 
     <tbody>
-      {paginatedUniversities.map((u) => (
-        <React.Fragment key={`uni-fragment-${u.id}`}>
+      {paginatedUniversities.map((u, i) => (
+        <>
           <tr
+            key={i}
             onClick={() => toggleUniversityDetails(u.id)}
             style={{
               borderTop: "1px solid #f1f5f9",
@@ -3493,7 +3420,7 @@ useEffect(() => {
 
         {/* EXPANDABLE DETAIL ROW */}
         {expandedUniversityId === u.id && (
-          <tr key={`detail-${u.id}`}>
+          <tr key={`detail-${i}`}>
             <td colSpan={9} style={{ padding: 0, background: "#f8fafc" }}>
               <div style={{ padding: "24px", borderTop: "2px solid #e2e8f0" }}>
                 
@@ -3871,7 +3798,7 @@ useEffect(() => {
             </td>
           </tr>
         )}
-        </React.Fragment>
+        </>
       ))}
     </tbody>
   </table>
@@ -3996,7 +3923,7 @@ useEffect(() => {
             </button> */}
             <button
             className="add-student-btn"
-            onClick={() => setShowAddStudent(true)}
+            onClick={() => navigate("/edupartner/add-student")}
             >
             <span style={{ fontSize: 18, lineHeight: 0 }}>+</span>
             <span>Add Student</span>
@@ -4104,7 +4031,7 @@ useEffect(() => {
     </p>
     <button
       className="add-student-btn"
-      onClick={() => setShowAddStudent(true)}
+      onClick={() => navigate("/edupartner/add-student")}
     >
       + Add Student
     </button>
@@ -4133,7 +4060,6 @@ useEffect(() => {
         <th style={{ padding: "14px 20px" }}>Email</th>
         <th style={{ padding: "14px 20px" }}>Phone</th>
         <th style={{ padding: "14px 20px" }}>Nationality</th>
-        {isSuperAdmin && <th style={{ padding: "14px 20px" }}>Admin</th>}
         <th style={{ padding: "14px 20px" }}>Added</th>
         <th style={{ padding: "14px 20px", textAlign: "right" }}>
           Actions
@@ -4142,9 +4068,9 @@ useEffect(() => {
     </thead>
 
     <tbody>
-      {paginatedStudents.map((s, index) => (
+      {paginatedStudents.map((s, i) => (
         <tr
-          key={`student-${s.id}-${index}`}
+          key={i}
           style={{
             borderTop: "1px solid #e2e8f0",
             fontSize: 14,
@@ -4208,23 +4134,6 @@ useEffect(() => {
               {s.nationality}
             </span>
           </td>
-
-          {/* Admin (Super Admin only) */}
-          {isSuperAdmin && (
-            <td style={{ padding: "16px 20px", color: "#334155" }}>
-              <span style={{ 
-                display: "inline-block",
-                padding: "4px 12px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "#fff",
-                borderRadius: "6px",
-                fontSize: "12px",
-                fontWeight: 600
-              }}>
-                {s.admin_name || 'Unknown'}
-              </span>
-            </td>
-          )}
 
           {/* Added */}
           <td style={{ padding: "16px 20px", color: "#334155" }}>
@@ -5571,7 +5480,6 @@ useEffect(() => {
         <th style={{ padding: "14px 20px" }}>Course</th>
         <th style={{ padding: "14px 20px" }}>Commission</th>
         <th style={{ padding: "14px 20px" }}>Preferred Intake</th>
-        {isSuperAdmin && <th style={{ padding: "14px 20px" }}>Admin</th>}
         <th style={{ padding: "14px 20px" }}>Status</th>
         <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
       </tr>
@@ -5661,29 +5569,6 @@ useEffect(() => {
               {app.pref_intake || "-"}
             </span>
           </td>
-
-          {/* Admin (Super Admin only) */}
-          {isSuperAdmin && (
-            <td style={{ padding: "16px 20px" }}>
-              {app.admin_name ? (
-                <span
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: 20,
-                    fontSize: 12,
-                    background: "#f3e8ff",
-                    color: "#7c3aed",
-                    border: "1px solid #e9d5ff",
-                    fontWeight: 500,
-                  }}
-                >
-                  {app.admin_name}
-                </span>
-              ) : (
-                <span style={{ color: "#94a3b8", fontSize: 12 }}>N/A</span>
-              )}
-            </td>
-          )}
 
           {/* Status */}
           <td style={{ padding: "16px 20px" }}>
@@ -6679,9 +6564,9 @@ useEffect(() => {
       gap: 20,
     }}
   >
-    {visibleAccommodationRequests.map((item, index) => (
+    {visibleAccommodationRequests.map((item) => (
       <div
-        key={`accommodation-${item.id}-${index}`}
+        key={item.id}
         style={{
           border: "1px solid #e2e8f0",
           borderRadius: 12,
@@ -7949,9 +7834,9 @@ useEffect(() => {
           gap: 20,
         }}
       >
-    {visibleLoanRequests.map((item, index) => (
+    {visibleLoanRequests.map((item) => (
       <div
-        key={`loan-${item.id}-${index}`}
+        key={item.id}
         style={{
           border: "1px solid #e2e8f0",
           borderRadius: 12,
@@ -8940,9 +8825,9 @@ useEffect(() => {
           gap: 20,
         }}
       >
-    {visibleTestPrepRequests.map((item, index) => (
+    {visibleTestPrepRequests.map((item) => (
       <div
-        key={`testprep-${item.id}-${index}`}
+        key={item.id}
         style={{
           border: "1px solid #e2e8f0",
           borderRadius: 12,
@@ -10006,7 +9891,7 @@ useEffect(() => {
                     <tbody>
                         {currentUsers.map((user, index) => (
                             <tr
-                            key={user.id}
+                            key={index}
                             style={{
                                 borderTop: "1px solid #e2e8f0",
                                 fontSize: 14,
@@ -10455,16 +10340,8 @@ useEffect(() => {
         <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
           Phone <span style={{ color: "#ef4444" }}>*</span>
         </label>
-        <input 
-          type="tel" 
-          placeholder="Enter 10 digit phone number" 
-          value={agentForm.phone}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-            setAgentForm({ ...agentForm, phone: value });
-          }}
-          pattern="[0-9]{10}"
-          maxLength={10}
+        <input type="tel" placeholder="Enter phone number" value={agentForm.phone}
+          onChange={(e) => setAgentForm({ ...agentForm, phone: e.target.value })}
           style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
             border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
         />
@@ -10782,16 +10659,8 @@ useEffect(() => {
         <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
           Phone <span style={{ color: "#ef4444" }}>*</span>
         </label>
-        <input 
-          type="tel" 
-          placeholder="Enter 10 digit phone number" 
-          value={counselorForm.phone}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-            setCounselorForm({ ...counselorForm, phone: value });
-          }}
-          pattern="[0-9]{10}"
-          maxLength={10}
+        <input type="tel" placeholder="Enter phone number" value={counselorForm.phone}
+          onChange={(e) => setCounselorForm({ ...counselorForm, phone: e.target.value })}
           style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
             border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
         />
@@ -11065,16 +10934,8 @@ useEffect(() => {
         <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600, color: "#334155" }}>
           Phone <span style={{ color: "#ef4444" }}>*</span>
         </label>
-        <input 
-          type="tel" 
-          placeholder="Enter 10 digit phone number" 
-          value={adminForm.phone}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-            setAdminForm({ ...adminForm, phone: value });
-          }}
-          pattern="[0-9]{10}"
-          maxLength={10}
+        <input type="tel" placeholder="Enter phone number" value={adminForm.phone}
+          onChange={(e) => setAdminForm({ ...adminForm, phone: e.target.value })}
           style={{ width: "100%", padding: "12px 14px", borderRadius: "10px",
             border: "2px solid #e2e8f0", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
         />
@@ -11098,34 +10959,17 @@ useEffect(() => {
             borderRadius: "10px", 
             border: "none",
             background: isSubmittingAdmin 
-              ? "#d1d5db" 
+              ? "#9ca3af" 
               : "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", 
             color: "#fff",
             cursor: isSubmittingAdmin ? "not-allowed" : "pointer", 
             fontWeight: 600, 
             fontSize: "14px",
             boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px"
+            opacity: isSubmittingAdmin ? 0.6 : 1
           }}
         >
-          {isSubmittingAdmin ? (
-            <>
-              <span style={{ 
-                display: "inline-block",
-                width: "14px",
-                height: "14px",
-                border: "2px solid #fff",
-                borderTopColor: "transparent",
-                borderRadius: "50%",
-                animation: "spin 0.6s linear infinite"
-              }}></span>
-              Creating...
-            </>
-          ) : (
-            "Add Admin"
-          )}
+          {isSubmittingAdmin ? "Creating..." : "Add Admin"}
         </button>
       </div>
     </div>
