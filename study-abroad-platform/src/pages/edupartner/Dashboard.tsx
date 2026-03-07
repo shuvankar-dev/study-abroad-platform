@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import "./dashboard.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
   Home, GraduationCap, Users, FileText, DollarSign, Building2, 
   CreditCard, BookOpen, MessageSquare, Shield, User, 
@@ -66,11 +66,11 @@ const selectStyle = {
 
 
 const Dashboard = () => {
+  const [searchParams] = useSearchParams();
   
-  
-  
-  // ✅ ADDED: section state
-  const [activeSection, setActiveSection] = useState("dashboard");
+  // ✅ ADDED: section state - check for section query parameter
+  const initialSection = searchParams.get("section") || "dashboard";
+  const [activeSection, setActiveSection] = useState(initialSection);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showAccommodationModal, setShowAccommodationModal] = useState(false);

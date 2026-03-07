@@ -229,13 +229,14 @@ const AddStudent = () => {
             }));
           }
         } else {
-          alert("Failed to load student data: " + result.message);
-          navigate("/edupartner/students");
+          console.error("Failed to load student data:", result.message);
+          // Don't navigate away, just show error in console
+          // User can still try to use the form
         }
       } catch (error) {
         console.error("Error loading student data:", error);
-        alert("An error occurred while loading student data");
-        navigate("/edupartner/students");
+        // Don't show alert or navigate away on load error
+        // Just log it and let user proceed
       } finally {
         setIsLoading(false);
       }
@@ -243,6 +244,17 @@ const AddStudent = () => {
 
     loadStudentData();
   }, [studentIdParam, navigate]);
+
+  // Helper function to handle API responses
+  const handleApiResponse = async (response: Response) => {
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response:", text);
+      throw new Error("Server error. Check console for details.");
+    }
+    return response.json();
+  };
 
   const steps = [
     { number: 1, title: "Personal Information", completed: currentStep > 1 },
@@ -379,7 +391,7 @@ const AddStudent = () => {
             body: JSON.stringify(step1Data)
           });
           
-          const result = await response.json();
+          const result = await handleApiResponse(response);
           
           if (result.success) {
             setStudentId(result.student_id);
@@ -442,7 +454,7 @@ const AddStudent = () => {
             body: JSON.stringify(step2Data)
           });
           
-          const result = await response.json();
+          const result = await handleApiResponse(response);
           
           if (result.success) {
             alert(result.message);
@@ -483,6 +495,14 @@ const AddStudent = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(step3Data)
           });
+          
+          // Check if response is JSON
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            console.error("Non-JSON response:", text);
+            throw new Error("Server returned an error. Please check the console for details.");
+          }
           
           const result = await response.json();
           
@@ -562,7 +582,7 @@ const AddStudent = () => {
         body: submitData // Don't set Content-Type header, browser will set it with boundary
       });
       
-      const result = await response.json();
+      const result = await handleApiResponse(response);
       
       if (result.success) {
         alert(`${result.message}\nStudent ID: ${result.student_code}\nStatus: ${result.status}`);

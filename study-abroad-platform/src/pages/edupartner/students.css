@@ -1,21 +1,14 @@
-.students-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+@import './dashboard.css';
+
+.students-content {
+  padding: 0;
 }
 
-.students-header {
+.students-header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-}
-
-.students-header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 4px 0;
 }
 
 .subtitle {
@@ -153,6 +146,17 @@
 .student-name {
   font-weight: 500;
   color: #1e293b;
+}
+
+.student-name-link {
+  color: #2563eb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.student-name-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
 .student-mobile {
