@@ -36,6 +36,7 @@ import EdupartnerProfileEdit from './pages/edupartner/profile_edit'
 import EdupartnerAddStudent from './pages/edupartner/AddStudent'
 import EdupartnerStudents from './pages/edupartner/Students'
 import EdupartnerStudentDashboard from './pages/edupartner/StudentDashboard'
+import EdupartnerNewUniversities from './pages/edupartner/NewUniversities'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -136,6 +137,7 @@ function AppContent() {
           <Route path="/edupartner/students" element={<EdupartnerStudents />} />
           <Route path="/edupartner/student/:studentId" element={<EdupartnerStudentDashboard />} />
           <Route path="/edupartner/add-student" element={<EdupartnerAddStudent />} />
+          <Route path="/edupartner/new-universities" element={<EdupartnerNewUniversities />} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
 

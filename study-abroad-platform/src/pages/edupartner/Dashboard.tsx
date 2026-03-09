@@ -467,6 +467,31 @@ const openApplicationModal = async () => {
   if (uniData.success) setUniversities(uniData.universities);
 };
 
+// ✅ Handle URL parameters for pre-filling application form
+useEffect(() => {
+  const university = searchParams.get("university");
+  const course = searchParams.get("course");
+  
+  if (university && course && activeSection === "applications") {
+    // Pre-fill the form
+    setApplicationForm(prev => ({
+      ...prev,
+      university: decodeURIComponent(university),
+      course: decodeURIComponent(course)
+    }));
+    
+    // Open the modal
+    openApplicationModal();
+    
+    // Clean up URL parameters after reading them
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete("university");
+    newSearchParams.delete("course");
+    navigate(`/edupartner/dashboard?section=applications`, { replace: true });
+  }
+}, [searchParams, activeSection]);
+
+
 
 
 
@@ -3303,7 +3328,124 @@ useEffect(() => {
 
           {/* Course */}
           <td style={{ padding: "18px 20px", color: "#475569" }}>
-            {u.Program_Name}
+            <div>{u.Program_Name}</div>
+            {/* Inline Feature Badges */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }}>
+              {u.Scholarship_Available?.toLowerCase() === "yes" && (
+                <span style={{
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 3
+                }}>
+                  <Award size={10} /> Scholarship
+                </span>
+              )}
+              {(u.Application_Fee === 0 || u.Application_Fee === "0" || u.Application_Fee === "0.00" || parseFloat(u.Application_Fee) === 0) && (
+                <span style={{
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  background: "linear-gradient(135deg, #ec4899, #db2777)",
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 3
+                }}>
+                  <Zap size={10} /> Free App
+                </span>
+              )}
+              {u.English_Proficiency_Exam_Waiver && u.English_Proficiency_Exam_Waiver !== "N/A" && u.English_Proficiency_Exam_Waiver !== "No" && u.English_Proficiency_Exam_Waiver.length > 3 && (
+                <span style={{
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  background: "linear-gradient(135deg, #14b8a6, #0d9488)",
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 3
+                }}>
+                  <FileCheck size={10} /> Eng. Waiver
+                </span>
+              )}
+              {u.IELTS_Score && parseFloat(u.IELTS_Score) > 0 && parseFloat(u.IELTS_Score) <= 5.5 && (
+                <span style={{
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 3
+                }}>
+                  <Languages size={10} /> Low IELTS
+                </span>
+              )}
+              {u.Backlog_Range && (() => {
+                const m = u.Backlog_Range.match(/(\d+)\s*-\s*(\d+)/);
+                return m && parseInt(m[2]) >= 10;
+              })() && (
+                <span style={{
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  background: "linear-gradient(135deg, #f97316, #ea580c)",
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 3
+                }}>
+                  <BarChart3 size={10} /> Backlog OK
+                </span>
+              )}
+              {(() => {
+                const ci = findCommissionInfo(u.University);
+                return ci && ci.tier === "PRIMARY" && ci.commissionMoreThan20 && ci.commissionMoreThan20 >= 18 ? (
+                  <span style={{
+                    padding: "2px 8px",
+                    borderRadius: 999,
+                    background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                    color: "#fff",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 3
+                  }}>
+                    <Flame size={10} /> High Comm.
+                  </span>
+                ) : null;
+              })()}
+              {(() => {
+                const ci = findCommissionInfo(u.University);
+                return ci?.remarks?.includes("LAKH") ? (
+                  <span style={{
+                    padding: "2px 8px",
+                    borderRadius: 999,
+                    background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                    color: "#fff",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 3
+                  }}>
+                    <Gift size={10} /> Bonus
+                  </span>
+                ) : null;
+              })()}
+            </div>
           </td>
 
           {/* Commission */}
