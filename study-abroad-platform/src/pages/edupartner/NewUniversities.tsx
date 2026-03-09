@@ -305,6 +305,8 @@ const NewUniversities = () => {
   const [filterAppFee, setFilterAppFee] = useState("");
   const [filterWaiver, setFilterWaiver] = useState("");
   const [filterTuitionRange, setFilterTuitionRange] = useState("");
+  const [filterIntake, setFilterIntake] = useState("");
+  const [filterPunjabHaryana, setFilterPunjabHaryana] = useState("");
   const [showEligibilityModal, setShowEligibilityModal] = useState(false);
   const [eligibilityFilters, setEligibilityFilters] = useState({
     nationality: "",
@@ -333,7 +335,7 @@ const NewUniversities = () => {
 
   useEffect(() => {
     filterUniversities();
-  }, [searchTerm, filterCountry, filterStudyLevel, filterScholarship, filterAppFee, filterWaiver, filterTuitionRange, universities]);
+  }, [searchTerm, filterCountry, filterStudyLevel, filterScholarship, filterAppFee, filterWaiver, filterTuitionRange, filterIntake, filterPunjabHaryana, universities]);
 
   const fetchUniversities = async () => {
     try {
@@ -407,6 +409,22 @@ const NewUniversities = () => {
           default: return true;
         }
       });
+    }
+
+    if (filterIntake) {
+      filtered = filtered.filter(uni => {
+        if (filterIntake === 'No Open Intakes') {
+          return !uni.OpenIntakes || uni.OpenIntakes.toLowerCase() === 'no open intakes';
+        }
+        return uni.OpenIntakes && uni.OpenIntakes.includes(filterIntake);
+      });
+    }
+
+    if (filterPunjabHaryana === 'exclude') {
+      filtered = filtered.filter(uni => 
+        uni.Remarks && 
+        (uni.Remarks.toLowerCase().includes('punjab') || uni.Remarks.toLowerCase().includes('haryana'))
+      );
     }
 
     setFilteredUniversities(filtered);
@@ -556,34 +574,83 @@ const NewUniversities = () => {
     );
   }
 
-  // ---------- SIDEBAR (reused) ----------
+  // ---------- SIDEBAR (same as Dashboard) ----------
   const Sidebar = () => (
     <aside className="sidebar">
       <div className="sidebar-brand">
         <GraduationCap size={24} /> <span>EduPartner</span>
       </div>
+
       <ul className="menu">
-        <li onClick={() => handleSidebarNavigation("dashboard")}><Home size={18} /> Dashboard</li>
-        <li className="active"><GraduationCap size={18} /> Universities (New)</li>
-        <li onClick={() => handleSidebarNavigation("students")}><Users size={18} /> Students</li>
+        <li onClick={() => navigate("/edupartner/dashboard")}>
+          <Home size={18} /> Dashboard
+        </li>
+
+        <li className="active">
+          <GraduationCap size={18} /> Universities
+        </li>
+
+        <li onClick={() => navigate("/edupartner/students")}>
+          <Users size={18} /> Students
+        </li>
+
         {userRole === "Admin" && !isSuperAdmin && (
-          <li onClick={() => handleSidebarNavigation("agents")}><Users size={18} /> Agents</li>
+          <li onClick={() => navigate("/edupartner/dashboard?section=agents")}>
+            <UserPlus size={18} /> Agents
+          </li>
         )}
+
         {isSuperAdmin && (
-          <li onClick={() => handleSidebarNavigation("admins")}><Shield size={18} /> Admins</li>
+          <li onClick={() => navigate("/edupartner/dashboard?section=admins")}>
+            <Shield size={18} /> Admins
+          </li>
         )}
+
         {userRole === "Agent" && (
-          <li onClick={() => handleSidebarNavigation("counselors")}><Users size={18} /> Counselors</li>
+          <li onClick={() => navigate("/edupartner/dashboard?section=counselors")}>
+            <UserPlus size={18} /> Counselors
+          </li>
         )}
-        <li onClick={() => handleSidebarNavigation("applications")}><FileText size={18} /> Applications</li>
-        <li onClick={() => handleSidebarNavigation("accommodation")}><Building2 size={18} /> Accommodation</li>
-        <li onClick={() => handleSidebarNavigation("loan")}><CreditCard size={18} /> Loan Services</li>
-        <li onClick={() => handleSidebarNavigation("testprep")}><BookOpen size={18} /> Test Prep</li>
-        <li onClick={() => handleSidebarNavigation("teamchat")}><MessageSquare size={18} /> Team Chat</li>
+
+        <li onClick={() => navigate("/edupartner/dashboard?section=applications")}>
+          <FileText size={18} /> Applications
+        </li>
+
+        {userRole !== "Counselor" && (
+          <li onClick={() => navigate("/edupartner/dashboard?section=commissions")}>
+            <DollarSign size={18} /> Commissions
+          </li>
+        )}
+
+        <li onClick={() => navigate("/edupartner/dashboard?section=accommodation")}>
+          <Building2 size={18} /> Accommodation
+        </li>
+
+        <li onClick={() => navigate("/edupartner/dashboard?section=loan")}>
+          <CreditCard size={18} /> Loan Services
+        </li>
+
+        <li onClick={() => navigate("/edupartner/dashboard?section=testprep")}>
+          <BookOpen size={18} /> Test Prep
+        </li>
+
+        <li onClick={() => navigate("/edupartner/dashboard?section=teamchat")}>
+          <MessageSquare size={18} /> Team Chat
+        </li>
+
+        {userRole === "Admin" && (
+          <li onClick={() => navigate("/edupartner/dashboard?section=permissions")}>
+            <Shield size={18} /> Permissions
+          </li>
+        )}
       </ul>
+
       <div className="sidebar-footer">
         <div className="avatar">{avatarLetter}</div>
-        <div><strong>{userName}</strong><p>{companyName}</p></div>
+        <div>
+          <strong>{userName}</strong>
+          <p>{companyName}</p>
+        </div>
       </div>
     </aside>
   );
@@ -936,33 +1003,80 @@ const NewUniversities = () => {
 
       <main className="main-content">
         <div className="nu-content">
-          {/* Header */}
-          <div className="nu-page-header">
-            <div>
-              <h1 className="nu-page-title">Programs</h1>
-              <p className="nu-page-subtitle">{filteredUniversities.length.toLocaleString()}+ programs found</p>
+          {/* Header - Single Line with Search on Right */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '20px',
+            gap: '20px'
+          }}>
+            {/* Left: Programs Title with Count */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', minWidth: 'fit-content' }}>
+              <h1 className="nu-page-title" style={{ margin: 0 }}>Programs</h1>
+              <p className="nu-page-subtitle" style={{ margin: 0 }}>{filteredUniversities.length.toLocaleString()}+ programs found</p>
             </div>
-            <button className="nu-filter-toggle" onClick={() => setShowFilters(!showFilters)}>
-              <Filter size={16} /> {showFilters ? 'Hide Filters' : 'Show Filters'} {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
-          </div>
 
-          {/* Search & Filters */}
-          <div className="nu-search-bar">
-            <div className="nu-search-input-wrapper">
-              <Search size={18} className="nu-search-icon" />
-              <input
-                type="text"
-                placeholder="Search by university, course, or country..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setVisibleCount(20); }}
-                className="nu-search-input"
-              />
-              {searchTerm && (
-                <button className="nu-search-clear" onClick={() => setSearchTerm("")}>
-                  <X size={16} />
-                </button>
-              )}
+            {/* Right: Search Bar with Button and Hide Filters */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '12px', 
+              alignItems: 'center'
+            }}>
+              <div style={{ position: 'relative', width: '400px' }}>
+                <Search size={18} className="nu-search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search by university, course, or country..."
+                  value={searchTerm}
+                  onChange={(e) => { setSearchTerm(e.target.value); setVisibleCount(20); }}
+                  className="nu-search-input"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      setVisibleCount(20);
+                    }
+                  }}
+                />
+                {searchTerm && (
+                  <button className="nu-search-clear" onClick={() => setSearchTerm("")}>
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+              <button 
+                className="nu-search-button"
+                onClick={() => setVisibleCount(20)}
+                style={{
+                  padding: '12px 28px',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(102, 126, 234, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                }}
+              >
+                <Search size={16} />
+                Search
+              </button>
+              <button className="nu-filter-toggle" onClick={() => setShowFilters(!showFilters)} style={{ minWidth: 'fit-content' }}>
+                <Filter size={16} /> {showFilters ? 'Hide Filters' : 'Show Filters'} {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
             </div>
           </div>
 
@@ -977,6 +1091,8 @@ const NewUniversities = () => {
                   setFilterAppFee("");
                   setFilterWaiver("");
                   setFilterTuitionRange("");
+                  setFilterIntake("");
+                  setFilterPunjabHaryana("");
                   setSearchTerm(""); 
                   setVisibleCount(20); 
                 }}>
@@ -1014,6 +1130,34 @@ const NewUniversities = () => {
                   >
                     <option value="">All Levels</option>
                     {uniqueLevels.map(l => <option key={l} value={l}>{l}</option>)}
+                  </select>
+                </div>
+
+                {/* Intake Month Filter */}
+                <div className="nu-filter-card">
+                  <label className="nu-filter-label">
+                    <Calendar size={16} />
+                    Intake Month
+                  </label>
+                  <select 
+                    className="nu-filter-select" 
+                    value={filterIntake} 
+                    onChange={(e) => { setFilterIntake(e.target.value); setVisibleCount(20); }}
+                  >
+                    <option value="">All Intakes</option>
+                    <option value="Jan">Jan</option>
+                    <option value="Feb">Feb</option>
+                    <option value="Mar">Mar</option>
+                    <option value="Apr">Apr</option>
+                    <option value="May">May</option>
+                    <option value="Jun">Jun</option>
+                    <option value="Jul">Jul</option>
+                    <option value="Aug">Aug</option>
+                    <option value="Sep">Sep</option>
+                    <option value="Oct">Oct</option>
+                    <option value="Nov">Nov</option>
+                    <option value="Dec">Dec</option>
+                    <option value="No Open Intakes">No Open Intakes</option>
                   </select>
                 </div>
 
@@ -1082,14 +1226,31 @@ const NewUniversities = () => {
                     <option value="high">Above $20,000</option>
                   </select>
                 </div>
+
+                {/* Punjab/Haryana Restriction Filter */}
+                <div className="nu-filter-card">
+                  <label className="nu-filter-label">
+                    <MapPin size={16} />
+                    Punjab/Haryana Restriction
+                  </label>
+                  <select 
+                    className="nu-filter-select" 
+                    value={filterPunjabHaryana} 
+                    onChange={(e) => { setFilterPunjabHaryana(e.target.value); setVisibleCount(20); }}
+                  >
+                    <option value="">All</option>
+                    <option value="exclude">Exclude Punjab/Haryana Restrictions</option>
+                  </select>
+                </div>
               </div>
 
               <div className="nu-active-filters">
-                {(filterCountry || filterStudyLevel || filterScholarship || filterAppFee || filterWaiver || filterTuitionRange) && (
+                {(filterCountry || filterStudyLevel || filterScholarship || filterAppFee || filterWaiver || filterTuitionRange || filterIntake || filterPunjabHaryana) && (
                   <div className="nu-active-filters-list">
                     <span className="nu-active-label">Active Filters:</span>
                     {filterCountry && <span className="nu-filter-chip">{filterCountry} <X size={14} onClick={() => setFilterCountry("")} /></span>}
                     {filterStudyLevel && <span className="nu-filter-chip">{filterStudyLevel} <X size={14} onClick={() => setFilterStudyLevel("")} /></span>}
+                    {filterIntake && <span className="nu-filter-chip">{filterIntake} <X size={14} onClick={() => setFilterIntake("")} /></span>}
                     {filterScholarship && <span className="nu-filter-chip">Scholarship <X size={14} onClick={() => setFilterScholarship("")} /></span>}
                     {filterAppFee && <span className="nu-filter-chip">Free App <X size={14} onClick={() => setFilterAppFee("")} /></span>}
                     {filterWaiver && <span className="nu-filter-chip">Waiver <X size={14} onClick={() => setFilterWaiver("")} /></span>}
@@ -1097,6 +1258,7 @@ const NewUniversities = () => {
                       {filterTuitionRange === 'low' ? 'Under $10K' : filterTuitionRange === 'medium' ? '$10K-$20K' : 'Above $20K'}
                       <X size={14} onClick={() => setFilterTuitionRange("")} />
                     </span>}
+                    {filterPunjabHaryana && <span className="nu-filter-chip">No Punjab/Haryana <X size={14} onClick={() => setFilterPunjabHaryana("")} /></span>}
                   </div>
                 )}
               </div>
@@ -1285,39 +1447,43 @@ const NewUniversities = () => {
               {/* Nationality */}
               <div className="nu-eligibility-field">
                 <label>Nationality <span className="nu-required">*</span></label>
-                <div className="nu-select-wrapper">
-                  <Search size={18} className="nu-select-icon" />
-                  <select 
-                    value={eligibilityFilters.nationality}
-                    onChange={(e) => setEligibilityFilters({...eligibilityFilters, nationality: e.target.value})}
-                  >
-                    <option value="">Select</option>
-                    <option value="India">India</option>
-                    <option value="China">China</option>
-                    <option value="Nigeria">Nigeria</option>
-                    <option value="Pakistan">Pakistan</option>
-                    <option value="Bangladesh">Bangladesh</option>
-                  </select>
-                </div>
+                <select 
+                  value={eligibilityFilters.nationality}
+                  onChange={(e) => setEligibilityFilters({...eligibilityFilters, nationality: e.target.value})}
+                >
+                  <option value="">Select</option>
+                  <option value="Australia">Australia</option>
+                  <option value="Canada">Canada</option>
+                  <option value="France">France</option>
+                  <option value="Germany">Germany</option>
+                  <option value="Ireland">Ireland</option>
+                  <option value="Netherlands">Netherlands</option>
+                  <option value="New Zealand">New Zealand</option>
+                  <option value="Singapore">Singapore</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="United States">United States</option>
+                </select>
               </div>
 
               {/* Education Country */}
               <div className="nu-eligibility-field">
                 <label>Education Country <span className="nu-required">*</span></label>
-                <div className="nu-select-wrapper">
-                  <Search size={18} className="nu-select-icon" />
-                  <select 
-                    value={eligibilityFilters.educationCountry}
-                    onChange={(e) => setEligibilityFilters({...eligibilityFilters, educationCountry: e.target.value})}
-                  >
-                    <option value="">Select</option>
-                    <option value="India">India</option>
-                    <option value="United Kingdom">United Kingdom</option>
-                    <option value="United States">United States</option>
-                    <option value="Canada">Canada</option>
-                    <option value="Australia">Australia</option>
-                  </select>
-                </div>
+                <select 
+                  value={eligibilityFilters.educationCountry}
+                  onChange={(e) => setEligibilityFilters({...eligibilityFilters, educationCountry: e.target.value})}
+                >
+                  <option value="">Select</option>
+                  <option value="Australia">Australia</option>
+                  <option value="Canada">Canada</option>
+                  <option value="France">France</option>
+                  <option value="Germany">Germany</option>
+                  <option value="Ireland">Ireland</option>
+                  <option value="Netherlands">Netherlands</option>
+                  <option value="New Zealand">New Zealand</option>
+                  <option value="Singapore">Singapore</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="United States">United States</option>
+                </select>
               </div>
 
               {/* Last Level Of Study */}
@@ -1328,10 +1494,8 @@ const NewUniversities = () => {
                   onChange={(e) => setEligibilityFilters({...eligibilityFilters, lastLevelOfStudy: e.target.value})}
                 >
                   <option value="">Select</option>
-                  <option value="High School">High School</option>
-                  <option value="Bachelor's Degree">Bachelor's Degree</option>
-                  <option value="Master's Degree">Master's Degree</option>
-                  <option value="Doctorate">Doctorate</option>
+                  <option value="Undergraduate">Undergraduate</option>
+                  <option value="Postgraduate">Postgraduate</option>
                 </select>
               </div>
 

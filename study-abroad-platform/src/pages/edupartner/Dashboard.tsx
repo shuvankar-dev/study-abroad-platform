@@ -2091,7 +2091,7 @@ useEffect(() => {
 
           <li
             className={activeSection === "universities" ? "active" : ""}
-            onClick={() => setActiveSection("universities")}
+            onClick={() => navigate("/edupartner/new-universities")}
           >
             <GraduationCap size={18} /> Universities
           </li>
