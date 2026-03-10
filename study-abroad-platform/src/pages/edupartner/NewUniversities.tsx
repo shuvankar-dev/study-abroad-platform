@@ -4,7 +4,7 @@ import {
   Search, Filter, GraduationCap, Users, Home, FileText, 
   Building2, CreditCard, BookOpen, MessageSquare, Shield,
   ExternalLink, Heart, MapPin, Clock, DollarSign, Award,
-  Briefcase, Globe, Zap, Star, CheckCircle, ChevronDown, ChevronUp, X,
+  Globe, Zap, CheckCircle, ChevronDown, ChevronUp, X,
   Gift, FileCheck, Languages, BarChart3, Flame, Calendar, UserPlus
 } from "lucide-react";
 import { findCommissionInfo, getTierColor } from "../../data/commissionData";
@@ -275,7 +275,7 @@ const getCountryFlag = (country: string): string => {
 };
 
 /** Format currency for tuition */
-const formatTuition = (tuition?: string, country?: string): string => {
+const formatTuition = (tuition?: string): string => {
   if (!tuition || tuition === 'N/A' || tuition === '0') return 'Contact university';
   return tuition;
 };
@@ -428,10 +428,6 @@ const NewUniversities = () => {
     }
 
     setFilteredUniversities(filtered);
-  };
-
-  const handleSidebarNavigation = (section: string) => {
-    navigate(`/edupartner/dashboard?section=${section}`);
   };
 
   const toggleFavorite = (e: React.MouseEvent, id: number) => {
@@ -939,7 +935,7 @@ const NewUniversities = () => {
                   <div className="nu-fee-grid">
                     <div className="nu-fee-item">
                       <span className="nu-fee-label">Tuition (1st year)</span>
-                      <span className="nu-fee-value">{formatTuition(uni.Yearly_Tuition_Fees, uni.Country)}</span>
+                      <span className="nu-fee-value">{formatTuition(uni.Yearly_Tuition_Fees)}</span>
                     </div>
                     <div className="nu-fee-item">
                       <span className="nu-fee-label">Application Fee</span>
@@ -1360,7 +1356,7 @@ const NewUniversities = () => {
                           </div>
                           <div className="nu-card-detail-row">
                             <span className="nu-card-detail-label">Tuition (1st year)</span>
-                            <span className="nu-card-detail-value">{formatTuition(uni.Yearly_Tuition_Fees, uni.Country)}</span>
+                            <span className="nu-card-detail-value">{formatTuition(uni.Yearly_Tuition_Fees)}</span>
                           </div>
                           <div className="nu-card-detail-row">
                             <span className="nu-card-detail-label">Application fee</span>

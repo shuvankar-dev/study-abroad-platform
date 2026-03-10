@@ -105,7 +105,7 @@ const Login = () => {
         </div>
 
         <div style={{ fontSize: '14px', opacity: 0.8 }}>
-          © 2024 EduPartner. Powered by <strong>CodeScholar Oversea</strong>. All rights reserved.
+          © 2024 EduPartner. Powered by <a href="https://codescholaroverseas.com/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><strong>CodeScholar Overseas</strong></a>. All rights reserved.
         </div>
       </div>
 
