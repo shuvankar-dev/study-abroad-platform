@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Edit, Trash2, Calendar, User, FileText, Search, Filter } from 'lucide-react';
-import ReactQuill from 'react-quill-new';  // Changed from 'react-quill'
-import 'react-quill-new/dist/quill.snow.css';  // Changed from 'react-quill/dist/quill.snow.css'
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
@@ -51,35 +51,6 @@ export default function AdminBlog() {
     featured_image: '',
     status: 'draft' as 'draft' | 'published'
   });
-
-  // Quill editor configuration
-  const quillModules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'align': [] }],
-      ['blockquote', 'code-block'],
-      ['link', 'image', 'video'],
-      ['clean']
-    ]
-  };
-
-  const quillFormats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike',
-    'color', 'background',
-    'script',
-    'list', 'bullet', 'indent',
-    'align',
-    'blockquote', 'code-block',
-    'link', 'image', 'video'
-  ];
 
   useEffect(() => {
     fetchPosts();
@@ -519,6 +490,29 @@ export default function AdminBlog() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Featured Image
                     </label>
+
+                    {/* Current image preview */}
+                    {formData.featured_image && (
+                      <div className="mb-3 relative inline-block">
+                        <img
+                          src={getImageUrl(formData.featured_image)}
+                          alt="Current featured"
+                          className="h-24 w-full object-cover rounded-lg border border-gray-200"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, featured_image: '' });
+                            setSelectedFile(null);
+                          }}
+                          className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded hover:bg-red-700"
+                        >
+                          ✕ Clear
+                        </button>
+                        <p className="text-xs text-gray-500 mt-1 truncate">{formData.featured_image}</p>
+                      </div>
+                    )}
                     
                     <div className="flex gap-2 mb-3">
                       <button
@@ -547,11 +541,11 @@ export default function AdminBlog() {
 
                     {uploadType === 'url' ? (
                       <input
-                        type="url"
+                        type="text"
                         value={formData.featured_image}
                         onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="https://example.com/image.jpg"
+                        placeholder="https://example.com/image.jpg or uploads/blog/filename.png"
                       />
                     ) : (
                       <div>
@@ -593,29 +587,38 @@ export default function AdminBlog() {
                 </div>
               </div>
               
-              {/* Rich Text Editor for Content */}
+              {/* CKEditor 5 Rich Text Editor for Content */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Content * <span className="text-xs text-gray-500">(Use toolbar for formatting)</span>
                 </label>
-                <div className="border border-gray-300 rounded-lg overflow-hidden">
-                  <ReactQuill
-                    theme="snow"
-                    value={formData.content}
-                    onChange={(content) => setFormData({ ...formData, content })}
-                    modules={quillModules}
-                    formats={quillFormats}
-                    placeholder="Write your blog post content here... Use the toolbar above to format text."
-                    className="bg-white"
-                    style={{ height: '400px' }}
+                <div className="border border-gray-300 rounded-lg overflow-hidden" style={{ minHeight: '450px' }}>
+                  <CKEditor
+                    editor={ClassicEditor as any}
+                    data={formData.content}
+                    onChange={(_event: any, editor: any) => {
+                      const data = editor.getData();
+                      setFormData(prev => ({ ...prev, content: data }));
+                    }}
+                    config={{
+                      toolbar: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', 'strikethrough', '|',
+                        'bulletedList', 'numberedList', '|',
+                        'indent', 'outdent', '|',
+                        'link', 'blockQuote', '|',
+                        'undo', 'redo'
+                      ],
+                      placeholder: 'Write your blog post content here...'
+                    }}
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Tip: You can add headings, lists, links, images, and format text using the toolbar above.
+                  Tip: Use the toolbar to format text, add headings, lists, links, and images.
                 </p>
               </div>
               
-              <div className="flex items-center gap-3 pt-4 border-t mt-16">
+              <div className="flex items-center gap-3 pt-4 border-t mt-4">
                 <button
                   type="submit"
                   disabled={loading}

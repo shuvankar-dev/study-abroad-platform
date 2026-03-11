@@ -220,12 +220,13 @@ const BlogDetail = () => {
           </div>
         )}
 
-        <div className="prose prose-lg max-w-none mb-12">
-          <div 
-            className="text-gray-700 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
-        </div>
+        <div 
+          className="prose prose-lg max-w-none mb-12 prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-a:text-blue-600"
+          dangerouslySetInnerHTML={{ __html: blog.content
+            .replace(/<p>(\s|&nbsp;)*<\/p>/gi, '')
+            .replace(/<p><br\s*\/?><\/p>/gi, '')
+          }}
+        />
 
         <div className="mt-12 pt-8 border-t border-gray-200">
           <Link 

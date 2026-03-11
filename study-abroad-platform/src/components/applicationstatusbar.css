@@ -1,0 +1,225 @@
+.application-status-bar {
+  width: 100%;
+  padding: 2rem 2rem;
+  background: transparent;
+  border-radius: 0;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.application-status-bar.compact {
+  padding: 1rem 1rem;
+  background: transparent;
+  margin: 1rem 0;
+}
+
+.status-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  min-width: 800px;
+}
+
+/* Progress Bar Background and Fill */
+.progress-bar-background {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  z-index: 0;
+}
+
+.progress-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.compact .progress-bar-background {
+  height: 3px;
+}
+
+.status-step-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.status-step-wrapper:first-child {
+  flex: 0 0 auto;
+}
+
+.status-step-wrapper:last-child {
+  flex: 0 0 auto;
+}
+
+.status-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Icon Container - ensures uniform height */
+.status-step > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  min-width: 24px;
+}
+
+.compact .status-step > div:first-child {
+  min-height: 20px;
+  min-width: 20px;
+}
+
+/* Completed Step Indicator - Green Circle with Checkmark */
+.completed-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #10b981;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: none;
+  box-shadow: 0 0 0 4px #ffffff;
+  position: relative;
+  z-index: 2;
+}
+
+.completed-indicator svg {
+  width: 14px;
+  height: 14px;
+}
+
+.compact .completed-indicator {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 0 0 3px #ffffff;
+}
+
+.compact .completed-indicator svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Step Dot (for active and future) - Same size as completed indicator */
+.step-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  border: none;
+  box-shadow: 0 0 0 4px #ffffff;
+  position: relative;
+  z-index: 2;
+}
+
+.active-dot {
+  background: #3b82f6;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 6px rgba(59, 130, 246, 0.2);
+}
+
+.future-dot {
+  background: #d1d5db;
+}
+
+.compact .step-dot {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 0 0 3px #ffffff;
+}
+
+.compact .active-dot {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 5px rgba(59, 130, 246, 0.2);
+}
+
+/* Step Label */
+.step-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-align: center;
+  max-width: 100px;
+  line-height: 1.3;
+  word-wrap: break-word;
+  margin-top: 0.5rem;
+}
+
+.status-step.completed .step-label {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.status-step.active .step-label {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.compact .step-label {
+  font-size: 0.7rem;
+  max-width: 85px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .step-label {
+    font-size: 0.7rem;
+    max-width: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .application-status-bar {
+    padding: 1.5rem 1rem;
+    overflow-x: auto;
+  }
+  
+  .status-steps {
+    min-width: 750px;
+  }
+  
+  .step-label {
+    font-size: 0.65rem;
+    max-width: 75px;
+  }
+  
+  .completed-indicator,
+  .step-dot {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .completed-indicator svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .progress-bar-background {
+    height: 3px;
+    top: 10px;
+  }
+  
+  .status-steps {
+    padding-top: 10px;
+  }
+}
