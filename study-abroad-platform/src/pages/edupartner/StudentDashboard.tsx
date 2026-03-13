@@ -21,6 +21,9 @@ interface Application {
   status: string;
   application_status?: string;
   submitted: string;
+  offer_letter_file?: string;
+  offer_letter_original_name?: string;
+  offer_letter_uploaded_at?: string;
 }
 
 interface StudentDocument {
@@ -88,6 +91,13 @@ const StudentDashboard = () => {
   const [showStudentStatusManager, setShowStudentStatusManager] = useState(false);
   const [userRole, setUserRole] = useState("");
   const [isAdminOrSuper, setIsAdminOrSuper] = useState(false);
+  const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
+  const [isUploadingOffer, setIsUploadingOffer] = useState(false);
+  const [extraDoc1File, setExtraDoc1File] = useState<File | null>(null);
+  const [extraDoc1Label, setExtraDoc1Label] = useState("");
+  const [extraDoc2File, setExtraDoc2File] = useState<File | null>(null);
+  const [extraDoc2Label, setExtraDoc2Label] = useState("");
+  const [isUploadingExtra, setIsUploadingExtra] = useState(false);
 
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost/studyabroadplatform-api'
@@ -135,6 +145,7 @@ const StudentDashboard = () => {
     try {
       const res = await fetch(`${API_BASE}/edupartner/get_student_documents.php?student_id=${studentId}`);
       const data = await res.json();
+      console.log('Fetched documents:', data); // Debug log
       if (data.success) {
         setStudentDocuments(data.documents);
       }
@@ -193,6 +204,103 @@ const StudentDashboard = () => {
     }
   };
 
+  const handleOfferLetterUpload = async () => {
+    if (!offerLetterFile || !selectedApp) return;
+
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    
+    if (user.role !== "Super Admin" && user.role !== "Admin") {
+      alert("Only Super Admin and Admin can upload offer letters");
+      return;
+    }
+
+    setIsUploadingOffer(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("offer_letter", offerLetterFile);
+      formData.append("application_id", selectedApp.id.toString());
+      formData.append("user_id", user.id.toString());
+      formData.append("user_role", user.role);
+
+      const res = await fetch(`${API_BASE}/edupartner/upload_offer_letter.php`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Offer letter uploaded successfully!");
+        setOfferLetterFile(null);
+        fetchApplications();
+        if (selectedApp) {
+          fetchAppStatusHistory(selectedApp.id);
+        }
+      } else {
+        alert(data.message || "Failed to upload offer letter");
+      }
+    } catch (err) {
+      console.error("Error uploading offer letter:", err);
+      alert("Error uploading offer letter");
+    } finally {
+      setIsUploadingOffer(false);
+    }
+  };
+
+  const handleDownloadOfferLetter = (applicationId: number) => {
+    window.open(`${API_BASE}/edupartner/download_offer_letter.php?application_id=${applicationId}`, '_blank');
+  };
+
+  const handleViewDocument = (documentId: number) => {
+    window.open(`${API_BASE}/edupartner/view_document.php?document_id=${documentId}`, '_blank');
+  };
+
+  const handleExtraDocUpload = async (docType: string) => {
+    const file = docType === 'extra_doc_1' ? extraDoc1File : extraDoc2File;
+    const label = docType === 'extra_doc_1' ? extraDoc1Label : extraDoc2Label;
+
+    if (!file || !label.trim() || !studentId) return;
+
+    setIsUploadingExtra(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("document", file);
+      formData.append("student_id", studentId);
+      formData.append("document_type", docType);
+      formData.append("document_label", label.trim());
+
+      const res = await fetch(`${API_BASE}/edupartner/upload_student_documents.php`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      console.log('Upload response:', data); // Debug log
+
+      if (data.success) {
+        alert(`${label} uploaded successfully!`);
+        if (docType === 'extra_doc_1') {
+          setExtraDoc1File(null);
+          setExtraDoc1Label("");
+        } else {
+          setExtraDoc2File(null);
+          setExtraDoc2Label("");
+        }
+        await fetchDocuments(); // Refresh document list
+      } else {
+        alert(data.message || "Failed to upload document");
+      }
+    } catch (err) {
+      console.error("Error uploading extra document:", err);
+      alert("Error uploading document");
+    } finally {
+      setIsUploadingExtra(false);
+    }
+  };
+
   const handleViewDetails = (app: Application) => {
     setSelectedApp(app);
     setShowStatusManager(false);
@@ -231,7 +339,13 @@ const StudentDashboard = () => {
     }
   };
 
-  const getDocumentTypeLabel = (type: string) => {
+  const getDocumentTypeLabel = (type: string, fileName?: string) => {
+    // For extra documents, use the file name (which contains the custom label)
+    if ((type === 'extra_doc_1' || type === 'extra_doc_2') && fileName) {
+      // Remove the file extension to show just the label
+      return fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+    }
+    
     const labels: Record<string, string> = {
       passport: "Passport",
       "10th_marksheet": "10th Marksheet",
@@ -243,7 +357,9 @@ const StudentDashboard = () => {
       sop: "Statement of Purpose (SOP)",
       cv: "CV / Resume",
       gap_certificate: "Gap Certificate",
-      work_experience: "Work Experience"
+      work_experience: "Work Experience",
+      extra_doc_1: "Extra Document",
+      extra_doc_2: "Extra Document"
     };
     return labels[type] || type.replace(/_/g, " ");
   };
@@ -390,7 +506,7 @@ const StudentDashboard = () => {
                   {getFileIcon(doc.file_name)}
                 </div>
                 <div className="doc-card-info">
-                  <div className="doc-type-label">{getDocumentTypeLabel(doc.document_type)}</div>
+                  <div className="doc-type-label">{getDocumentTypeLabel(doc.document_type, doc.file_name)}</div>
                   <div className="doc-file-name" title={doc.file_name}>{doc.file_name}</div>
                   <div className="doc-meta">
                     <span>{doc.file_size_mb} MB</span>
@@ -398,6 +514,18 @@ const StudentDashboard = () => {
                   </div>
                 </div>
                 <div className="doc-card-actions">
+                  {(doc.file_name.toLowerCase().endsWith('.pdf') || 
+                    doc.file_name.toLowerCase().endsWith('.jpg') || 
+                    doc.file_name.toLowerCase().endsWith('.jpeg') || 
+                    doc.file_name.toLowerCase().endsWith('.png')) && (
+                    <button
+                      onClick={() => handleViewDocument(doc.id)}
+                      className="doc-action-btn view"
+                      title="View"
+                    >
+                      <Eye size={16} />
+                    </button>
+                  )}
                   <a
                     href={`${API_BASE}/edupartner/download_document.php?document_id=${doc.id}`}
                     className="doc-action-btn download"
@@ -412,6 +540,78 @@ const StudentDashboard = () => {
             ))}
           </div>
         )}
+
+        {/* Extra Documents Upload - Available for all roles */}
+        <div className="extra-docs-upload-section">
+          <h3>Upload Additional Documents</h3>
+          <p className="extra-docs-info">If university requests additional documents, you can upload them here</p>
+            
+          <div className="extra-docs-grid">
+            {/* Extra Doc 1 */}
+            <div className="extra-doc-upload-card">
+              <input
+                type="text"
+                placeholder="Document name (e.g., Financial Statement)"
+                value={extraDoc1Label}
+                onChange={(e) => setExtraDoc1Label(e.target.value)}
+                className="extra-doc-name-input"
+              />
+              <div className="extra-doc-upload-controls">
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  onChange={(e) => setExtraDoc1File(e.target.files?.[0] || null)}
+                  className="file-input"
+                  id="extra-doc1-main"
+                />
+                <label htmlFor="extra-doc1-main" className="btn-choose-file-compact">
+                  {extraDoc1File ? extraDoc1File.name : 'Choose File'}
+                </label>
+                {extraDoc1File && extraDoc1Label.trim() && (
+                  <button
+                    className="btn-upload-compact"
+                    onClick={() => handleExtraDocUpload('extra_doc_1')}
+                    disabled={isUploadingExtra}
+                  >
+                    {isUploadingExtra ? 'Uploading...' : 'Upload'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Extra Doc 2 */}
+            <div className="extra-doc-upload-card">
+              <input
+                type="text"
+                placeholder="Document name (e.g., Medical Certificate)"
+                value={extraDoc2Label}
+                onChange={(e) => setExtraDoc2Label(e.target.value)}
+                className="extra-doc-name-input"
+              />
+              <div className="extra-doc-upload-controls">
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  onChange={(e) => setExtraDoc2File(e.target.files?.[0] || null)}
+                  className="file-input"
+                  id="extra-doc2-main"
+                />
+                <label htmlFor="extra-doc2-main" className="btn-choose-file-compact">
+                  {extraDoc2File ? extraDoc2File.name : 'Choose File'}
+                </label>
+                {extraDoc2File && extraDoc2Label.trim() && (
+                  <button
+                    className="btn-upload-compact"
+                    onClick={() => handleExtraDocUpload('extra_doc_2')}
+                    disabled={isUploadingExtra}
+                  >
+                    {isUploadingExtra ? 'Uploading...' : 'Upload'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Applications Section */}
@@ -516,6 +716,66 @@ const StudentDashboard = () => {
                 <div className="detail-section">
                   <h3><FileText size={18} /> Additional Notes</h3>
                   <p>{selectedApp.additional_notes}</p>
+                </div>
+              )}
+
+              {/* Offer Letter Section - Show when status is awaiting_school_decision or later */}
+              {selectedApp.application_status && 
+               ['awaiting_school_decision', 'admission_processing', 'pre_arrival', 'arrival'].includes(selectedApp.application_status) && (
+                <div className="detail-section offer-letter-section">
+                  <h3><FileText size={18} /> Offer Letter</h3>
+                  
+                  {selectedApp.offer_letter_file ? (
+                    <div className="offer-letter-info">
+                      <div className="offer-letter-details">
+                        <File size={20} className="offer-icon" />
+                        <div>
+                          <p className="offer-filename">{selectedApp.offer_letter_original_name}</p>
+                          <p className="offer-date">Uploaded: {selectedApp.offer_letter_uploaded_at}</p>
+                        </div>
+                      </div>
+                      <button 
+                        className="btn-download-offer"
+                        onClick={() => handleDownloadOfferLetter(selectedApp.id)}
+                      >
+                        <Download size={16} /> Download
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="no-offer-letter">
+                      {isAdminOrSuper ? (
+                        <div className="upload-offer-section">
+                          <p className="upload-info">No offer letter uploaded yet</p>
+                          <div className="upload-offer-controls">
+                            <input
+                              type="file"
+                              accept=".pdf"
+                              onChange={(e) => setOfferLetterFile(e.target.files?.[0] || null)}
+                              className="file-input"
+                              id="offer-letter-input"
+                            />
+                            <label htmlFor="offer-letter-input" className="btn-choose-file">
+                              Choose PDF File
+                            </label>
+                            {offerLetterFile && (
+                              <div className="selected-file-info">
+                                <span>{offerLetterFile.name}</span>
+                                <button
+                                  className="btn-upload-offer"
+                                  onClick={handleOfferLetterUpload}
+                                  disabled={isUploadingOffer}
+                                >
+                                  {isUploadingOffer ? 'Uploading...' : 'Upload Offer Letter'}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="no-offer-message">No offer letter available yet</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
