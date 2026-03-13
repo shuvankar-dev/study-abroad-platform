@@ -5,7 +5,7 @@ import {
   Building2, CreditCard, BookOpen, MessageSquare, Shield,
   ExternalLink, Heart, MapPin, Clock, DollarSign, Award,
   Globe, Zap, CheckCircle, ChevronDown, ChevronUp, X,
-  Gift, FileCheck, Languages, BarChart3, Flame, Calendar, UserPlus
+  Gift, FileCheck, Languages, BarChart3, Flame, Calendar, UserPlus, Menu
 } from "lucide-react";
 import { findCommissionInfo, getTierColor } from "../../data/commissionData";
 import "./newuniversities.css";
@@ -320,6 +320,7 @@ const NewUniversities = () => {
   // Track logo loading stage per uni: 0=clearbit, 1=google-favicon, 2=fallback
   const [logoStage, setLogoStage] = useState<Record<number, number>>({});
   const [visibleCount, setVisibleCount] = useState(20);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Get user info
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -572,71 +573,76 @@ const NewUniversities = () => {
 
   // ---------- SIDEBAR (same as Dashboard) ----------
   const Sidebar = () => (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <GraduationCap size={24} /> <span>EduPartner</span>
-      </div>
+    <>
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className="sidebar-brand">
+          <GraduationCap size={24} /> <span>EduPartner</span>
+          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
+            <X size={20} />
+          </button>
+        </div>
 
-      <ul className="menu">
-        <li onClick={() => navigate("/edupartner/dashboard")}>
-          <Home size={18} /> Dashboard
-        </li>
-
-        <li className="active">
-          <GraduationCap size={18} /> Universities
-        </li>
-
-        <li onClick={() => navigate("/edupartner/students")}>
-          <Users size={18} /> Students
-        </li>
-
-        {userRole === "Admin" && !isSuperAdmin && (
-          <li onClick={() => navigate("/edupartner/dashboard?section=agents")}>
-            <UserPlus size={18} /> Agents
+        <ul className="menu">
+          <li onClick={() => { navigate("/edupartner/dashboard"); setSidebarOpen(false); }}>
+            <Home size={18} /> Dashboard
           </li>
-        )}
 
-        {isSuperAdmin && (
-          <li onClick={() => navigate("/edupartner/dashboard?section=admins")}>
-            <Shield size={18} /> Admins
+          <li className="active" onClick={() => setSidebarOpen(false)}>
+            <GraduationCap size={18} /> Universities
           </li>
-        )}
 
-        {userRole === "Agent" && (
-          <li onClick={() => navigate("/edupartner/dashboard?section=counselors")}>
-            <UserPlus size={18} /> Counselors
+          <li onClick={() => { navigate("/edupartner/students"); setSidebarOpen(false); }}>
+            <Users size={18} /> Students
           </li>
-        )}
 
-        <li onClick={() => navigate("/edupartner/dashboard?section=applications")}>
-          <FileText size={18} /> Applications
-        </li>
+          {userRole === "Admin" && !isSuperAdmin && (
+            <li onClick={() => { navigate("/edupartner/dashboard?section=agents"); setSidebarOpen(false); }}>
+              <UserPlus size={18} /> Agents
+            </li>
+          )}
 
-        {userRole !== "Counselor" && (
-          <li onClick={() => navigate("/edupartner/dashboard?section=commissions")}>
-            <DollarSign size={18} /> Commissions
+          {isSuperAdmin && (
+            <li onClick={() => { navigate("/edupartner/dashboard?section=admins"); setSidebarOpen(false); }}>
+              <Shield size={18} /> Admins
+            </li>
+          )}
+
+          {userRole === "Agent" && (
+            <li onClick={() => { navigate("/edupartner/dashboard?section=counselors"); setSidebarOpen(false); }}>
+              <UserPlus size={18} /> Counselors
+            </li>
+          )}
+
+          <li onClick={() => { navigate("/edupartner/dashboard?section=applications"); setSidebarOpen(false); }}>
+            <FileText size={18} /> Applications
           </li>
-        )}
 
-        <li onClick={() => navigate("/edupartner/dashboard?section=accommodation")}>
-          <Building2 size={18} /> Accommodation
-        </li>
+          {userRole !== "Counselor" && (
+            <li onClick={() => { navigate("/edupartner/dashboard?section=commissions"); setSidebarOpen(false); }}>
+              <DollarSign size={18} /> Commissions
+            </li>
+          )}
 
-        <li onClick={() => navigate("/edupartner/dashboard?section=loan")}>
-          <CreditCard size={18} /> Loan Services
-        </li>
+          <li onClick={() => { navigate("/edupartner/dashboard?section=accommodation"); setSidebarOpen(false); }}>
+            <Building2 size={18} /> Accommodation
+          </li>
 
-        <li onClick={() => navigate("/edupartner/dashboard?section=testprep")}>
-          <BookOpen size={18} /> Test Prep
-        </li>
+          <li onClick={() => { navigate("/edupartner/dashboard?section=loan"); setSidebarOpen(false); }}>
+            <CreditCard size={18} /> Loan Services
+          </li>
 
-        <li onClick={() => navigate("/edupartner/dashboard?section=teamchat")}>
-          <MessageSquare size={18} /> Team Chat
-        </li>
+          <li onClick={() => { navigate("/edupartner/dashboard?section=testprep"); setSidebarOpen(false); }}>
+            <BookOpen size={18} /> Test Prep
+          </li>
 
-        {userRole === "Admin" && (
-          <li onClick={() => navigate("/edupartner/dashboard?section=permissions")}>
-            <Shield size={18} /> Permissions
+          <li onClick={() => { navigate("/edupartner/dashboard?section=teamchat"); setSidebarOpen(false); }}>
+            <MessageSquare size={18} /> Team Chat
+          </li>
+
+          {userRole === "Admin" && (
+            <li onClick={() => { navigate("/edupartner/dashboard?section=permissions"); setSidebarOpen(false); }}>
+              <Shield size={18} /> Permissions
           </li>
         )}
       </ul>
@@ -649,6 +655,7 @@ const NewUniversities = () => {
         </div>
       </div>
     </aside>
+    </>
   );
 
   // ---------- DETAIL VIEW ----------
@@ -998,9 +1005,14 @@ const NewUniversities = () => {
       <Sidebar />
 
       <main className="main-content">
+        {/* Mobile menu button */}
+        <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+          <Menu size={24} />
+        </button>
+
         <div className="nu-content">
           {/* Header - Single Line with Search on Right */}
-          <div style={{ 
+          <div className="nu-header-row" style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center', 
@@ -1019,7 +1031,7 @@ const NewUniversities = () => {
               gap: '12px', 
               alignItems: 'center'
             }}>
-              <div style={{ position: 'relative', width: '400px' }}>
+              <div className="nu-search-wrapper" style={{ position: 'relative', width: '400px' }}>
                 <Search size={18} className="nu-search-icon" />
                 <input
                   type="text"

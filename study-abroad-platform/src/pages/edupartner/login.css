@@ -2,11 +2,9 @@
   display: flex;
   min-height: 100vh;
   width: 100%;
-  overflow: hidden;
 }
 
-/* LEFT SIDE */
-
+/* LEFT SIDE - Branding */
 .login-left {
   flex: 1;
   padding: 60px;
@@ -43,10 +41,6 @@
   margin-bottom: 20px;
 }
 
-.left-content h1 span {
-  opacity: 0.85;
-}
-
 .left-content p {
   max-width: 520px;
   font-size: 18px;
@@ -59,22 +53,19 @@
   opacity: 0.8;
 }
 
-/* RIGHT SIDE */
-
+/* RIGHT SIDE - Login Form */
 .login-right {
   flex: 1;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 40px;
 }
 
 .login-card {
-  width: 420px;
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 14px;
-  box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 420px;
 }
 
 .login-card h2 {
@@ -86,10 +77,10 @@
 .subtitle {
   color: #6b7280;
   margin-bottom: 30px;
+  font-size: 15px;
 }
 
 /* FORM */
-
 .form-group {
   margin-bottom: 22px;
 }
@@ -109,6 +100,7 @@
   border-radius: 8px;
   padding: 12px;
   gap: 10px;
+  background: #ffffff;
 }
 
 .input-box input {
@@ -121,10 +113,10 @@
 .icon {
   font-size: 16px;
   color: #6b7280;
+  flex-shrink: 0;
 }
 
 /* BUTTON */
-
 .signin-btn {
   width: 100%;
   padding: 14px;
@@ -143,7 +135,6 @@
 }
 
 /* REGISTER */
-
 .register-text {
   margin-top: 20px;
   text-align: center;
@@ -158,128 +149,71 @@
 }
 
 /* ============================================ */
-/* MOBILE RESPONSIVE STYLES */
+/* MOBILE RESPONSIVE - TABLET */
 /* ============================================ */
-
-@media (max-width: 768px) {
-  .login-container {
-    flex-direction: column-reverse;
-    min-height: 100vh;
-    height: auto;
-    overflow-y: auto;
-  }
-
+@media (max-width: 968px) {
   .login-left {
-    flex: none;
-    padding: 30px 24px 40px 24px;
-    min-height: auto;
-    height: auto;
-  }
-
-  .brand {
-    font-size: 18px;
-    margin-bottom: 20px;
-  }
-
-  .logo-box {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-  }
-
-  .left-content {
-    margin-bottom: 20px;
+    padding: 40px;
   }
 
   .left-content h1 {
-    font-size: 28px;
-    margin-bottom: 12px;
-    line-height: 1.3;
-  }
-
-  .left-content p {
-    font-size: 15px;
-    max-width: 100%;
-    line-height: 1.5;
-  }
-
-  .copyright {
-    font-size: 12px;
-    margin-top: 0;
+    font-size: 40px;
   }
 
   .login-right {
-    flex: none;
-    padding: 40px 24px 40px 24px;
-    background: #ffffff;
-    min-height: auto;
+    padding: 40px 30px;
+  }
+}
+
+/* ============================================ */
+/* MOBILE RESPONSIVE - PHONE */
+/* ============================================ */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column !important;
+  }
+
+  /* HIDE branding on mobile */
+  .login-left {
+    display: none !important;
+  }
+
+  /* SHOW only login form - full width */
+  .login-right {
+    flex: none !important;
+    width: 100% !important;
+    min-height: 100vh;
+    padding: 40px 24px !important;
   }
 
   .login-card {
-    width: 100%;
     max-width: 100%;
-    padding: 0;
-    box-shadow: none;
-    background: transparent;
   }
 
   .login-card h2 {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .subtitle {
     font-size: 14px;
-    margin-bottom: 24px;
-  }
-
-  .form-group {
-    margin-bottom: 20px;
   }
 }
 
+/* ============================================ */
+/* MOBILE RESPONSIVE - SMALL PHONE */
+/* ============================================ */
 @media (max-width: 480px) {
-  .login-left {
-    padding: 30px 20px 24px 20px;
-  }
-
-  .brand {
-    font-size: 16px;
-    margin-bottom: 16px;
-  }
-
-  .logo-box {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  .left-content h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .left-content p {
-    font-size: 14px;
-  }
-
-  .copyright {
-    font-size: 11px;
-  }
-
   .login-right {
-    padding: 32px 20px 50px 20px;
-  }
-
-  .login-card {
-    padding: 0;
+    padding: 32px 20px;
   }
 
   .login-card h2 {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .subtitle {
     font-size: 13px;
+    margin-bottom: 24px;
   }
 
   .form-group {
@@ -291,7 +225,7 @@
   }
 
   .input-box {
-    padding: 10px 12px;
+    padding: 11px 12px;
   }
 
   .input-box input {
@@ -299,11 +233,49 @@
   }
 
   .signin-btn {
-    padding: 12px;
+    padding: 13px;
     font-size: 15px;
   }
 
   .register-text {
     font-size: 13px;
+  }
+}
+
+/* ============================================ */
+/* MOBILE RESPONSIVE - EXTRA SMALL */
+/* ============================================ */
+@media (max-width: 375px) {
+  .login-right {
+    padding: 28px 16px;
+  }
+
+  .login-card h2 {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+  }
+
+  .input-box {
+    padding: 10px;
+  }
+
+  .input-box input {
+    font-size: 13px;
+  }
+
+  .signin-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .register-text {
+    font-size: 12px;
   }
 }

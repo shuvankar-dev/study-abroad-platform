@@ -21,6 +21,7 @@
   height: 100vh;
   overflow-y: auto;
   z-index: 50;
+  transition: left 0.3s ease;
 }
 
 .sidebar-brand {
@@ -1461,14 +1462,46 @@
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 200px;
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    z-index: 1000;
   }
-  
+
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .main-content {
-    margin-left: 200px;
+    margin-left: 0;
     padding: 16px;
   }
-  
+
   .nu-filters-row {
     flex-direction: column;
   }
@@ -1477,6 +1510,60 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+  }
+
+  .nu-page-title {
+    font-size: 20px;
+  }
+
+  .nu-card-body {
+    padding: 16px 16px 0;
+  }
+
+  .nu-card-footer {
+    padding: 14px 16px;
+  }
+
+  .nu-detail-header-card {
+    padding: 20px;
+  }
+
+  .nu-detail-uni-title {
+    font-size: 22px;
+  }
+
+  .nu-detail-section-card {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    margin-left: 0;
+    padding: 12px;
+  }
+
+  .nu-page-title {
+    font-size: 18px;
+  }
+
+  .nu-card {
+    min-height: auto;
+  }
+
+  .nu-detail-header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .nu-detail-logo-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nu-detail-meta-tags {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
@@ -1915,5 +2002,37 @@
   .nu-modal-btn-secondary,
   .nu-modal-btn-primary {
     width: 100%;
+  }
+}
+
+/* ===== NewUniversities Header Responsive ===== */
+@media (max-width: 768px) {
+  .nu-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .nu-header-row > div:last-child {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .nu-search-wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .nu-content {
+    padding: 16px !important;
+  }
+  .nu-filters-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .nu-page-title {
+    font-size: 20px !important;
+  }
+  .nu-page-subtitle {
+    font-size: 13px !important;
   }
 }

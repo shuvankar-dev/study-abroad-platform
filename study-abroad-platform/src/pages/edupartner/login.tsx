@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, Lock, GraduationCap, ArrowRight, AlertCircle } from "lucide-react";
+import "./login.css";
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
@@ -50,14 +51,14 @@ const Login = () => {
   };
 
   return (
-    <div style={{ 
+    <div className="login-container" style={{ 
       display: 'flex', 
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     }}>
       
       {/* LEFT SECTION */}
-      <div style={{
+      <div className="login-left" style={{
         flex: 1,
         padding: '60px',
         color: '#ffffff',
@@ -110,7 +111,7 @@ const Login = () => {
       </div>
 
       {/* RIGHT SECTION */}
-      <div style={{
+      <div className="login-right" style={{
         flex: 1,
         background: '#ffffff',
         display: 'flex',

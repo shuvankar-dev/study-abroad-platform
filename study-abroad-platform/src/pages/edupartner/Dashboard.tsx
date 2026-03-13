@@ -7,7 +7,7 @@ import {
   CreditCard, BookOpen, MessageSquare, Shield, User, 
   LogOut, Plus, Search, Filter, Clock,
   TrendingUp, CheckCircle, AlertCircle, Mail, Phone, Globe, 
-  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame
+  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame, Menu
 } from "lucide-react";
 import { findCommissionInfo, getTierColor } from "../../data/commissionData";
 
@@ -72,6 +72,7 @@ const Dashboard = () => {
   const initialSection = searchParams.get("section") || "dashboard";
   const [activeSection, setActiveSection] = useState(initialSection);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showAccommodationModal, setShowAccommodationModal] = useState(false);
   const [showLoanModal, setShowLoanModal] = useState(false);
@@ -2075,30 +2076,36 @@ useEffect(() => {
   return (
     <div className="dashboard-container">
 
+      {/* MOBILE OVERLAY */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+
       {/* SIDEBAR */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-brand">
           <GraduationCap size={24} /> <span>EduPartner</span>
+          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
+            <X size={20} />
+          </button>
         </div>
 
         <ul className="menu">
           <li
             className={activeSection === "dashboard" ? "active" : ""}
-            onClick={() => setActiveSection("dashboard")}
+            onClick={() => { setActiveSection("dashboard"); setSidebarOpen(false); }}
           >
             <Home size={18} /> Dashboard
           </li>
 
           <li
             className={activeSection === "universities" ? "active" : ""}
-            onClick={() => navigate("/edupartner/new-universities")}
+            onClick={() => { navigate("/edupartner/new-universities"); setSidebarOpen(false); }}
           >
             <GraduationCap size={18} /> Universities
           </li>
 
           <li
             className={activeSection === "students" ? "active" : ""}
-            onClick={() => navigate("/edupartner/students")}
+            onClick={() => { navigate("/edupartner/students"); setSidebarOpen(false); }}
             >
             <Users size={18} /> Students
           </li>
@@ -2106,7 +2113,7 @@ useEffect(() => {
           {userRole === "Admin" && !isSuperAdmin && (
             <li
               className={activeSection === "agents" ? "active" : ""}
-              onClick={() => setActiveSection("agents")}
+              onClick={() => { setActiveSection("agents"); setSidebarOpen(false); }}
             >
               <UserPlus size={18} /> Agents
             </li>
@@ -2115,7 +2122,7 @@ useEffect(() => {
           {isSuperAdmin && (
             <li
               className={activeSection === "admins" ? "active" : ""}
-              onClick={() => setActiveSection("admins")}
+              onClick={() => { setActiveSection("admins"); setSidebarOpen(false); }}
             >
               <Shield size={18} /> Admins
             </li>
@@ -2124,7 +2131,7 @@ useEffect(() => {
           {userRole === "Agent" && (
             <li
               className={activeSection === "counselors" ? "active" : ""}
-              onClick={() => setActiveSection("counselors")}
+              onClick={() => { setActiveSection("counselors"); setSidebarOpen(false); }}
             >
               <UserPlus size={18} /> Counselors
             </li>
@@ -2132,7 +2139,7 @@ useEffect(() => {
 
           <li
             className={activeSection === "applications" ? "active" : ""}
-            onClick={() => setActiveSection("applications")}
+            onClick={() => { setActiveSection("applications"); setSidebarOpen(false); }}
             >
             <FileText size={18} /> Applications
             </li>
@@ -2140,7 +2147,7 @@ useEffect(() => {
           {userRole !== "Counselor" && (
             <li
               className={activeSection === "commissions" ? "active" : ""}
-              onClick={() => setActiveSection("commissions")}
+              onClick={() => { setActiveSection("commissions"); setSidebarOpen(false); }}
               >
               <DollarSign size={18} /> Commissions
               </li>
@@ -2148,27 +2155,27 @@ useEffect(() => {
 
            <li
                 className={activeSection === "accommodation" ? "active" : ""}
-                onClick={() => setActiveSection("accommodation")}
+                onClick={() => { setActiveSection("accommodation"); setSidebarOpen(false); }}
             >
                 <Building2 size={18} /> Accommodation
             </li>
 
             <li
                 className={activeSection === "loan" ? "active" : ""}
-                onClick={() => setActiveSection("loan")}
+                onClick={() => { setActiveSection("loan"); setSidebarOpen(false); }}
             >
                 <CreditCard size={18} /> Loan Services
             </li>
 
             <li
                 className={activeSection === "testprep" ? "active" : ""}
-                onClick={() => setActiveSection("testprep")}
+                onClick={() => { setActiveSection("testprep"); setSidebarOpen(false); }}
             >
                 <BookOpen size={18} /> Test Prep
             </li>
           <li 
           className={activeSection === "teamchat" ? "active" : ""}
-          onClick={() => setActiveSection("teamchat")}
+          onClick={() => { setActiveSection("teamchat"); setSidebarOpen(false); }}
           >
             <MessageSquare size={18} /> Team Chat
             </li>
@@ -2176,7 +2183,7 @@ useEffect(() => {
             <>
                 <li
                 className={activeSection === "permissions" ? "active" : ""}
-                onClick={() => setActiveSection("permissions")}
+                onClick={() => { setActiveSection("permissions"); setSidebarOpen(false); }}
                 >
                 <Shield size={18} /> Permissions
             </li>
@@ -2200,6 +2207,9 @@ useEffect(() => {
 
         {/* HEADER STRIP */}
         <div className="header-strip">
+          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <Menu size={22} />
+          </button>
           <h2 className="header-title">
             {{
                 dashboard: "Dashboard",
@@ -3264,7 +3274,7 @@ useEffect(() => {
     border: "1px solid #e2e8f0",
     borderRadius: 12,
     background: "#fff",
-    overflow: "hidden",
+    overflowX: "auto",
     boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
   }}
 >
@@ -4185,7 +4195,7 @@ useEffect(() => {
     border: "1px solid #e2e8f0",
     borderRadius: 12,
     background: "#fff",
-    overflow: "hidden",
+    overflowX: "auto",
   }}
 >
   <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -5122,51 +5132,42 @@ useEffect(() => {
                 </button>
               </div>
             ) : (
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
-                    <tr style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", textAlign: "left", fontSize: 13, color: "#fff" }}>
-                      <th style={{ padding: "14px 20px" }}>Company Name</th>
-                      <th style={{ padding: "14px 20px" }}>Agent Name</th>
-                      <th style={{ padding: "14px 20px" }}>Email</th>
-                      <th style={{ padding: "14px 20px" }}>Phone</th>
-                      <th style={{ padding: "14px 20px" }}>Status</th>
-                      <th style={{ padding: "14px 20px" }}>Created</th>
-                      <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
+                    <tr style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", textAlign: "left", fontSize: 13, color: "#fff", whiteSpace: "nowrap" }}>
+                      <th style={{ padding: "12px 14px" }}>Company Name</th>
+                      <th style={{ padding: "12px 14px" }}>Agent Name</th>
+                      <th style={{ padding: "12px 14px" }}>Email</th>
+                      <th style={{ padding: "12px 14px" }}>Phone</th>
+                      <th style={{ padding: "12px 14px" }}>Status</th>
+                      <th style={{ padding: "12px 14px" }}>Created</th>
+                      <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {agents.map((agent: any) => (
-                      <tr key={agent.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 14, color: "#0f172a" }}>
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#e0e7ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#4f46e5", fontSize: 16 }}>
-                              <Building2 size={18} />
+                      <tr key={agent.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 13, color: "#0f172a" }}>
+                        <td style={{ padding: "12px 14px" }}>
+                          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#e0e7ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#4f46e5", flexShrink: 0 }}>
+                              <Building2 size={16} />
                             </div>
                             <div style={{ fontWeight: 600 }}>{agent.company_name}</div>
                           </div>
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <User size={16} style={{ color: "#64748b" }} />
-                            {agent.user_name}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {agent.user_name}
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Mail size={16} style={{ color: "#64748b" }} />
-                            {agent.email}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {agent.email}
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Phone size={16} style={{ color: "#64748b" }} />
-                            {agent.phone}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {agent.phone}
                         </td>
-                        <td style={{ padding: "16px 20px" }}>
+                        <td style={{ padding: "12px 14px" }}>
                           <span style={{ 
-                            padding: "4px 12px", 
+                            padding: "3px 10px", 
                             borderRadius: 20, 
                             fontSize: 12, 
                             fontWeight: 600,
@@ -5176,31 +5177,28 @@ useEffect(() => {
                             {agent.status}
                           </span>
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Calendar size={16} style={{ color: "#64748b" }} />
-                            {agent.created_at ? new Date(agent.created_at).toLocaleDateString() : "N/A"}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {agent.created_at ? new Date(agent.created_at).toLocaleDateString() : "N/A"}
                         </td>
-                        <td style={{ padding: "16px 20px", textAlign: "right" }}>
-                          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
                             <button
                               onClick={() => {
                                 setEditingAgent(agent);
                                 setShowEditAgentModal(true);
                               }}
-                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
                             >
-                              <Edit2 size={16} style={{ color: "#667eea" }} />
+                              <Edit2 size={15} style={{ color: "#667eea" }} />
                             </button>
                             <button
                               onClick={() => {
                                 setDeletingAgentId(agent.id);
                                 setShowDeleteAgentModal(true);
                               }}
-                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
                             >
-                              <Trash2 size={16} style={{ color: "#ef4444" }} />
+                              <Trash2 size={15} style={{ color: "#ef4444" }} />
                             </button>
                           </div>
                         </td>
@@ -5243,64 +5241,56 @@ useEffect(() => {
                 </button>
               </div>
             ) : (
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
-                    <tr style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", textAlign: "left", fontSize: 13, color: "#fff" }}>
-                      <th style={{ padding: "14px 20px" }}>Company Name</th>
-                      <th style={{ padding: "14px 20px" }}>Admin Name</th>
-                      <th style={{ padding: "14px 20px" }}>Email</th>
-                      <th style={{ padding: "14px 20px" }}>Phone</th>
-                      <th style={{ padding: "14px 20px" }}>Agents</th>
-                      <th style={{ padding: "14px 20px" }}>Status</th>
-                      <th style={{ padding: "14px 20px" }}>Created</th>
-                      <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
+                    <tr style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", textAlign: "left", fontSize: 13, color: "#fff", whiteSpace: "nowrap" }}>
+                      <th style={{ padding: "12px 14px" }}>Company Name</th>
+                      <th style={{ padding: "12px 14px" }}>Admin Name</th>
+                      <th style={{ padding: "12px 14px" }}>Email</th>
+                      <th style={{ padding: "12px 14px" }}>Phone</th>
+                      <th style={{ padding: "12px 14px" }}>Agents</th>
+                      <th style={{ padding: "12px 14px" }}>Status</th>
+                      <th style={{ padding: "12px 14px" }}>Created</th>
+                      <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {admins.map((admin: any) => (
-                      <tr key={admin.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 14, color: "#0f172a" }}>
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#fef3c7", display: "flex", alignItems: "center", justifyContent: "center", color: "#d97706", fontSize: 16 }}>
-                              <Building2 size={18} />
+                      <tr key={admin.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 13, color: "#0f172a" }}>
+                        <td style={{ padding: "12px 14px" }}>
+                          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#fef3c7", display: "flex", alignItems: "center", justifyContent: "center", color: "#d97706", flexShrink: 0 }}>
+                              <Building2 size={16} />
                             </div>
                             <div style={{ fontWeight: 600 }}>{admin.company_name}</div>
                           </div>
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <User size={16} style={{ color: "#64748b" }} />
-                            {admin.user_name}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {admin.user_name}
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Mail size={16} style={{ color: "#64748b" }} />
-                            {admin.email}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {admin.email}
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Phone size={16} style={{ color: "#64748b" }} />
-                            {admin.phone}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {admin.phone}
                         </td>
-                        <td style={{ padding: "16px 20px" }}>
+                        <td style={{ padding: "12px 14px" }}>
                           <span style={{ 
-                            padding: "4px 12px", 
+                            padding: "3px 10px", 
                             borderRadius: 20, 
                             fontSize: 12, 
                             fontWeight: 600,
                             background: "#dbeafe",
-                            color: "#1e40af"
+                            color: "#1e40af",
+                            whiteSpace: "nowrap"
                           }}>
                             {admin.agent_count} Agents
                           </span>
                         </td>
-                        <td style={{ padding: "16px 20px" }}>
+                        <td style={{ padding: "12px 14px" }}>
                           <span style={{ 
-                            padding: "4px 12px", 
+                            padding: "3px 10px", 
                             borderRadius: 20, 
                             fontSize: 12, 
                             fontWeight: 600,
@@ -5310,31 +5300,28 @@ useEffect(() => {
                             {admin.status}
                           </span>
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Calendar size={16} style={{ color: "#64748b" }} />
-                            {admin.created_at ? new Date(admin.created_at).toLocaleDateString() : "N/A"}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {admin.created_at ? new Date(admin.created_at).toLocaleDateString() : "N/A"}
                         </td>
-                        <td style={{ padding: "16px 20px", textAlign: "right" }}>
-                          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
                             <button
                               onClick={() => {
                                 setEditingAdmin(admin);
                                 setShowEditAdminModal(true);
                               }}
-                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
                             >
-                              <Edit2 size={16} style={{ color: "#f59e0b" }} />
+                              <Edit2 size={15} style={{ color: "#f59e0b" }} />
                             </button>
                             <button
                               onClick={() => {
                                 setDeletingAdminId(admin.id);
                                 setShowDeleteAdminModal(true);
                               }}
-                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
                             >
-                              <Trash2 size={16} style={{ color: "#ef4444" }} />
+                              <Trash2 size={15} style={{ color: "#ef4444" }} />
                             </button>
                           </div>
                         </td>
@@ -5363,7 +5350,7 @@ useEffect(() => {
               </button>
             </div>
 
-            {/* COUNSELORS TABLE */}
+            {/* COUNSELORS TABLE - check for overflow hidden */}
             {!counselors || counselors.length === 0 ? (
               <div style={{ padding: 80, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", textAlign: "center" }}>
                 <div style={{ fontSize: 42, marginBottom: 12, color: "#94a3b8" }}>
@@ -5377,51 +5364,42 @@ useEffect(() => {
                 </button>
               </div>
             ) : (
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
-                    <tr style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", textAlign: "left", fontSize: 13, color: "#fff" }}>
-                      <th style={{ padding: "14px 20px" }}>Company Name</th>
-                      <th style={{ padding: "14px 20px" }}>Counselor Name</th>
-                      <th style={{ padding: "14px 20px" }}>Email</th>
-                      <th style={{ padding: "14px 20px" }}>Phone</th>
-                      <th style={{ padding: "14px 20px" }}>Status</th>
-                      <th style={{ padding: "14px 20px" }}>Created</th>
-                      <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
+                    <tr style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", textAlign: "left", fontSize: 13, color: "#fff", whiteSpace: "nowrap" }}>
+                      <th style={{ padding: "12px 14px" }}>Company Name</th>
+                      <th style={{ padding: "12px 14px" }}>Counselor Name</th>
+                      <th style={{ padding: "12px 14px" }}>Email</th>
+                      <th style={{ padding: "12px 14px" }}>Phone</th>
+                      <th style={{ padding: "12px 14px" }}>Status</th>
+                      <th style={{ padding: "12px 14px" }}>Created</th>
+                      <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {counselors.map((counselor: any) => (
-                      <tr key={counselor.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 14, color: "#0f172a" }}>
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#d1fae5", display: "flex", alignItems: "center", justifyContent: "center", color: "#059669", fontSize: 16 }}>
-                              <Building2 size={18} />
+                      <tr key={counselor.id} style={{ borderTop: "1px solid #e2e8f0", fontSize: 13, color: "#0f172a" }}>
+                        <td style={{ padding: "12px 14px" }}>
+                          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#d1fae5", display: "flex", alignItems: "center", justifyContent: "center", color: "#059669", flexShrink: 0 }}>
+                              <Building2 size={16} />
                             </div>
                             <div style={{ fontWeight: 600 }}>{counselor.company_name}</div>
                           </div>
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <User size={16} style={{ color: "#64748b" }} />
-                            {counselor.user_name}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {counselor.user_name}
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Mail size={16} style={{ color: "#64748b" }} />
-                            {counselor.email}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {counselor.email}
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Phone size={16} style={{ color: "#64748b" }} />
-                            {counselor.phone}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {counselor.phone}
                         </td>
-                        <td style={{ padding: "16px 20px" }}>
+                        <td style={{ padding: "12px 14px" }}>
                           <span style={{ 
-                            padding: "4px 12px", 
+                            padding: "3px 10px", 
                             borderRadius: 20, 
                             fontSize: 12, 
                             fontWeight: 600,
@@ -5431,31 +5409,28 @@ useEffect(() => {
                             {counselor.status}
                           </span>
                         </td>
-                        <td style={{ padding: "16px 20px", color: "#334155" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <Calendar size={16} style={{ color: "#64748b" }} />
-                            {counselor.created_at ? new Date(counselor.created_at).toLocaleDateString() : "N/A"}
-                          </span>
+                        <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                          {counselor.created_at ? new Date(counselor.created_at).toLocaleDateString() : "N/A"}
                         </td>
-                        <td style={{ padding: "16px 20px", textAlign: "right" }}>
-                          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
                             <button
                               onClick={() => {
                                 setEditingCounselor(counselor);
                                 setShowEditCounselorModal(true);
                               }}
-                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
                             >
-                              <Edit2 size={16} style={{ color: "#10b981" }} />
+                              <Edit2 size={15} style={{ color: "#10b981" }} />
                             </button>
                             <button
                               onClick={() => {
                                 setDeletingCounselorId(counselor.id);
                                 setShowDeleteCounselorModal(true);
                               }}
-                              style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
                             >
-                              <Trash2 size={16} style={{ color: "#ef4444" }} />
+                              <Trash2 size={15} style={{ color: "#ef4444" }} />
                             </button>
                           </div>
                         </td>
@@ -5603,7 +5578,7 @@ useEffect(() => {
     border: "1px solid #e2e8f0",
     borderRadius: 12,
     background: "#fff",
-    overflow: "hidden",
+    overflowX: "auto",
   }}
 >
   
@@ -10009,7 +9984,7 @@ useEffect(() => {
                     border: "1px solid #e2e8f0",
                     borderRadius: 12,
                     background: "#ffffff",
-                    overflow: "hidden",
+                    overflowX: "auto",
                 }}
                 >
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Search, UserPlus, Eye, Edit,
   Home, GraduationCap, Users, FileText, DollarSign, Building2, 
-  CreditCard, BookOpen, MessageSquare, Shield
+  CreditCard, BookOpen, MessageSquare, Shield, Menu, X
 } from "lucide-react";
 import "./students.css";
 
@@ -33,6 +33,7 @@ const Students = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Get user info from localStorage
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -120,11 +121,10 @@ const Students = () => {
   };
 
   const handleSidebarNavigation = (section: string) => {
+    setSidebarOpen(false);
     if (section === "students") {
-      // Already on students page, do nothing
       return;
     }
-    // Navigate to dashboard with the section as a query parameter
     navigate(`/edupartner/dashboard?section=${section}`);
   };
 
@@ -138,10 +138,14 @@ const Students = () => {
 
   return (
     <div className="dashboard-container">
+      {/* Mobile overlay */}
+      <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)} />
+
       {/* SIDEBAR */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-brand">
           <GraduationCap size={24} /> <span>EduPartner</span>
+          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
         </div>
 
         <ul className="menu">
@@ -219,6 +223,9 @@ const Students = () => {
 
       {/* MAIN CONTENT */}
       <main className="main-content" style={{ paddingTop: "20px" }}>
+        <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+          <Menu size={24} />
+        </button>
         {/* STUDENTS CONTENT */}
         <div className="students-content">
           <div className="students-header-section">

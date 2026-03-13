@@ -412,3 +412,271 @@
     transform: rotate(360deg);
   }
 }
+
+/* ===== MOBILE MENU BUTTON (hidden on desktop) ===== */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: #0f172a;
+}
+
+.mobile-menu-btn:hover {
+  background: #f1f5f9;
+}
+
+/* ===== SIDEBAR CLOSE BUTTON (hidden on desktop) ===== */
+.sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  color: #94a3b8;
+  margin-left: auto;
+}
+
+.sidebar-close-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== SIDEBAR OVERLAY (hidden on desktop) ===== */
+.sidebar-overlay {
+  display: none;
+}
+
+/* ===================================================
+   COMPACT TABLES - fit on Mac / smaller screens
+   =================================================== */
+.main-content table {
+  table-layout: auto;
+}
+.main-content table th,
+.main-content table td {
+  padding: 12px 14px !important;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.main-content table td {
+  white-space: normal;
+}
+.main-content table th {
+  white-space: nowrap;
+}
+
+/* ===================================================
+   RESPONSIVE - TABLET (1024px)
+   =================================================== */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .status-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-body .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================================================
+   RESPONSIVE - SMALL TABLET / LARGE PHONE (768px)
+   =================================================== */
+@media (max-width: 768px) {
+  /* Hide sidebar by default on mobile */
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+
+  /* Overlay when sidebar is open */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  /* Show mobile menu button */
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Show sidebar close button */
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Main content takes full width */
+  .main-content {
+    padding: 16px;
+  }
+
+  /* Header strip adjustments */
+  .header-strip {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 0 16px;
+    gap: 8px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  /* Status grid */
+  .status-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* Content grid - stack vertically */
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Welcome section */
+  .welcome h1 {
+    font-size: 22px;
+  }
+
+  /* Topbar */
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .top-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .top-actions button {
+    margin-left: 0;
+    flex: 1;
+  }
+
+  /* Modal adjustments */
+  .modal-card {
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-body .row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Add student button */
+  .add-student-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ===================================================
+   RESPONSIVE - PHONE (480px)
+   =================================================== */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 12px;
+  }
+
+  .header-strip {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding: 0 12px;
+    height: 52px;
+  }
+
+  .header-title {
+    font-size: 14px;
+  }
+
+  .header-user span {
+    display: none;
+  }
+
+  /* Stats grid - single column on very small */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .status-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .welcome h1 {
+    font-size: 20px;
+  }
+
+  .welcome p {
+    font-size: 13px;
+  }
+
+  .topbar {
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .topbar h2 {
+    font-size: 18px;
+  }
+
+  .outline-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .add-student-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .add-student-btn span {
+    display: none;
+  }
+}

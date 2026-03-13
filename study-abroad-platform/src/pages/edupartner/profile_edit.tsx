@@ -61,6 +61,7 @@ const Profileedit = () => {
   // ✅ ADDED: section state
   const [activeSection, setActiveSection] = useState("dashboard");
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showAccommodationModal, setShowAccommodationModal] = useState(false);
   const [showLoanModal, setShowLoanModal] = useState(false);
@@ -593,70 +594,74 @@ useEffect(() => {
   return (
     <div className="dashboard-container">
 
+      {/* Mobile overlay */}
+      <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)} />
+
       {/* SIDEBAR */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-brand">
           🎓 <span>EduPartner</span>
+          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>✕</button>
         </div>
 
         <ul className="menu">
           <li
             className={activeSection === "dashboard" ? "active" : ""}
-            onClick={() => navigate("/edupartner/dashboard")}
+            onClick={() => { setSidebarOpen(false); navigate("/edupartner/dashboard"); }}
           >
             🏠 Dashboard
           </li>
 
           <li
             className={activeSection === "universities" ? "active" : ""}
-            onClick={() => setActiveSection("universities")}
+            onClick={() => { setSidebarOpen(false); setActiveSection("universities"); }}
           >
             🎓 Universities
           </li>
 
           <li
             className={activeSection === "students" ? "active" : ""}
-            onClick={() => setActiveSection("students")}
+            onClick={() => { setSidebarOpen(false); setActiveSection("students"); }}
             >
             👨‍🎓 Students
           </li>
           <li
             className={activeSection === "applications" ? "active" : ""}
-            onClick={() => setActiveSection("applications")}
+            onClick={() => { setSidebarOpen(false); setActiveSection("applications"); }}
             >
             📄 Applications
             </li>
 
           <li
             className={activeSection === "commissions" ? "active" : ""}
-            onClick={() => setActiveSection("commissions")}
+            onClick={() => { setSidebarOpen(false); setActiveSection("commissions"); }}
             >
             💰 Commissions
             </li>
 
            <li
                 className={activeSection === "accommodation" ? "active" : ""}
-                onClick={() => setActiveSection("accommodation")}
+                onClick={() => { setSidebarOpen(false); setActiveSection("accommodation"); }}
             >
                 🏠 Accommodation
             </li>
 
             <li
                 className={activeSection === "loan" ? "active" : ""}
-                onClick={() => setActiveSection("loan")}
+                onClick={() => { setSidebarOpen(false); setActiveSection("loan"); }}
             >
                 💳 Loan Services
             </li>
 
             <li
                 className={activeSection === "testprep" ? "active" : ""}
-                onClick={() => setActiveSection("testprep")}
+                onClick={() => { setSidebarOpen(false); setActiveSection("testprep"); }}
             >
                 📝 Test Prep
             </li>
           <li 
           className={activeSection === "teamchat" ? "active" : ""}
-          onClick={() => setActiveSection("teamchat")}
+          onClick={() => { setSidebarOpen(false); setActiveSection("teamchat"); }}
           >
             💬 Team Chat
             </li>
@@ -664,7 +669,7 @@ useEffect(() => {
             <>
                 <li
                 className={activeSection === "permissions" ? "active" : ""}
-                onClick={() => setActiveSection("permissions")}
+                onClick={() => { setSidebarOpen(false); setActiveSection("permissions"); }}
                 >
                 👨‍🎓 Permissions
             </li>
@@ -685,6 +690,8 @@ useEffect(() => {
 
       {/* MAIN */}
       <main className="main-content">
+
+        <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>☰</button>
 
         {/* HEADER STRIP */}
         <div className="header-strip">
