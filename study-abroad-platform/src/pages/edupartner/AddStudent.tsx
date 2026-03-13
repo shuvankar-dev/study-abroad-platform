@@ -644,6 +644,16 @@ const AddStudent = () => {
                 <span>I confirm that all the details provided are correct</span>
               </label>
             </div>
+            <div className="form-navigation">
+              {currentStep > 1 && <button className="btn-secondary" onClick={handleBack} disabled={isSaving}>Previous</button>}
+              <button 
+                className="btn-primary" 
+                onClick={handleNext}
+                disabled={isSaving || !confirmStep1}
+              >
+                {isSaving ? 'Saving...' : 'Save & Next'}
+              </button>
+            </div>
           </>
         )}
         {currentStep === 2 && (
@@ -658,6 +668,16 @@ const AddStudent = () => {
                 />
                 <span>I confirm that all the details provided are correct</span>
               </label>
+            </div>
+            <div className="form-navigation">
+              <button className="btn-secondary" onClick={handleBack} disabled={isSaving}>Previous</button>
+              <button 
+                className="btn-primary" 
+                onClick={handleNext}
+                disabled={isSaving || !confirmStep2}
+              >
+                {isSaving ? 'Saving...' : 'Save & Next'}
+              </button>
             </div>
           </>
         )}
@@ -674,29 +694,28 @@ const AddStudent = () => {
                 <span>I confirm that all the details provided are correct</span>
               </label>
             </div>
+            <div className="form-navigation">
+              <button className="btn-secondary" onClick={handleBack} disabled={isSaving}>Previous</button>
+              <button 
+                className="btn-primary" 
+                onClick={handleNext}
+                disabled={isSaving || !confirmStep3}
+              >
+                {isSaving ? 'Saving...' : 'Save & Next'}
+              </button>
+            </div>
           </>
         )}
-        {currentStep === 4 && <Step4AdditionalDetails formData={formData} onChange={handleInputChange} />}
-      </div>
-      <div className="form-navigation">
-        {currentStep > 1 && <button className="btn-secondary" onClick={handleBack} disabled={isSaving}>Previous</button>}
-        {currentStep < 4 ? (
-          <button 
-            className="btn-primary" 
-            onClick={handleNext}
-            disabled={
-              isSaving ||
-              (currentStep === 1 && !confirmStep1) || 
-              (currentStep === 2 && !confirmStep2) || 
-              (currentStep === 3 && !confirmStep3)
-            }
-          >
-            {isSaving ? 'Saving...' : 'Save & Next'}
-          </button>
-        ) : (
-          <button className="btn-primary" onClick={handleSubmit} disabled={isSaving}>
-            {isSaving ? 'Submitting...' : 'Submit'}
-          </button>
+        {currentStep === 4 && (
+          <>
+            <Step4AdditionalDetails formData={formData} onChange={handleInputChange} />
+            <div className="form-navigation">
+              <button className="btn-secondary" onClick={handleBack} disabled={isSaving}>Previous</button>
+              <button className="btn-primary" onClick={handleSubmit} disabled={isSaving}>
+                {isSaving ? 'Submitting...' : 'Submit'}
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
