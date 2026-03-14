@@ -472,15 +472,13 @@ const openApplicationModal = async () => {
 useEffect(() => {
   const university = searchParams.get("university");
   const course = searchParams.get("course");
-  const intake = searchParams.get("intake");
   
   if (university && course && activeSection === "applications") {
     // Pre-fill the form
     setApplicationForm(prev => ({
       ...prev,
       university: decodeURIComponent(university),
-      course: decodeURIComponent(course),
-      preferred_intake: intake ? decodeURIComponent(intake) : ""
+      course: decodeURIComponent(course)
     }));
     
     // Open the modal
@@ -490,7 +488,6 @@ useEffect(() => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.delete("university");
     newSearchParams.delete("course");
-    newSearchParams.delete("intake");
     navigate(`/edupartner/dashboard?section=applications`, { replace: true });
   }
 }, [searchParams, activeSection]);
@@ -6010,18 +6007,9 @@ useEffect(() => {
           </label>
           <select
             value={applicationForm.university}
-            onChange={(e) => {
-              const selectedUniversity = e.target.value;
-              // Find the selected university object to get Open_Intakes
-              const universityData = filteredUniversities.find(u => u.University === selectedUniversity);
-              const openIntakes = universityData?.Open_Intakes || "";
-              
-              setApplicationForm({ 
-                ...applicationForm, 
-                university: selectedUniversity,
-                preferred_intake: openIntakes // Auto-fill open intakes
-              });
-            }}
+            onChange={(e) =>
+              setApplicationForm({ ...applicationForm, university: e.target.value })
+            }
             disabled={!applicationForm.course}
             style={{
               width: "100%",
@@ -6213,291 +6201,148 @@ useEffect(() => {
 
 {showEditApplicationModal && (
   <div className="modal-overlay">
-    <div className="modal-card" style={{ maxWidth: "600px", maxHeight: "90vh", overflowY: "auto" }}>
+    <div className="modal-card">
 
       {/* HEADER */}
-      <div className="modal-header" style={{ 
-        padding: "20px 24px", 
-        borderBottom: "1px solid #e2e8f0",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
-      }}>
-        <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 600, color: "#0f172a" }}>Edit Application</h3>
+      <div className="modal-header">
+        <h3>Edit Application</h3>
         <button
           onClick={() => setShowEditApplicationModal(false)}
-          style={{ 
-            background: "transparent", 
-            border: "none",
-            color: "#64748b",
-            fontSize: "24px",
-            cursor: "pointer",
-            padding: "0",
-            width: "32px",
-            height: "32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "6px",
-            transition: "all 0.2s"
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#f1f5f9"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+          style={{ background: "white", color: "black" }}
         >
           ✕
         </button>
       </div>
 
       {/* BODY */}
-      <div className="modal-body" style={{ padding: "24px" }}>
+      <div className="modal-body">
 
         {/* STUDENT */}
-        <div style={{ marginBottom: "20px" }}>
-          <label style={{ 
-            display: "block",
-            fontSize: "14px", 
-            fontWeight: 600,
-            color: "#374151",
-            marginBottom: "8px"
-          }}>Student *</label>
-          <select
-            value={editApplicationForm.student_id}
-            onChange={(e) => {
-              const selected = students.find(
-                (s) => s.id === Number(e.target.value)
-              );
+        <label>Student *</label>
+        <select
+          value={editApplicationForm.student_id}
+          onChange={(e) => {
+            const selected = students.find(
+              (s) => s.id === Number(e.target.value)
+            );
 
-              setEditApplicationForm({
-                ...editApplicationForm,
-                student_id: e.target.value,
-                student_name: selected?.name || "",
-              });
-            }}
-            style={{ 
-              width: "100%",
-              padding: "10px 12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              fontSize: "14px",
-              color: "#0f172a",
-              background: "#fff",
-              cursor: "pointer"
-            }}
-          >
-            <option value="">Select student</option>
-            {students.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
+            setEditApplicationForm({
+              ...editApplicationForm,
+              student_id: e.target.value,
+              student_name: selected?.name || "",
+            });
+          }}
+          style={{ width: "100%" }}
+        >
+          <option value="">Select student</option>
+          {students.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
 
         {/* COURSE */}
-        <div style={{ marginBottom: "20px" }}>
-          <label style={{ 
-            display: "block",
-            fontSize: "14px", 
-            fontWeight: 600,
-            color: "#374151",
-            marginBottom: "8px"
-          }}>Course *</label>
-          <select
-            value={editApplicationForm.course}
-            onChange={(e) =>
-              setEditApplicationForm({
-                ...editApplicationForm,
-                course: e.target.value,
-                university: "",
-              })
-            }
-            style={{ 
-              width: "100%",
-              padding: "10px 12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              fontSize: "14px",
-              color: "#0f172a",
-              background: "#fff",
-              cursor: "pointer"
-            }}
-          >
-            <option value="">Select course</option>
-            {uniqueCourses.map((course, i) => (
-              <option key={i} value={course}>
-                {course}
-              </option>
-            ))}
-          </select>
-        </div>
+        <label>Course *</label>
+        <select
+          value={editApplicationForm.course}
+          onChange={(e) =>
+            setEditApplicationForm({
+              ...editApplicationForm,
+              course: e.target.value,
+              university: "",
+            })
+          }
+          style={{ width: "100%" }}
+        >
+          <option value="">Select course</option>
+          {uniqueCourses.map((course, i) => (
+            <option key={i} value={course}>
+              {course}
+            </option>
+          ))}
+        </select>
 
         {/* UNIVERSITY */}
-        <div style={{ marginBottom: "20px" }}>
-          <label style={{ 
-            display: "block",
-            fontSize: "14px", 
-            fontWeight: 600,
-            color: "#374151",
-            marginBottom: "8px"
-          }}>University *</label>
-          <select
-            value={editApplicationForm.university}
-            onChange={(e) =>
-              setEditApplicationForm({
-                ...editApplicationForm,
-                university: e.target.value,
-              })
-            }
-            disabled={!editApplicationForm.course}
-            style={{ 
-              width: "100%",
-              padding: "10px 12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              fontSize: "14px",
-              color: "#0f172a",
-              background: editApplicationForm.course ? "#fff" : "#f8fafc",
-              cursor: editApplicationForm.course ? "pointer" : "not-allowed",
-              opacity: editApplicationForm.course ? 1 : 0.6
-            }}
-          >
-            <option value="">Select university</option>
-            {universities
-              .filter((u) => u.Program_Name === editApplicationForm.course)
-              .map((u, i) => (
-                <option key={i} value={u.University}>
-                  {u.University}
-                </option>
-              ))}
-          </select>
-        </div>
+        <label>University *</label>
+        <select
+          value={editApplicationForm.university}
+          onChange={(e) =>
+            setEditApplicationForm({
+              ...editApplicationForm,
+              university: e.target.value,
+            })
+          }
+          disabled={!editApplicationForm.course}
+          style={{ width: "100%" }}
+        >
+          <option value="">Select university</option>
+          {universities
+            .filter((u) => u.Program_Name === editApplicationForm.course)
+            .map((u, i) => (
+              <option key={i} value={u.University}>
+                {u.University}
+              </option>
+            ))}
+        </select>
 
         {/* INTAKE */}
-        <div style={{ marginBottom: "20px" }}>
-          <label style={{ 
-            display: "block",
-            fontSize: "14px", 
-            fontWeight: 600,
-            color: "#374151",
-            marginBottom: "8px"
-          }}>Preferred Intake</label>
-          <input
-            value={editApplicationForm.preferred_intake}
-            onChange={(e) =>
-              setEditApplicationForm({
-                ...editApplicationForm,
-                preferred_intake: e.target.value,
-              })
-            }
-            placeholder="e.g., September 2024"
-            style={{ 
-              width: "100%",
-              padding: "10px 12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              fontSize: "14px",
-              color: "#0f172a",
-              background: "#fff",
-              boxSizing: "border-box"
-            }}
-          />
-        </div>
+        <label>Preferred Intake</label>
+        <input
+          value={editApplicationForm.preferred_intake}
+          onChange={(e) =>
+            setEditApplicationForm({
+              ...editApplicationForm,
+              preferred_intake: e.target.value,
+            })
+          }
+          style={{ width: "95%" }}
+        />
 
         {/* STATUS */}
-        <div style={{ marginBottom: "20px" }}>
-          <label style={{ 
-            display: "block",
-            fontSize: "14px", 
-            fontWeight: 600,
-            color: "#374151",
-            marginBottom: "8px"
-          }}>Status *</label>
-          <select
-            value={editApplicationForm.status}
-            onChange={(e) =>
-              setEditApplicationForm({
-                ...editApplicationForm,
-                status: e.target.value,
-              })
-            }
-            style={{ 
-              width: "100%",
-              padding: "10px 12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              fontSize: "14px",
-              color: "#0f172a",
-              background: "#fff",
-              cursor: "pointer"
-            }}
-          >
-            <option value="Submitted">Submitted</option>
-            <option value="Under Review">Under Review</option>
-            <option value="Accepted">Accepted</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Enrolled">Enrolled</option>
-          </select>
-        </div>
+        <label>Status *</label>
+        <select
+          value={editApplicationForm.status}
+          onChange={(e) =>
+            setEditApplicationForm({
+              ...editApplicationForm,
+              status: e.target.value,
+            })
+          }
+          style={{ width: "100%" }}
+        >
+          <option value="Submitted">Submitted</option>
+          <option value="Under Review">Under Review</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Enrolled">Enrolled</option>
+        </select>
 
         {/* NOTES */}
-        <div style={{ marginBottom: "0" }}>
-          <label style={{ 
-            display: "block",
-            fontSize: "14px", 
-            fontWeight: 600,
-            color: "#374151",
-            marginBottom: "8px"
-          }}>Additional Notes</label>
-          <textarea
-            value={editApplicationForm.notes}
-            onChange={(e) =>
-              setEditApplicationForm({
-                ...editApplicationForm,
-                notes: e.target.value,
-              })
-            }
-            placeholder="Add any additional notes or comments..."
-            rows={4}
-            style={{ 
-              width: "100%",
-              padding: "10px 12px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              fontSize: "14px",
-              color: "#0f172a",
-              background: "#fff",
-              resize: "vertical",
-              fontFamily: "inherit",
-              boxSizing: "border-box"
-            }}
-          />
-        </div>
+        <label>Additional Notes</label>
+        <textarea
+          value={editApplicationForm.notes}
+          onChange={(e) =>
+            setEditApplicationForm({
+              ...editApplicationForm,
+              notes: e.target.value,
+            })
+          }
+          style={{ width: "95%" }}
+        />
       </div>
 
       {/* FOOTER */}
-      <div style={{ 
-        padding: "16px 24px",
-        borderTop: "1px solid #e2e8f0",
-        display: "flex", 
-        justifyContent: "flex-end", 
-        gap: "12px",
-        background: "#f8fafc"
-      }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
         <button
           onClick={() => setShowEditApplicationModal(false)}
           style={{
-            padding: "10px 20px",
-            borderRadius: "8px",
+            padding: "10px 18px",
+            borderRadius: 8,
             border: "1px solid #e2e8f0",
             background: "#fff",
             color: "#374151",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            transition: "all 0.2s"
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#f8fafc"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
         >
           Cancel
         </button>
@@ -6507,20 +6352,16 @@ useEffect(() => {
           style={{
             background: "#1d4ed8",
             color: "#fff",
-            padding: "10px 24px",
-            borderRadius: "8px",
+            padding: "10px 20px",
+            borderRadius: 8,
             border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            transition: "all 0.2s"
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#1e40af"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "#1d4ed8"}
         >
           Update Application
         </button>
+        <br></br>
       </div>
+      <br></br>
     </div>
   </div>
 )}
