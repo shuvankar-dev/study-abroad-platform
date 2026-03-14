@@ -20,7 +20,7 @@ interface University {
   Duration: string;
   Study_Level: string;
   Commission: string;
-  OpenIntakes: string;
+  Open_Intakes: string;
   Scholarship_Available?: string;
   Application_Fee?: string | number;
   English_Proficiency_Exam_Waiver?: string;
@@ -332,28 +332,51 @@ const NewUniversities = () => {
 
   useEffect(() => {
     fetchUniversities();
-  }, []);
+  }, [filterCountry, filterStudyLevel, filterScholarship, filterAppFee, filterWaiver, filterTuitionRange, filterIntake, filterPunjabHaryana]);
 
   useEffect(() => {
-    filterUniversities();
-  }, [searchTerm, filterCountry, filterStudyLevel, filterScholarship, filterAppFee, filterWaiver, filterTuitionRange, filterIntake, filterPunjabHaryana, universities]);
+    // Client-side search filter only
+    if (searchTerm) {
+      const filtered = universities.filter(uni =>
+        uni.University.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        uni.Course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        uni.Country.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUniversities(filtered);
+    } else {
+      setFilteredUniversities(universities);
+    }
+  }, [searchTerm, universities]);
 
   const fetchUniversities = async () => {
     try {
+      setLoading(true);
       const API_BASE = window.location.hostname === 'localhost'
         ? 'http://localhost/studyabroadplatform-api'
         : '/studyabroadplatform-api';
 
-      const response = await fetch(`${API_BASE}/edupartner/get_universities.php`);
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (filterCountry) params.append('country', filterCountry);
+      if (filterStudyLevel) params.append('study_level', filterStudyLevel);
+      if (filterScholarship) params.append('scholarship', filterScholarship);
+      if (filterAppFee) params.append('app_fee', filterAppFee);
+      if (filterWaiver) params.append('waiver', filterWaiver);
+      if (filterTuitionRange) params.append('tuition_range', filterTuitionRange);
+      if (filterIntake) params.append('intake', filterIntake);
+      if (filterPunjabHaryana) params.append('punjab_haryana', filterPunjabHaryana);
+
+      const url = `${API_BASE}/edupartner/get_universities.php${params.toString() ? '?' + params.toString() : ''}`;
+      console.log('Fetching universities with URL:', url);
+
+      const response = await fetch(url);
       const data = await response.json();
 
       if (data.success) {
-        // Log first university to see all available fields
+        console.log('Filters applied:', data.filters_applied);
+        console.log('Universities returned:', data.universities.length);
         if (data.universities.length > 0) {
-          console.log('First university data:', data.universities[0]);
-          console.log('All field names:', Object.keys(data.universities[0]));
-          console.log('StudyLevel value:', data.universities[0].StudyLevel);
-          console.log('Study_Level value:', data.universities[0].Study_Level);
+          console.log('First university Open_Intakes:', data.universities[0].Open_Intakes);
         }
         setUniversities(data.universities);
         setFilteredUniversities(data.universities);
@@ -363,72 +386,6 @@ const NewUniversities = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterUniversities = () => {
-    let filtered = universities;
-
-    if (searchTerm) {
-      filtered = filtered.filter(uni =>
-        uni.University.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        uni.Course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        uni.Country.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (filterCountry) {
-      filtered = filtered.filter(uni => uni.Country === filterCountry);
-    }
-
-    if (filterStudyLevel) {
-      filtered = filtered.filter(uni => uni.Study_Level === filterStudyLevel);
-    }
-
-    if (filterScholarship === 'yes') {
-      filtered = filtered.filter(uni => uni.Scholarship_Available?.toLowerCase() === 'yes');
-    }
-
-    if (filterAppFee === 'free') {
-      filtered = filtered.filter(uni => isAppFree(uni.Application_Fee));
-    }
-
-    if (filterWaiver === 'yes') {
-      filtered = filtered.filter(uni => 
-        uni.English_Proficiency_Exam_Waiver && 
-        uni.English_Proficiency_Exam_Waiver !== 'N/A' && 
-        uni.English_Proficiency_Exam_Waiver.toLowerCase() !== 'no'
-      );
-    }
-
-    if (filterTuitionRange) {
-      filtered = filtered.filter(uni => {
-        const fee = parseFloat(uni.Yearly_Tuition_Fees || '0');
-        switch(filterTuitionRange) {
-          case 'low': return fee > 0 && fee <= 10000;
-          case 'medium': return fee > 10000 && fee <= 20000;
-          case 'high': return fee > 20000;
-          default: return true;
-        }
-      });
-    }
-
-    if (filterIntake) {
-      filtered = filtered.filter(uni => {
-        if (filterIntake === 'No Open Intakes') {
-          return !uni.OpenIntakes || uni.OpenIntakes.toLowerCase() === 'no open intakes';
-        }
-        return uni.OpenIntakes && uni.OpenIntakes.includes(filterIntake);
-      });
-    }
-
-    if (filterPunjabHaryana === 'exclude') {
-      filtered = filtered.filter(uni => 
-        uni.Remarks && 
-        (uni.Remarks.toLowerCase().includes('punjab') || uni.Remarks.toLowerCase().includes('haryana'))
-      );
-    }
-
-    setFilteredUniversities(filtered);
   };
 
   const toggleFavorite = (e: React.MouseEvent, id: number) => {
@@ -663,7 +620,7 @@ const NewUniversities = () => {
     const uni = selectedUniversity;
     const badges = getBadges(uni);
     const success = getSuccessChance(uni);
-    const intakes = parseIntakes(uni.OpenIntakes);
+    const intakes = parseIntakes(uni.Open_Intakes);
 
     return (
       <div className="dashboard-container">
@@ -692,7 +649,7 @@ const NewUniversities = () => {
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <button 
                     className="nu-create-app-btn"
-                    onClick={() => navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}`)}
+                    onClick={() => navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}&intake=${encodeURIComponent(uni.Open_Intakes || '')}`)}
                     style={{
                       padding: '12px 24px',
                       background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
@@ -1294,7 +1251,7 @@ const NewUniversities = () => {
                 {displayedUniversities.map((uni) => {
                   const badges = getBadges(uni);
                   const success = getSuccessChance(uni);
-                  const intakes = parseIntakes(uni.OpenIntakes);
+                  const intakes = parseIntakes(uni.Open_Intakes);
                   const isFav = favorites.has(uni.id);
 
                   return (
@@ -1407,7 +1364,7 @@ const NewUniversities = () => {
                       <div className="nu-card-footer">
                         <button className="nu-apply-btn" onClick={(e) => { 
                           e.stopPropagation(); 
-                          navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}`);
+                          navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}&intake=${encodeURIComponent(uni.Open_Intakes || '')}`);
                         }}>
                           Create Application <ExternalLink size={14} />
                         </button>

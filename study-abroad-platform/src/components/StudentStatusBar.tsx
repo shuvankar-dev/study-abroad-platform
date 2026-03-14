@@ -32,12 +32,13 @@ const StudentStatusBar = ({
           const isCompleted = index < currentStepIndex;
           const isActive = index === currentStepIndex;
           const isFuture = index > currentStepIndex;
+          const isLastStepAndCurrent = index === statusSteps.length - 1 && isActive;
 
           return (
             <div key={step.key} className="student-status-step-wrapper">
-              <div className={`student-status-step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''} ${isFuture ? 'future' : ''}`}>
+              <div className={`student-status-step ${isCompleted || isLastStepAndCurrent ? 'completed' : ''} ${isActive && !isLastStepAndCurrent ? 'active' : ''} ${isFuture ? 'future' : ''}`}>
                 <div className="student-step-indicator">
-                  {isCompleted ? (
+                  {isCompleted || isLastStepAndCurrent ? (
                     <CheckCircle className="student-step-icon completed-icon" size={28} />
                   ) : isActive ? (
                     <div className="student-step-icon active-icon">
@@ -56,7 +57,7 @@ const StudentStatusBar = ({
               </div>
               
               {index < statusSteps.length - 1 && (
-                <div className={`student-step-connector ${isCompleted ? 'completed' : ''}`} />
+                <div className={`student-step-connector ${isCompleted || isLastStepAndCurrent ? 'completed' : ''}`} />
               )}
             </div>
           );

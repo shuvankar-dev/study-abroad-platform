@@ -253,6 +253,28 @@
   margin-bottom: 0;
 }
 
+.student-status-history {
+  margin-top: 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.student-status-history .status-history-header {
+  margin-bottom: 16px;
+}
+
+.student-status-history h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .coming-soon-card {
   background: white;
   border: 1px solid #e2e8f0;
@@ -963,24 +985,6 @@
 }
 
 /* ========================================
-   Student Profile Enhancements (Legacy - kept for compatibility)
-   ======================================== */
-
-.student-status-history {
-  margin-top: 20px;
-}
-
-.student-status-history h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 12px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* ========================================
    Documents Section (in Documents Tab)
    ======================================== */
 .documents-section {
@@ -1188,6 +1192,93 @@
   margin: 0.5rem 0;
   color: #4b5563;
   line-height: 1.6;
+}
+
+/* Two Column Grid for Application Status and Status History */
+.detail-section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 2rem;
+}
+
+.detail-section-grid .detail-section {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Status History Collapsible Header */
+.status-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.status-history-header:hover {
+  background: #f1f5f9;
+}
+
+.status-history-header h3 {
+  margin: 0;
+}
+
+.toggle-history-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e2e8f0;
+  color: #667eea;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.toggle-history-btn:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  transform: scale(1.1);
+}
+
+.history-collapsed-text {
+  color: #94a3b8;
+  font-size: 14px;
+  font-style: italic;
+  margin: 8px 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .detail-section-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .detail-section-grid .detail-section {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .detail-section-grid .detail-section:last-child {
+    border-bottom: none;
+  }
 }
 
 /* Responsive adjustments */

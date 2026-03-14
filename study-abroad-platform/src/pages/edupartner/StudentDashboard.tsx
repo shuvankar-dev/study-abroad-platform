@@ -99,6 +99,8 @@ const StudentDashboard = () => {
   const [extraDoc2Label, setExtraDoc2Label] = useState("");
   const [isUploadingExtra, setIsUploadingExtra] = useState(false);
   const [activeTab, setActiveTab] = useState<'progress' | 'documents' | 'applications'>('progress');
+  const [showStatusHistory, setShowStatusHistory] = useState(false);
+  const [showStudentStatusHistory, setShowStudentStatusHistory] = useState(false);
 
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost/studyabroadplatform-api'
@@ -510,21 +512,36 @@ const StudentDashboard = () => {
 
                 {studentStatusHistory.length > 0 && (
                   <div className="student-status-history">
-                    <h3><History size={18} /> Status History</h3>
-                    <div className="status-history-list">
-                      {studentStatusHistory.map((history) => (
-                        <div key={history.id} className="history-item">
-                          <div className="history-header">
-                            <span className="history-status">{history.new_status.replace(/_/g, ' ')}</span>
-                            <span className="history-date">{history.changed_at}</span>
-                          </div>
-                          <div className="history-details">
-                            <span>Changed by: {history.changed_by_name} ({history.changed_by_role})</span>
-                            {history.notes && <p className="history-notes">{history.notes}</p>}
-                          </div>
-                        </div>
-                      ))}
+                    <div 
+                      className="status-history-header" 
+                      onClick={() => setShowStudentStatusHistory(!showStudentStatusHistory)}
+                    >
+                      <h3><History size={18} /> Status History</h3>
+                      <button className="toggle-history-btn">
+                        {showStudentStatusHistory ? '−' : '+'}
+                      </button>
                     </div>
+                    
+                    {showStudentStatusHistory && (
+                      <div className="status-history-list">
+                        {studentStatusHistory.map((history) => (
+                          <div key={history.id} className="history-item">
+                            <div className="history-header">
+                              <span className="history-status">{history.new_status.replace(/_/g, ' ')}</span>
+                              <span className="history-date">{history.changed_at}</span>
+                            </div>
+                            <div className="history-details">
+                              <span>Changed by: {history.changed_by_name} ({history.changed_by_role})</span>
+                              {history.notes && <p className="history-notes">{history.notes}</p>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {!showStudentStatusHistory && (
+                      <p className="history-collapsed-text">Click to view status history</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -749,13 +766,49 @@ const StudentDashboard = () => {
                 <p><strong>Preferred Intake:</strong> {selectedApp.pref_intake || "Not specified"}</p>
               </div>
 
-              <div className="detail-section">
-                <h3><FileText size={18} /> Application Status</h3>
-                <div className={getStatusClass(selectedApp.status)}>
-                  {getStatusIcon(selectedApp.status)}
-                  {selectedApp.status}
+              {/* Two Column Layout for Application Status and Status History */}
+              <div className="detail-section-grid">
+                <div className="detail-section">
+                  <h3><FileText size={18} /> Application Status</h3>
+                  <div className={getStatusClass(selectedApp.status)}>
+                    {getStatusIcon(selectedApp.status)}
+                    {selectedApp.status}
+                  </div>
+                  <p><strong>Submitted:</strong> {selectedApp.submitted}</p>
                 </div>
-                <p><strong>Submitted:</strong> {selectedApp.submitted}</p>
+
+                <div className="detail-section">
+                  <div 
+                    className="status-history-header" 
+                    onClick={() => setShowStatusHistory(!showStatusHistory)}
+                  >
+                    <h3><History size={18} /> Status History</h3>
+                    <button className="toggle-history-btn">
+                      {showStatusHistory ? '−' : '+'}
+                    </button>
+                  </div>
+                  
+                  {showStatusHistory && statusHistory.length > 0 && (
+                    <div className="status-history-list">
+                      {statusHistory.map((history) => (
+                        <div key={history.id} className="history-item">
+                          <div className="history-header">
+                            <span className="history-status">{history.new_status.replace(/_/g, ' ')}</span>
+                            <span className="history-date">{history.changed_at}</span>
+                          </div>
+                          <div className="history-details">
+                            <span>Changed by: {history.changed_by_name} ({history.changed_by_role})</span>
+                            {history.notes && <p className="history-notes">{history.notes}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {!showStatusHistory && (
+                    <p className="history-collapsed-text">Click to view status history</p>
+                  )}
+                </div>
               </div>
 
               {selectedApp.additional_notes && (
@@ -821,26 +874,6 @@ const StudentDashboard = () => {
                       )}
                     </div>
                   )}
-                </div>
-              )}
-
-              {statusHistory.length > 0 && (
-                <div className="detail-section">
-                  <h3><History size={18} /> Status History</h3>
-                  <div className="status-history-list">
-                    {statusHistory.map((history) => (
-                      <div key={history.id} className="history-item">
-                        <div className="history-header">
-                          <span className="history-status">{history.new_status.replace(/_/g, ' ')}</span>
-                          <span className="history-date">{history.changed_at}</span>
-                        </div>
-                        <div className="history-details">
-                          <span>Changed by: {history.changed_by_name} ({history.changed_by_role})</span>
-                          {history.notes && <p className="history-notes">{history.notes}</p>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               )}
 

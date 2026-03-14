@@ -472,13 +472,15 @@ const openApplicationModal = async () => {
 useEffect(() => {
   const university = searchParams.get("university");
   const course = searchParams.get("course");
+  const intake = searchParams.get("intake");
   
   if (university && course && activeSection === "applications") {
     // Pre-fill the form
     setApplicationForm(prev => ({
       ...prev,
       university: decodeURIComponent(university),
-      course: decodeURIComponent(course)
+      course: decodeURIComponent(course),
+      preferred_intake: intake ? decodeURIComponent(intake) : ""
     }));
     
     // Open the modal
@@ -488,6 +490,7 @@ useEffect(() => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.delete("university");
     newSearchParams.delete("course");
+    newSearchParams.delete("intake");
     navigate(`/edupartner/dashboard?section=applications`, { replace: true });
   }
 }, [searchParams, activeSection]);
@@ -6007,9 +6010,18 @@ useEffect(() => {
           </label>
           <select
             value={applicationForm.university}
-            onChange={(e) =>
-              setApplicationForm({ ...applicationForm, university: e.target.value })
-            }
+            onChange={(e) => {
+              const selectedUniversity = e.target.value;
+              // Find the selected university object to get Open_Intakes
+              const universityData = filteredUniversities.find(u => u.University === selectedUniversity);
+              const openIntakes = universityData?.Open_Intakes || "";
+              
+              setApplicationForm({ 
+                ...applicationForm, 
+                university: selectedUniversity,
+                preferred_intake: openIntakes // Auto-fill open intakes
+              });
+            }}
             disabled={!applicationForm.course}
             style={{
               width: "100%",
