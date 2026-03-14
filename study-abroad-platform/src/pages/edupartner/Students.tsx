@@ -125,6 +125,10 @@ const Students = () => {
     if (section === "students") {
       return;
     }
+    if (section === "universities") {
+      navigate("/edupartner/new-universities");
+      return;
+    }
     navigate(`/edupartner/dashboard?section=${section}`);
   };
 
