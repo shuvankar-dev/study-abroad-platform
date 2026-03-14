@@ -1,11 +1,11 @@
 .student-dashboard-container {
   padding: 24px;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
 .dashboard-header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .dashboard-header h1 {
@@ -33,6 +33,224 @@
   background: #f8fafc;
   color: #2563eb;
   border-color: #cbd5e1;
+}
+
+/* ========================================
+   Dashboard Layout - Sidebar + Main
+   ======================================== */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ========================================
+   Sidebar Styles
+   ======================================== */
+.dashboard-sidebar {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  position: sticky;
+  top: 24px;
+}
+
+.sidebar-profile {
+  text-align: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.sidebar-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin: 0 auto 16px;
+}
+
+.sidebar-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+  word-break: break-word;
+}
+
+.sidebar-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.sidebar-id-badge {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.sidebar-status-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.sidebar-status-badge.draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.sidebar-status-badge.completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.sidebar-status-badge.submitted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.sidebar-details {
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sidebar-detail-item svg {
+  color: #667eea;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.sidebar-edit-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.sidebar-edit-btn:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* ========================================
+   Main Content Area
+   ======================================== */
+.dashboard-main {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ========================================
+   Tab Navigation
+   ======================================== */
+.tab-navigation {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.tab-btn svg {
+  flex-shrink: 0;
+}
+
+/* ========================================
+   Tab Content
+   ======================================== */
+.tab-content {
+  padding: 24px;
+}
+
+/* ========================================
+   Student Status Section (in Progress Tab)
+   ======================================== */
+.student-status-section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
 }
 
 .coming-soon-card {
@@ -246,12 +464,14 @@
   border-color: #2563eb;
 }
 
-/* Applications Section */
+/* ========================================
+   Applications Section (in Applications Tab)
+   ======================================== */
 .applications-section {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .section-header {
@@ -602,30 +822,74 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .student-profile-card {
-    flex-direction: column;
-    text-align: center;
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
   }
 
-  .profile-details {
-    justify-content: center;
+  .dashboard-sidebar {
+    position: static;
+  }
+
+  .tab-btn {
+    font-size: 14px;
+    padding: 14px 16px;
+  }
+
+  .tab-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .student-dashboard-container {
+    padding: 16px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 24px;
+  }
+
+  .sidebar-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .sidebar-name {
+    font-size: 18px;
+  }
+
+  .tab-navigation {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    justify-content: flex-start;
+    padding: 14px 20px;
+  }
+
+  .tab-content {
+    padding: 16px;
   }
 
   .applications-grid {
     grid-template-columns: 1fr;
   }
 
-  .status-progress-bar {
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .document-card {
+    padding: 12px;
+  }
+
+  .doc-type-label {
+    font-size: 13px;
+  }
+
+  .profile-meta {
     flex-wrap: wrap;
-  }
-
-  .progress-step {
-    min-width: 80px;
-  }
-
-  .step-label {
-    font-size: 10px;
   }
 }
 
@@ -699,58 +963,8 @@
 }
 
 /* ========================================
-   Student Profile Enhancements
+   Student Profile Enhancements (Legacy - kept for compatibility)
    ======================================== */
-.profile-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.student-id-badge {
-  background: #f1f5f9;
-  color: #475569;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: monospace;
-}
-
-.profile-status-badge {
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.profile-status-badge.draft {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.profile-status-badge.completed {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.profile-status-badge.submitted {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-/* ========================================
-   Student Status Section
-   ======================================== */
-.student-status-section {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-}
 
 .student-status-history {
   margin-top: 20px;
@@ -767,14 +981,14 @@
 }
 
 /* ========================================
-   Documents Section
+   Documents Section (in Documents Tab)
    ======================================== */
 .documents-section {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
 }
 
 .documents-grid {

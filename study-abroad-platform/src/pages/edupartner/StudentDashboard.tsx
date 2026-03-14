@@ -98,6 +98,7 @@ const StudentDashboard = () => {
   const [extraDoc2File, setExtraDoc2File] = useState<File | null>(null);
   const [extraDoc2Label, setExtraDoc2Label] = useState("");
   const [isUploadingExtra, setIsUploadingExtra] = useState(false);
+  const [activeTab, setActiveTab] = useState<'progress' | 'documents' | 'applications'>('progress');
 
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost/studyabroadplatform-api'
@@ -145,7 +146,7 @@ const StudentDashboard = () => {
     try {
       const res = await fetch(`${API_BASE}/edupartner/get_student_documents.php?student_id=${studentId}`);
       const data = await res.json();
-      console.log('Fetched documents:', data); // Debug log
+      console.log('Fetched documents:', data);
       if (data.success) {
         setStudentDocuments(data.documents);
       }
@@ -278,7 +279,7 @@ const StudentDashboard = () => {
 
       const data = await res.json();
 
-      console.log('Upload response:', data); // Debug log
+      console.log('Upload response:', data);
 
       if (data.success) {
         alert(`${label} uploaded successfully!`);
@@ -289,7 +290,7 @@ const StudentDashboard = () => {
           setExtraDoc2File(null);
           setExtraDoc2Label("");
         }
-        await fetchDocuments(); // Refresh document list
+        await fetchDocuments();
       } else {
         alert(data.message || "Failed to upload document");
       }
@@ -340,9 +341,7 @@ const StudentDashboard = () => {
   };
 
   const getDocumentTypeLabel = (type: string, fileName?: string) => {
-    // For extra documents, use the file name (which contains the custom label)
     if ((type === 'extra_doc_1' || type === 'extra_doc_2') && fileName) {
-      // Remove the file extension to show just the label
       return fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
     }
     
@@ -395,287 +394,335 @@ const StudentDashboard = () => {
         <h1>Student Dashboard</h1>
       </div>
 
-      {/* Student Profile Card */}
-      {studentData && (
-        <div className="student-profile-card">
-          <div className="profile-avatar">
-            <User size={48} />
-          </div>
-          <div className="profile-info">
-            <h2>{getStudentName()}</h2>
-            <div className="profile-meta">
-              <span className="student-id-badge">ID: {studentData.profile.student_code}</span>
-              <span className={`profile-status-badge ${studentData.profile.status}`}>
-                {studentData.profile.status}
-              </span>
-            </div>
-            <div className="profile-details">
-              {studentData.profile.email && (
-                <span className="profile-detail">
-                  <Mail size={14} /> {studentData.profile.email}
+      <div className="dashboard-layout">
+        {/* Sidebar with Student Details */}
+        {studentData && (
+          <aside className="dashboard-sidebar">
+            <div className="sidebar-profile">
+              <div className="sidebar-avatar">
+                <User size={56} />
+              </div>
+              <h2 className="sidebar-name">{getStudentName()}</h2>
+              <div className="sidebar-badges">
+                <span className="sidebar-id-badge">ID: {studentData.profile.student_code}</span>
+                <span className={`sidebar-status-badge ${studentData.profile.status}`}>
+                  {studentData.profile.status}
                 </span>
+              </div>
+            </div>
+
+            <div className="sidebar-details">
+              {studentData.profile.email && (
+                <div className="sidebar-detail-item">
+                  <Mail size={16} />
+                  <div>
+                    <div className="detail-label">Email</div>
+                    <div className="detail-value">{studentData.profile.email}</div>
+                  </div>
+                </div>
               )}
               {studentData.profile.mobile && (
-                <span className="profile-detail">
-                  <Phone size={14} /> {studentData.profile.mobile}
-                </span>
+                <div className="sidebar-detail-item">
+                  <Phone size={16} />
+                  <div>
+                    <div className="detail-label">Phone</div>
+                    <div className="detail-value">{studentData.profile.mobile}</div>
+                  </div>
+                </div>
               )}
               {studentData.personal_info?.citizenship_country && (
-                <span className="profile-detail">
-                  <Globe size={14} /> {studentData.personal_info.citizenship_country}
-                </span>
+                <div className="sidebar-detail-item">
+                  <Globe size={16} />
+                  <div>
+                    <div className="detail-label">Country</div>
+                    <div className="detail-value">{studentData.personal_info.citizenship_country}</div>
+                  </div>
+                </div>
               )}
             </div>
-          </div>
-          <button className="edit-profile-btn" onClick={() => navigate(`/edupartner/add-student?edit=${studentId}`)}>
-            <Edit size={16} /> Edit Profile
-          </button>
-        </div>
-      )}
 
-      {/* Student Overall Status Bar */}
-      {studentData && (
-        <div className="student-status-section">
-          <div className="section-header">
-            <h2>Student Progress</h2>
-            {isAdminOrSuper && (
-              <button 
-                className="btn-primary"
-                onClick={() => setShowStudentStatusManager(!showStudentStatusManager)}
-              >
-                {showStudentStatusManager ? 'Hide' : 'Update Status'}
-              </button>
-            )}
-          </div>
-          
-          <StudentStatusBar 
-            currentStatus={studentData.profile.overall_status || "details_submitted"} 
-            showLabels={true}
-          />
-
-          {/* Student Status Manager for Admin/Super Admin */}
-          {isAdminOrSuper && showStudentStatusManager && (
-            <StudentStatusManager
-              studentId={studentData.profile.student_id}
-              currentStatus={studentData.profile.overall_status || "details_submitted"}
-              onStatusUpdate={handleStudentStatusUpdate}
-              userRole={userRole}
-            />
-          )}
-
-          {/* Student Status History */}
-          {studentStatusHistory.length > 0 && (
-            <div className="student-status-history">
-              <h3><History size={18} /> Status History</h3>
-              <div className="status-history-list">
-                {studentStatusHistory.map((history) => (
-                  <div key={history.id} className="history-item">
-                    <div className="history-header">
-                      <span className="history-status">{history.new_status.replace(/_/g, ' ')}</span>
-                      <span className="history-date">{history.changed_at}</span>
-                    </div>
-                    <div className="history-details">
-                      <span>Changed by: {history.changed_by_name} ({history.changed_by_role})</span>
-                      {history.notes && <p className="history-notes">{history.notes}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Documents Section */}
-      <div className="documents-section">
-        <div className="section-header">
-          <h2>Documents ({studentDocuments.length})</h2>
-        </div>
-
-        {studentDocuments.length === 0 ? (
-          <div className="empty-state">
-            <FileText size={48} />
-            <h3>No Documents Uploaded</h3>
-            <p>No documents have been uploaded for this student yet.</p>
-          </div>
-        ) : (
-          <div className="documents-grid">
-            {studentDocuments.map((doc) => (
-              <div key={doc.id} className="document-card">
-                <div className="doc-card-icon">
-                  {getFileIcon(doc.file_name)}
-                </div>
-                <div className="doc-card-info">
-                  <div className="doc-type-label">{getDocumentTypeLabel(doc.document_type, doc.file_name)}</div>
-                  <div className="doc-file-name" title={doc.file_name}>{doc.file_name}</div>
-                  <div className="doc-meta">
-                    <span>{doc.file_size_mb} MB</span>
-                    <span>{new Date(doc.uploaded_at).toLocaleDateString()}</span>
-                  </div>
-                </div>
-                <div className="doc-card-actions">
-                  {(doc.file_name.toLowerCase().endsWith('.pdf') || 
-                    doc.file_name.toLowerCase().endsWith('.jpg') || 
-                    doc.file_name.toLowerCase().endsWith('.jpeg') || 
-                    doc.file_name.toLowerCase().endsWith('.png')) && (
-                    <button
-                      onClick={() => handleViewDocument(doc.id)}
-                      className="doc-action-btn view"
-                      title="View"
-                    >
-                      <Eye size={16} />
-                    </button>
-                  )}
-                  <a
-                    href={`${API_BASE}/edupartner/download_document.php?document_id=${doc.id}`}
-                    className="doc-action-btn download"
-                    title="Download"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Download size={16} />
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
+            <button 
+              className="sidebar-edit-btn" 
+              onClick={() => navigate(`/edupartner/add-student?edit=${studentId}`)}
+            >
+              <Edit size={16} /> Edit Profile
+            </button>
+          </aside>
         )}
 
-        {/* Extra Documents Upload - Available for all roles */}
-        <div className="extra-docs-upload-section">
-          <h3>Upload Additional Documents</h3>
-          <p className="extra-docs-info">If university requests additional documents, you can upload them here</p>
-            
-          <div className="extra-docs-grid">
-            {/* Extra Doc 1 */}
-            <div className="extra-doc-upload-card">
-              <input
-                type="text"
-                placeholder="Document name (e.g., Financial Statement)"
-                value={extraDoc1Label}
-                onChange={(e) => setExtraDoc1Label(e.target.value)}
-                className="extra-doc-name-input"
-              />
-              <div className="extra-doc-upload-controls">
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                  onChange={(e) => setExtraDoc1File(e.target.files?.[0] || null)}
-                  className="file-input"
-                  id="extra-doc1-main"
-                />
-                <label htmlFor="extra-doc1-main" className="btn-choose-file-compact">
-                  {extraDoc1File ? extraDoc1File.name : 'Choose File'}
-                </label>
-                {extraDoc1File && extraDoc1Label.trim() && (
-                  <button
-                    className="btn-upload-compact"
-                    onClick={() => handleExtraDocUpload('extra_doc_1')}
-                    disabled={isUploadingExtra}
-                  >
-                    {isUploadingExtra ? 'Uploading...' : 'Upload'}
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Extra Doc 2 */}
-            <div className="extra-doc-upload-card">
-              <input
-                type="text"
-                placeholder="Document name (e.g., Medical Certificate)"
-                value={extraDoc2Label}
-                onChange={(e) => setExtraDoc2Label(e.target.value)}
-                className="extra-doc-name-input"
-              />
-              <div className="extra-doc-upload-controls">
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                  onChange={(e) => setExtraDoc2File(e.target.files?.[0] || null)}
-                  className="file-input"
-                  id="extra-doc2-main"
-                />
-                <label htmlFor="extra-doc2-main" className="btn-choose-file-compact">
-                  {extraDoc2File ? extraDoc2File.name : 'Choose File'}
-                </label>
-                {extraDoc2File && extraDoc2Label.trim() && (
-                  <button
-                    className="btn-upload-compact"
-                    onClick={() => handleExtraDocUpload('extra_doc_2')}
-                    disabled={isUploadingExtra}
-                  >
-                    {isUploadingExtra ? 'Uploading...' : 'Upload'}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Applications Section */}
-      <div className="applications-section">
-        <div className="section-header">
-          <h2>Applications ({applications.length})</h2>
-          <button className="btn-primary" onClick={() => navigate("/edupartner/dashboard?section=applications")}>
-            + New Application
-          </button>
-        </div>
-
-        {applications.length === 0 ? (
-          <div className="empty-state">
-            <FileText size={48} />
-            <h3>No Applications Yet</h3>
-            <p>This student hasn't submitted any applications.</p>
-            <button className="btn-primary" onClick={() => navigate("/edupartner/dashboard?section=applications")}>
-              Create First Application
+        {/* Main Content Area with Tabs */}
+        <main className="dashboard-main">
+          {/* Tab Navigation */}
+          <div className="tab-navigation">
+            <button 
+              className={`tab-btn ${activeTab === 'progress' ? 'active' : ''}`}
+              onClick={() => setActiveTab('progress')}
+            >
+              <CheckCircle size={18} />
+              Student Progress
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'documents' ? 'active' : ''}`}
+              onClick={() => setActiveTab('documents')}
+            >
+              <FileText size={18} />
+              Documents
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'applications' ? 'active' : ''}`}
+              onClick={() => setActiveTab('applications')}
+            >
+              <Building2 size={18} />
+              Applications
             </button>
           </div>
-        ) : (
-          <div className="applications-grid">
-            {applications.map((app, index) => (
-              <div key={`${app.id}-${index}`} className="application-card" onClick={() => handleViewDetails(app)}>
-                <div className="app-card-header">
-                  <div className="app-id">App ID: #{app.id}</div>
-                  <div className={getStatusClass(app.status)}>
-                    {getStatusIcon(app.status)}
-                    {app.status}
-                  </div>
+
+          {/* Tab Content */}
+          <div className="tab-content">
+            {/* Student Progress Tab */}
+            {activeTab === 'progress' && studentData && (
+              <div className="student-status-section">
+                <div className="section-header">
+                  <h2>Student Progress</h2>
+                  {isAdminOrSuper && (
+                    <button 
+                      className="btn-primary"
+                      onClick={() => setShowStudentStatusManager(!showStudentStatusManager)}
+                    >
+                      {showStudentStatusManager ? 'Hide' : 'Update Status'}
+                    </button>
+                  )}
                 </div>
                 
-                <div className="app-card-body">
-                  <h3>{app.university_name}</h3>
-                  <p className="course-name">{app.course_name}</p>
-                  
-                  {/* Mini application status bar */}
-                  <div className="app-card-status-bar">
-                    <ApplicationStatusBar 
-                      currentStatus={app.application_status || "application_created"} 
-                      showLabels={false}
-                      compact={true}
-                    />
-                  </div>
+                <StudentStatusBar 
+                  currentStatus={studentData.profile.overall_status || "details_submitted"} 
+                  showLabels={true}
+                />
 
-                  <div className="app-details">
-                    <div className="app-detail">
-                      <Calendar size={14} />
-                      <span>Intake: {app.pref_intake || "Not specified"}</span>
-                    </div>
-                    <div className="app-detail">
-                      <Clock size={14} />
-                      <span>Submitted: {app.submitted}</span>
+                {isAdminOrSuper && showStudentStatusManager && (
+                  <StudentStatusManager
+                    studentId={studentData.profile.student_id}
+                    currentStatus={studentData.profile.overall_status || "details_submitted"}
+                    onStatusUpdate={handleStudentStatusUpdate}
+                    userRole={userRole}
+                  />
+                )}
+
+                {studentStatusHistory.length > 0 && (
+                  <div className="student-status-history">
+                    <h3><History size={18} /> Status History</h3>
+                    <div className="status-history-list">
+                      {studentStatusHistory.map((history) => (
+                        <div key={history.id} className="history-item">
+                          <div className="history-header">
+                            <span className="history-status">{history.new_status.replace(/_/g, ' ')}</span>
+                            <span className="history-date">{history.changed_at}</span>
+                          </div>
+                          <div className="history-details">
+                            <span>Changed by: {history.changed_by_name} ({history.changed_by_role})</span>
+                            {history.notes && <p className="history-notes">{history.notes}</p>}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
+                )}
+              </div>
+            )}
+
+            {/* Documents Tab */}
+            {activeTab === 'documents' && (
+              <div className="documents-section">
+                <div className="section-header">
+                  <h2>Documents ({studentDocuments.length})</h2>
                 </div>
 
-                <div className="app-card-footer">
-                  <button className="view-details-btn">View Details →</button>
+                {studentDocuments.length === 0 ? (
+                  <div className="empty-state">
+                    <FileText size={48} />
+                    <h3>No Documents Uploaded</h3>
+                    <p>No documents have been uploaded for this student yet.</p>
+                  </div>
+                ) : (
+                  <div className="documents-grid">
+                    {studentDocuments.map((doc) => (
+                      <div key={doc.id} className="document-card">
+                        <div className="doc-card-icon">
+                          {getFileIcon(doc.file_name)}
+                        </div>
+                        <div className="doc-card-info">
+                          <div className="doc-type-label">{getDocumentTypeLabel(doc.document_type, doc.file_name)}</div>
+                          <div className="doc-file-name" title={doc.file_name}>{doc.file_name}</div>
+                          <div className="doc-meta">
+                            <span>{doc.file_size_mb} MB</span>
+                            <span>{new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <div className="doc-card-actions">
+                          {(doc.file_name.toLowerCase().endsWith('.pdf') || 
+                            doc.file_name.toLowerCase().endsWith('.jpg') || 
+                            doc.file_name.toLowerCase().endsWith('.jpeg') || 
+                            doc.file_name.toLowerCase().endsWith('.png')) && (
+                            <button
+                              onClick={() => handleViewDocument(doc.id)}
+                              className="doc-action-btn view"
+                              title="View"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          )}
+                          <a
+                            href={`${API_BASE}/edupartner/download_document.php?document_id=${doc.id}`}
+                            className="doc-action-btn download"
+                            title="Download"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Download size={16} />
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="extra-docs-upload-section">
+                  <h3>Upload Additional Documents</h3>
+                  <p className="extra-docs-info">If university requests additional documents, you can upload them here</p>
+                    
+                  <div className="extra-docs-grid">
+                    <div className="extra-doc-upload-card">
+                      <input
+                        type="text"
+                        placeholder="Document name (e.g., Financial Statement)"
+                        value={extraDoc1Label}
+                        onChange={(e) => setExtraDoc1Label(e.target.value)}
+                        className="extra-doc-name-input"
+                      />
+                      <div className="extra-doc-upload-controls">
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                          onChange={(e) => setExtraDoc1File(e.target.files?.[0] || null)}
+                          className="file-input"
+                          id="extra-doc1-main"
+                        />
+                        <label htmlFor="extra-doc1-main" className="btn-choose-file-compact">
+                          {extraDoc1File ? extraDoc1File.name : 'Choose File'}
+                        </label>
+                        {extraDoc1File && extraDoc1Label.trim() && (
+                          <button
+                            className="btn-upload-compact"
+                            onClick={() => handleExtraDocUpload('extra_doc_1')}
+                            disabled={isUploadingExtra}
+                          >
+                            {isUploadingExtra ? 'Uploading...' : 'Upload'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="extra-doc-upload-card">
+                      <input
+                        type="text"
+                        placeholder="Document name (e.g., Medical Certificate)"
+                        value={extraDoc2Label}
+                        onChange={(e) => setExtraDoc2Label(e.target.value)}
+                        className="extra-doc-name-input"
+                      />
+                      <div className="extra-doc-upload-controls">
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                          onChange={(e) => setExtraDoc2File(e.target.files?.[0] || null)}
+                          className="file-input"
+                          id="extra-doc2-main"
+                        />
+                        <label htmlFor="extra-doc2-main" className="btn-choose-file-compact">
+                          {extraDoc2File ? extraDoc2File.name : 'Choose File'}
+                        </label>
+                        {extraDoc2File && extraDoc2Label.trim() && (
+                          <button
+                            className="btn-upload-compact"
+                            onClick={() => handleExtraDocUpload('extra_doc_2')}
+                            disabled={isUploadingExtra}
+                          >
+                            {isUploadingExtra ? 'Uploading...' : 'Upload'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* Applications Tab */}
+            {activeTab === 'applications' && (
+              <div className="applications-section">
+                <div className="section-header">
+                  <h2>Applications ({applications.length})</h2>
+                  <button className="btn-primary" onClick={() => navigate("/edupartner/dashboard?section=applications")}>
+                    + New Application
+                  </button>
+                </div>
+
+                {applications.length === 0 ? (
+                  <div className="empty-state">
+                    <FileText size={48} />
+                    <h3>No Applications Yet</h3>
+                    <p>This student hasn't submitted any applications.</p>
+                    <button className="btn-primary" onClick={() => navigate("/edupartner/dashboard?section=applications")}>
+                      Create First Application
+                    </button>
+                  </div>
+                ) : (
+                  <div className="applications-grid">
+                    {applications.map((app, index) => (
+                      <div key={`${app.id}-${index}`} className="application-card" onClick={() => handleViewDetails(app)}>
+                        <div className="app-card-header">
+                          <div className="app-id">App ID: #{app.id}</div>
+                          <div className={getStatusClass(app.status)}>
+                            {getStatusIcon(app.status)}
+                            {app.status}
+                          </div>
+                        </div>
+                        
+                        <div className="app-card-body">
+                          <h3>{app.university_name}</h3>
+                          <p className="course-name">{app.course_name}</p>
+                          
+                          <div className="app-card-status-bar">
+                            <ApplicationStatusBar 
+                              currentStatus={app.application_status || "application_created"} 
+                              showLabels={false}
+                              compact={true}
+                            />
+                          </div>
+
+                          <div className="app-details">
+                            <div className="app-detail">
+                              <Calendar size={14} />
+                              <span>Intake: {app.pref_intake || "Not specified"}</span>
+                            </div>
+                            <div className="app-detail">
+                              <Clock size={14} />
+                              <span>Submitted: {app.submitted}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="app-card-footer">
+                          <button className="view-details-btn">View Details →</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        )}
+        </main>
       </div>
 
       {/* Application Detail Modal */}
@@ -687,7 +734,6 @@ const StudentDashboard = () => {
               <button className="modal-close" onClick={() => setSelectedApp(null)}>×</button>
             </div>
 
-            {/* Application Status Progress Bar */}
             <div className="modal-status-bar">
               <ApplicationStatusBar 
                 currentStatus={selectedApp.application_status || "application_created"} 
@@ -719,7 +765,6 @@ const StudentDashboard = () => {
                 </div>
               )}
 
-              {/* Offer Letter Section - Show when status is awaiting_school_decision or later */}
               {selectedApp.application_status && 
                ['awaiting_school_decision', 'admission_processing', 'pre_arrival', 'arrival'].includes(selectedApp.application_status) && (
                 <div className="detail-section offer-letter-section">
@@ -779,7 +824,6 @@ const StudentDashboard = () => {
                 </div>
               )}
 
-              {/* Application Status History */}
               {statusHistory.length > 0 && (
                 <div className="detail-section">
                   <h3><History size={18} /> Status History</h3>
@@ -800,7 +844,6 @@ const StudentDashboard = () => {
                 </div>
               )}
 
-              {/* Application Status Manager for Admin/Super Admin */}
               {isAdminOrSuper && showStatusManager && (
                 <ApplicationStatusManager
                   applicationId={selectedApp.id}
