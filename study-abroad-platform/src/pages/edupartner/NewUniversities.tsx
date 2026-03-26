@@ -1476,6 +1476,7 @@ const NewUniversities = () => {
                   <option value="Canada">Canada</option>
                   <option value="France">France</option>
                   <option value="Germany">Germany</option>
+                  <option value="India">India</option>
                   <option value="Ireland">Ireland</option>
                   <option value="Netherlands">Netherlands</option>
                   <option value="New Zealand">New Zealand</option>
@@ -1497,6 +1498,7 @@ const NewUniversities = () => {
                   <option value="Canada">Canada</option>
                   <option value="France">France</option>
                   <option value="Germany">Germany</option>
+                  <option value="India">India</option>
                   <option value="Ireland">Ireland</option>
                   <option value="Netherlands">Netherlands</option>
                   <option value="New Zealand">New Zealand</option>
@@ -1514,8 +1516,10 @@ const NewUniversities = () => {
                   onChange={(e) => setEligibilityFilters({...eligibilityFilters, lastLevelOfStudy: e.target.value})}
                 >
                   <option value="">Select</option>
-                  <option value="Undergraduate">Undergraduate</option>
-                  <option value="Postgraduate">Postgraduate</option>
+                  <option value="12th Grade">12th Grade</option>
+                  <option value="Diploma">Diploma</option>
+                  <option value="Graduation/Bachelor's">Graduation/Bachelor's</option>
+                  <option value="Post Graduation/Master's">Post Graduation/Master's</option>
                 </select>
               </div>
 
@@ -1528,8 +1532,7 @@ const NewUniversities = () => {
                 >
                   <option value="">Select</option>
                   <option value="Percentage">Percentage</option>
-                  <option value="GPA (4.0)">GPA (4.0)</option>
-                  <option value="GPA (10.0)">GPA (10.0)</option>
+                  <option value="GPA">GPA</option>
                   <option value="CGPA">CGPA</option>
                 </select>
               </div>
