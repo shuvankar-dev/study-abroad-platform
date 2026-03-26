@@ -370,10 +370,13 @@ const NewUniversities = () => {
       let filtered = universities;
 
       if (searchTerm) {
+        const term = searchTerm.toLowerCase();
         filtered = filtered.filter(uni =>
-          (uni.University || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (uni.Course || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (uni.Country || '').toLowerCase().includes(searchTerm.toLowerCase())
+          (uni.University || '').toLowerCase().includes(term) ||
+          (uni.Program_Name || '').toLowerCase().includes(term) ||
+          (uni.Course || '').toLowerCase().includes(term) ||
+          (uni.Country || '').toLowerCase().includes(term) ||
+          (uni.Campus || '').toLowerCase().includes(term)
         );
       }
 
