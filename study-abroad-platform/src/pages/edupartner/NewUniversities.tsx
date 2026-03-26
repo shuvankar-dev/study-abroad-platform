@@ -370,10 +370,14 @@ const NewUniversities = () => {
       let filtered = universities;
 
       if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
         filtered = filtered.filter(uni =>
-          (uni.University || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (uni.Course || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (uni.Country || '').toLowerCase().includes(searchTerm.toLowerCase())
+          (uni.University || '').toLowerCase().includes(searchLower) ||
+          (uni.Course || '').toLowerCase().includes(searchLower) ||
+          (uni.Program_Name || '').toLowerCase().includes(searchLower) ||
+          (uni.Country || '').toLowerCase().includes(searchLower) ||
+          (uni.Campus || '').toLowerCase().includes(searchLower) ||
+          (uni.Study_Level || '').toLowerCase().includes(searchLower)
         );
       }
 
@@ -1040,7 +1044,7 @@ const NewUniversities = () => {
                 <Search size={18} className="nu-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search by university, course, or country..."
+                  placeholder="Search by university, program, course, country, campus, or level..."
                   value={searchTerm}
                   onChange={(e) => { setSearchTerm(e.target.value); setVisibleCount(20); }}
                   className="nu-search-input"
