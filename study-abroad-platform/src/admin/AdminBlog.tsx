@@ -41,6 +41,8 @@ export default function AdminBlog() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadType, setUploadType] = useState<'url' | 'file'>('url');
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -98,10 +100,45 @@ export default function AdminBlog() {
     }
   };
 
+  const handleFileSelect = (file: File | null) => {
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+      setFilePreview(null);
+    }
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        setModalError('Only JPG and PNG files are allowed');
+        setSelectedFile(null);
+        return;
+      }
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setModalError('File size must be less than 5MB');
+        setSelectedFile(null);
+        return;
+      }
+      setModalError(null);
+      setSelectedFile(file);
+      setFilePreview(URL.createObjectURL(file));
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setModalError(null);
+
+    // Client-side validation for file upload mode
+    if (uploadType === 'file' && !selectedFile && !formData.featured_image) {
+      setModalError('Please select an image file to upload');
+      setLoading(false);
+      return;
+    }
 
     try {
       const url = editingPost 
@@ -142,10 +179,23 @@ export default function AdminBlog() {
         });
       }
 
+      // Handle non-JSON responses (server errors)
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Server returned non-JSON response:', text.substring(0, 500));
+        setModalError('Server error during upload. Please try again or use a smaller image.');
+        return;
+      }
+
       const data = await response.json();
       
       if (response.ok && data?.success) {
         await fetchPosts();
+        if (filePreview) {
+          URL.revokeObjectURL(filePreview);
+          setFilePreview(null);
+        }
         setIsModalOpen(false);
         setEditingPost(null);
         setFormData({
@@ -159,11 +209,13 @@ export default function AdminBlog() {
         });
         setSelectedFile(null);
         setUploadType('url');
+        setModalError(null);
       } else {
-        setError(data?.message || 'Operation failed');
+        setModalError(data?.message || 'Operation failed. Please check image and try again.');
       }
     } catch (err: any) {
-      setError(err.message || 'Operation failed');
+      console.error('Upload error:', err);
+      setModalError(err.message || 'Upload failed. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -182,6 +234,11 @@ export default function AdminBlog() {
     });
     setSelectedFile(null);
     setUploadType('url');
+    setModalError(null);
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+      setFilePreview(null);
+    }
     setIsModalOpen(true);
   };
 
@@ -225,6 +282,11 @@ export default function AdminBlog() {
     });
     setSelectedFile(null);
     setUploadType('url');
+    setModalError(null);
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+      setFilePreview(null);
+    }
     setIsModalOpen(true);
   };
 
@@ -422,6 +484,11 @@ export default function AdminBlog() {
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {modalError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                  {modalError}
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left Column */}
                 <div className="space-y-4">
@@ -551,13 +618,25 @@ export default function AdminBlog() {
                       <div>
                         <input
                           type="file"
-                          accept="image/jpeg,image/jpg,image/png"
-                          onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                          accept="image/jpeg,image/png"
+                          onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                           Accepted formats: JPG, PNG (Max 5MB)
                         </p>
+                        {filePreview && selectedFile && (
+                          <div className="mt-2">
+                            <img
+                              src={filePreview}
+                              alt="Selected file preview"
+                              className="h-20 max-w-full object-cover rounded border border-gray-200"
+                            />
+                            <p className="text-xs text-green-600 mt-1">
+                              ✓ {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -624,7 +703,9 @@ export default function AdminBlog() {
                   disabled={loading}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
                 >
-                  {loading ? 'Saving...' : (editingPost ? 'Update Post' : 'Create Post')}
+                  {loading 
+                    ? (uploadType === 'file' && selectedFile ? 'Uploading Image...' : 'Saving...') 
+                    : (editingPost ? 'Update Post' : 'Create Post')}
                 </button>
                 <button
                   type="button"

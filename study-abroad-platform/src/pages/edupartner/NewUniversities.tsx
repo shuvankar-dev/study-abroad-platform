@@ -20,7 +20,7 @@ interface University {
   Duration: string;
   Study_Level: string;
   Commission: string;
-  OpenIntakes: string;
+  Open_Intakes: string;
   Scholarship_Available?: string;
   Application_Fee?: string | number;
   English_Proficiency_Exam_Waiver?: string;
@@ -366,15 +366,16 @@ const NewUniversities = () => {
   };
 
   const filterUniversities = () => {
-    let filtered = universities;
+    try {
+      let filtered = universities;
 
-    if (searchTerm) {
-      filtered = filtered.filter(uni =>
-        uni.University.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        uni.Course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        uni.Country.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+      if (searchTerm) {
+        filtered = filtered.filter(uni =>
+          (uni.University || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (uni.Course || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (uni.Country || '').toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
 
     if (filterCountry) {
       filtered = filtered.filter(uni => uni.Country === filterCountry);
@@ -415,9 +416,9 @@ const NewUniversities = () => {
     if (filterIntake) {
       filtered = filtered.filter(uni => {
         if (filterIntake === 'No Open Intakes') {
-          return !uni.OpenIntakes || uni.OpenIntakes.toLowerCase() === 'no open intakes';
+          return !uni.Open_Intakes || uni.Open_Intakes.toLowerCase() === 'no open intakes';
         }
-        return uni.OpenIntakes && uni.OpenIntakes.includes(filterIntake);
+        return uni.Open_Intakes && uni.Open_Intakes.includes(filterIntake);
       });
     }
 
@@ -429,6 +430,10 @@ const NewUniversities = () => {
     }
 
     setFilteredUniversities(filtered);
+    } catch (error) {
+      console.error('Error filtering universities:', error);
+      setFilteredUniversities(universities);
+    }
   };
 
   const toggleFavorite = (e: React.MouseEvent, id: number) => {
@@ -663,7 +668,7 @@ const NewUniversities = () => {
     const uni = selectedUniversity;
     const badges = getBadges(uni);
     const success = getSuccessChance(uni);
-    const intakes = parseIntakes(uni.OpenIntakes);
+    const intakes = parseIntakes(uni.Open_Intakes);
 
     return (
       <div className="dashboard-container">
@@ -998,7 +1003,7 @@ const NewUniversities = () => {
   // ---------- MAIN LIST VIEW ----------
   const uniqueCountries = [...new Set(universities.map(u => u.Country).filter(Boolean))].sort();
   const uniqueLevels = [...new Set(universities.map(u => u.Study_Level).filter(Boolean))].sort();
-  const displayedUniversities = filteredUniversities.slice(0, visibleCount);
+  const displayedUniversities = (filteredUniversities || []).slice(0, visibleCount);
 
   return (
     <div className="dashboard-container">
@@ -1292,9 +1297,10 @@ const NewUniversities = () => {
 
               <div className="nu-cards-grid">
                 {displayedUniversities.map((uni) => {
+                  if (!uni) return null;
                   const badges = getBadges(uni);
                   const success = getSuccessChance(uni);
-                  const intakes = parseIntakes(uni.OpenIntakes);
+                  const intakes = parseIntakes(uni.Open_Intakes);
                   const isFav = favorites.has(uni.id);
 
                   return (
