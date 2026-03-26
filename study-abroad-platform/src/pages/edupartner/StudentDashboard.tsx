@@ -679,7 +679,10 @@ const StudentDashboard = () => {
               <div className="applications-section">
                 <div className="section-header">
                   <h2>Applications ({applications.length})</h2>
-                  <button className="btn-primary" onClick={() => navigate("/edupartner/dashboard?section=applications")}>
+                  <button className="btn-primary" onClick={() => {
+                    const studentName = getStudentName();
+                    navigate(`/edupartner/dashboard?section=applications&student_id=${studentId}&student_name=${encodeURIComponent(studentName)}`);
+                  }}>
                     + New Application
                   </button>
                 </div>
@@ -689,7 +692,10 @@ const StudentDashboard = () => {
                     <FileText size={48} />
                     <h3>No Applications Yet</h3>
                     <p>This student hasn't submitted any applications.</p>
-                    <button className="btn-primary" onClick={() => navigate("/edupartner/dashboard?section=applications")}>
+                    <button className="btn-primary" onClick={() => {
+                      const studentName = getStudentName();
+                      navigate(`/edupartner/dashboard?section=applications&student_id=${studentId}&student_name=${encodeURIComponent(studentName)}`);
+                    }}>
                       Create First Application
                     </button>
                   </div>

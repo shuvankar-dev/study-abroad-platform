@@ -473,6 +473,8 @@ useEffect(() => {
   const university = searchParams.get("university");
   const course = searchParams.get("course");
   const intakes = searchParams.get("intakes");
+  const studentId = searchParams.get("student_id");
+  const studentName = searchParams.get("student_name");
   
   if (university && course && activeSection === "applications") {
     // Pre-fill the form
@@ -480,7 +482,8 @@ useEffect(() => {
       ...prev,
       university: decodeURIComponent(university),
       course: decodeURIComponent(course),
-      preferred_intake: intakes ? decodeURIComponent(intakes) : prev.preferred_intake
+      preferred_intake: intakes ? decodeURIComponent(intakes) : prev.preferred_intake,
+      student_id: studentId ? studentId : prev.student_id
     }));
     
     // Open the modal
@@ -491,6 +494,23 @@ useEffect(() => {
     newSearchParams.delete("university");
     newSearchParams.delete("course");
     newSearchParams.delete("intakes");
+    newSearchParams.delete("student_id");
+    newSearchParams.delete("student_name");
+    navigate(`/edupartner/dashboard?section=applications`, { replace: true });
+  } else if (studentId && activeSection === "applications") {
+    // Only student info provided (from student dashboard)
+    setApplicationForm(prev => ({
+      ...prev,
+      student_id: studentId
+    }));
+    
+    // Open the modal
+    openApplicationModal();
+    
+    // Clean up URL parameters
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete("student_id");
+    newSearchParams.delete("student_name");
     navigate(`/edupartner/dashboard?section=applications`, { replace: true });
   }
 }, [searchParams, activeSection]);
