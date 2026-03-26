@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, User, FileText, Edit, CheckCircle, 
   Clock, AlertCircle, XCircle, Calendar, Building2,
-  Mail, Phone, Globe, History, Download, Eye, File
+  Mail, Phone, Globe, History, Download, Eye, File,
+  GraduationCap, Star, X, Sparkles
 } from "lucide-react";
 import ApplicationStatusBar from "../../components/ApplicationStatusBar";
 import ApplicationStatusManager from "../../components/ApplicationStatusManager";
@@ -101,6 +102,18 @@ const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState<'progress' | 'documents' | 'applications'>('progress');
   const [showStatusHistory, setShowStatusHistory] = useState(false);
   const [showStudentStatusHistory, setShowStudentStatusHistory] = useState(false);
+
+  // New Application Modal state
+  const [showNewAppModal, setShowNewAppModal] = useState(false);
+  const [universities, setUniversities] = useState<any[]>([]);
+  const [isSubmittingApp, setIsSubmittingApp] = useState(false);
+  const [applicationForm, setApplicationForm] = useState({
+    student_name: "",
+    course: "",
+    university: "",
+    preferred_intake: "",
+    notes: "",
+  });
 
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost/studyabroadplatform-api'
@@ -309,6 +322,107 @@ const StudentDashboard = () => {
     setShowStatusManager(false);
     fetchAppStatusHistory(app.id);
   };
+
+  // ========== New Application Modal Functions ==========
+  const fetchUniversitiesForModal = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/edupartner/get_universities.php`);
+      const data = await res.json();
+      if (data.success) setUniversities(data.universities);
+    } catch (err) {
+      console.error("Failed to fetch universities", err);
+    }
+  };
+
+  const openNewAppModal = () => {
+    const studentName = getStudentName();
+    setApplicationForm({
+      student_name: studentName,
+      course: "",
+      university: "",
+      preferred_intake: "",
+      notes: "",
+    });
+    setShowNewAppModal(true);
+    fetchUniversitiesForModal();
+  };
+
+  const closeNewAppModal = () => {
+    setShowNewAppModal(false);
+    setApplicationForm({
+      student_name: "",
+      course: "",
+      university: "",
+      preferred_intake: "",
+      notes: "",
+    });
+  };
+
+  const handleSelectRecommendation = (uni: any) => {
+    const intakes = uni.Open_Intakes
+      ? uni.Open_Intakes.split(/[,;]/).map((s: string) => s.trim()).filter(Boolean).join(',')
+      : '';
+    setApplicationForm({
+      ...applicationForm,
+      course: uni.Program_Name || "",
+      university: uni.University || "",
+      preferred_intake: intakes || applicationForm.preferred_intake,
+    });
+  };
+
+  const submitNewApplication = async () => {
+    if (!applicationForm.course || !applicationForm.university) {
+      alert("Please fill all required fields (Course & University)");
+      return;
+    }
+
+    setIsSubmittingApp(true);
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    try {
+      const res = await fetch(`${API_BASE}/edupartner/submit_application.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: user.id,
+          student_name: applicationForm.student_name,
+          university_name: applicationForm.university,
+          course_name: applicationForm.course,
+          pref_intake: applicationForm.preferred_intake,
+          additional_notes: applicationForm.notes,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        closeNewAppModal();
+        fetchApplications();
+      } else {
+        alert(data.error || "Failed to submit application");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server error");
+    } finally {
+      setIsSubmittingApp(false);
+    }
+  };
+
+  // Derived data for modal dropdowns
+  const uniqueCourses = [...new Set(universities.map((u: any) => u.Program_Name).filter(Boolean))];
+  const filteredUniversitiesForCourse = universities.filter(
+    (u: any) => u.Program_Name === applicationForm.course
+  );
+
+  // Recommended universities: filtered by selected course, sorted by Entry_Requirements ASC
+  const recommendedForCourse = applicationForm.course
+    ? [...filteredUniversitiesForCourse].sort((a: any, b: any) => {
+        const reqA = (a.Entry_Requirements || '').toString().toLowerCase();
+        const reqB = (b.Entry_Requirements || '').toString().toLowerCase();
+        return reqA.localeCompare(reqB);
+      })
+    : [];
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
@@ -679,10 +793,7 @@ const StudentDashboard = () => {
               <div className="applications-section">
                 <div className="section-header">
                   <h2>Applications ({applications.length})</h2>
-                  <button className="btn-primary" onClick={() => {
-                    const studentName = getStudentName();
-                    navigate(`/edupartner/dashboard?section=applications&student_id=${studentId}&student_name=${encodeURIComponent(studentName)}`);
-                  }}>
+                  <button className="btn-primary" onClick={openNewAppModal}>
                     + New Application
                   </button>
                 </div>
@@ -691,13 +802,7 @@ const StudentDashboard = () => {
                   <div className="empty-state">
                     <FileText size={48} />
                     <h3>No Applications Yet</h3>
-                    <p>This student hasn't submitted any applications.</p>
-                    <button className="btn-primary" onClick={() => {
-                      const studentName = getStudentName();
-                      navigate(`/edupartner/dashboard?section=applications&student_id=${studentId}&student_name=${encodeURIComponent(studentName)}`);
-                    }}>
-                      Create First Application
-                    </button>
+                    <p>This student hasn't submitted any applications. Click "+ New Application" above to get started.</p>
                   </div>
                 ) : (
                   <div className="applications-grid">
@@ -903,6 +1008,222 @@ const StudentDashboard = () => {
                   {showStatusManager ? 'Hide Status Manager' : 'Update Status'}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ New Application Modal ============ */}
+      {showNewAppModal && (
+        <div className="modal-overlay" onClick={closeNewAppModal}>
+          <div className="new-app-modal" onClick={(e) => e.stopPropagation()}>
+
+            {/* HEADER */}
+            <div className="new-app-modal-header">
+              <div>
+                <h3>Submit New Application</h3>
+                <p>Fill in the details and choose a university</p>
+              </div>
+              <button className="new-app-close-btn" onClick={closeNewAppModal}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* BODY: Two columns */}
+            <div className="new-app-modal-body">
+
+              {/* LEFT: Application Form */}
+              <div className="new-app-form-section">
+                <h4 className="new-app-section-title"><FileText size={18} /> Application Details</h4>
+
+                {/* Student Name (auto-filled, read-only) */}
+                <div className="new-app-field">
+                  <label>Student <span className="required">*</span></label>
+                  <div className="new-app-student-display">
+                    <User size={18} />
+                    <span>{applicationForm.student_name || getStudentName()}</span>
+                  </div>
+                </div>
+
+                {/* Course */}
+                <div className="new-app-field">
+                  <label>Course <span className="required">*</span></label>
+                  <select
+                    value={applicationForm.course}
+                    onChange={(e) =>
+                      setApplicationForm({
+                        ...applicationForm,
+                        course: e.target.value,
+                        university: "",
+                        preferred_intake: "",
+                      })
+                    }
+                  >
+                    <option value="">Select a course</option>
+                    {uniqueCourses.map((course, i) => (
+                      <option key={i} value={course as string}>
+                        {course as string}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* University */}
+                <div className="new-app-field">
+                  <label>University <span className="required">*</span></label>
+                  <select
+                    value={applicationForm.university}
+                    onChange={(e) => {
+                      const selectedUniversity = e.target.value;
+                      const universityData = universities.find(
+                        (u: any) => u.University === selectedUniversity && u.Program_Name === applicationForm.course
+                      );
+                      const intakes = universityData?.Open_Intakes
+                        ? universityData.Open_Intakes.split(/[,;]/).map((s: string) => s.trim()).filter(Boolean).join(',')
+                        : '';
+                      setApplicationForm({
+                        ...applicationForm,
+                        university: selectedUniversity,
+                        preferred_intake: intakes || applicationForm.preferred_intake,
+                      });
+                    }}
+                    disabled={!applicationForm.course}
+                  >
+                    <option value="">Select a university</option>
+                    {filteredUniversitiesForCourse.map((u: any, i: number) => (
+                      <option key={i} value={u.University}>
+                        {u.University}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Intake */}
+                <div className="new-app-field">
+                  <label>
+                    Preferred Intake
+                    {applicationForm.preferred_intake && (
+                      <span className="auto-filled-tag">Auto-filled</span>
+                    )}
+                  </label>
+                  {(() => {
+                    const intakes = applicationForm.preferred_intake
+                      ? applicationForm.preferred_intake.split(',').map((i) => i.trim()).filter(Boolean)
+                      : [];
+                    if (intakes.length > 1) {
+                      return (
+                        <select
+                          value={applicationForm.preferred_intake}
+                          onChange={(e) =>
+                            setApplicationForm({ ...applicationForm, preferred_intake: e.target.value })
+                          }
+                        >
+                          <option value="">Select Intake Month</option>
+                          {intakes.map((intake, idx) => (
+                            <option key={idx} value={intake}>{intake}</option>
+                          ))}
+                        </select>
+                      );
+                    } else {
+                      return (
+                        <input
+                          placeholder="e.g. September 2025"
+                          value={applicationForm.preferred_intake}
+                          onChange={(e) =>
+                            setApplicationForm({ ...applicationForm, preferred_intake: e.target.value })
+                          }
+                          readOnly={intakes.length === 1}
+                        />
+                      );
+                    }
+                  })()}
+                </div>
+
+                {/* Notes */}
+                <div className="new-app-field">
+                  <label>Additional Notes</label>
+                  <textarea
+                    placeholder="Any additional information..."
+                    value={applicationForm.notes}
+                    onChange={(e) =>
+                      setApplicationForm({ ...applicationForm, notes: e.target.value })
+                    }
+                    rows={3}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="new-app-form-actions">
+                  <button className="new-app-cancel-btn" onClick={closeNewAppModal}>Cancel</button>
+                  <button
+                    className="new-app-submit-btn"
+                    onClick={submitNewApplication}
+                    disabled={isSubmittingApp}
+                  >
+                    {isSubmittingApp ? "Submitting..." : "Submit Application"}
+                  </button>
+                </div>
+              </div>
+
+              {/* RIGHT: Recommendation Panel */}
+              <div className="new-app-rec-section">
+                <div className="new-app-rec-header">
+                  <h4><Sparkles size={18} /> Recommended Universities</h4>
+                  <p>Sorted by highest admission chance</p>
+                </div>
+
+                <div className="new-app-rec-list">
+                  {!applicationForm.course ? (
+                    <div className="new-app-rec-empty">
+                      <GraduationCap size={32} />
+                      <p>Select a course to see recommended universities</p>
+                    </div>
+                  ) : recommendedForCourse.length === 0 ? (
+                    <div className="new-app-rec-empty">
+                      <GraduationCap size={32} />
+                      <p>No universities found for this course</p>
+                    </div>
+                  ) : (
+                    recommendedForCourse.map((uni: any, idx: number) => (
+                      <div
+                        key={uni.id || idx}
+                        className={`new-app-rec-card ${
+                          applicationForm.university === uni.University
+                            ? "selected"
+                            : ""
+                        }`}
+                        onClick={() => handleSelectRecommendation(uni)}
+                      >
+                        <div className="rec-card-top">
+                          <div className="rec-card-rank">#{idx + 1}</div>
+                          <div className="rec-card-info">
+                            <div className="rec-card-uni">{uni.University}</div>
+                            <div className="rec-card-program">{uni.Program_Name}</div>
+                          </div>
+                        </div>
+                        <div className="rec-card-meta">
+                          {uni.Country && (
+                            <span className="rec-meta-item">
+                              <Globe size={12} /> {uni.Country}
+                            </span>
+                          )}
+                          {uni.Entry_Requirements && (
+                            <span className="rec-meta-item rec-meta-entry">
+                              <Star size={12} /> {uni.Entry_Requirements}
+                            </span>
+                          )}
+                          {uni.Open_Intakes && (
+                            <span className="rec-meta-item">
+                              <Calendar size={12} /> {uni.Open_Intakes}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
