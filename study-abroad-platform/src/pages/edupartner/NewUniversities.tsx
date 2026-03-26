@@ -701,7 +701,11 @@ const NewUniversities = () => {
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <button 
                     className="nu-create-app-btn"
-                    onClick={() => navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}`)}
+                    onClick={() => {
+                      const intakes = parseIntakes(uni.Open_Intakes);
+                      const intakeParam = intakes.length > 0 ? `&intakes=${encodeURIComponent(intakes.join(','))}` : '';
+                      navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}${intakeParam}`);
+                    }}
                     style={{
                       padding: '12px 24px',
                       background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
@@ -1416,8 +1420,10 @@ const NewUniversities = () => {
                       {/* Footer */}
                       <div className="nu-card-footer">
                         <button className="nu-apply-btn" onClick={(e) => { 
-                          e.stopPropagation(); 
-                          navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}`);
+                          e.stopPropagation();
+                          const intakes = parseIntakes(uni.Open_Intakes);
+                          const intakeParam = intakes.length > 0 ? `&intakes=${encodeURIComponent(intakes.join(','))}` : '';
+                          navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}${intakeParam}`);
                         }}>
                           Create Application <ExternalLink size={14} />
                         </button>
