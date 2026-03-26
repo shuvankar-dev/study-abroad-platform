@@ -370,14 +370,10 @@ const NewUniversities = () => {
       let filtered = universities;
 
       if (searchTerm) {
-        const searchLower = searchTerm.toLowerCase();
         filtered = filtered.filter(uni =>
-          (uni.University || '').toLowerCase().includes(searchLower) ||
-          (uni.Course || '').toLowerCase().includes(searchLower) ||
-          (uni.Program_Name || '').toLowerCase().includes(searchLower) ||
-          (uni.Country || '').toLowerCase().includes(searchLower) ||
-          (uni.Campus || '').toLowerCase().includes(searchLower) ||
-          (uni.Study_Level || '').toLowerCase().includes(searchLower)
+          (uni.University || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (uni.Course || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (uni.Country || '').toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
@@ -701,11 +697,7 @@ const NewUniversities = () => {
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <button 
                     className="nu-create-app-btn"
-                    onClick={() => {
-                      const intakes = parseIntakes(uni.Open_Intakes);
-                      const intakeParam = intakes.length > 0 ? `&intakes=${encodeURIComponent(intakes.join(','))}` : '';
-                      navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}${intakeParam}`);
-                    }}
+                    onClick={() => navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}`)}
                     style={{
                       padding: '12px 24px',
                       background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
@@ -1048,7 +1040,7 @@ const NewUniversities = () => {
                 <Search size={18} className="nu-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search by university, program, course, country, campus, or level..."
+                  placeholder="Search by university, course, or country..."
                   value={searchTerm}
                   onChange={(e) => { setSearchTerm(e.target.value); setVisibleCount(20); }}
                   className="nu-search-input"
@@ -1420,10 +1412,8 @@ const NewUniversities = () => {
                       {/* Footer */}
                       <div className="nu-card-footer">
                         <button className="nu-apply-btn" onClick={(e) => { 
-                          e.stopPropagation();
-                          const intakes = parseIntakes(uni.Open_Intakes);
-                          const intakeParam = intakes.length > 0 ? `&intakes=${encodeURIComponent(intakes.join(','))}` : '';
-                          navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}${intakeParam}`);
+                          e.stopPropagation(); 
+                          navigate(`/edupartner/dashboard?section=applications&university=${encodeURIComponent(uni.University)}&course=${encodeURIComponent(uni.Program_Name || uni.Course)}`);
                         }}>
                           Create Application <ExternalLink size={14} />
                         </button>

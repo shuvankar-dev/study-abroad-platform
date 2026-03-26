@@ -472,18 +472,13 @@ const openApplicationModal = async () => {
 useEffect(() => {
   const university = searchParams.get("university");
   const course = searchParams.get("course");
-  const intakes = searchParams.get("intakes");
-  const studentId = searchParams.get("student_id");
-  const studentName = searchParams.get("student_name");
   
   if (university && course && activeSection === "applications") {
     // Pre-fill the form
     setApplicationForm(prev => ({
       ...prev,
       university: decodeURIComponent(university),
-      course: decodeURIComponent(course),
-      preferred_intake: intakes ? decodeURIComponent(intakes) : prev.preferred_intake,
-      student_id: studentId ? studentId : prev.student_id
+      course: decodeURIComponent(course)
     }));
     
     // Open the modal
@@ -493,24 +488,6 @@ useEffect(() => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.delete("university");
     newSearchParams.delete("course");
-    newSearchParams.delete("intakes");
-    newSearchParams.delete("student_id");
-    newSearchParams.delete("student_name");
-    navigate(`/edupartner/dashboard?section=applications`, { replace: true });
-  } else if (studentId && activeSection === "applications") {
-    // Only student info provided (from student dashboard)
-    setApplicationForm(prev => ({
-      ...prev,
-      student_id: studentId
-    }));
-    
-    // Open the modal
-    openApplicationModal();
-    
-    // Clean up URL parameters
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete("student_id");
-    newSearchParams.delete("student_name");
     navigate(`/edupartner/dashboard?section=applications`, { replace: true });
   }
 }, [searchParams, activeSection]);
@@ -6030,24 +6007,9 @@ useEffect(() => {
           </label>
           <select
             value={applicationForm.university}
-            onChange={(e) => {
-              const selectedUniversity = e.target.value;
-              // Find the university data to get intake information
-              const universityData = universities.find(
-                u => u.University === selectedUniversity && u.Program_Name === applicationForm.course
-              );
-              
-              // Auto-fill intake if available
-              const intakes = universityData?.Open_Intakes 
-                ? universityData.Open_Intakes.split(/[,;]/).map((s: string) => s.trim()).filter(Boolean).join(',')
-                : '';
-              
-              setApplicationForm({ 
-                ...applicationForm, 
-                university: selectedUniversity,
-                preferred_intake: intakes || applicationForm.preferred_intake
-              });
-            }}
+            onChange={(e) =>
+              setApplicationForm({ ...applicationForm, university: e.target.value })
+            }
             disabled={!applicationForm.course}
             style={{
               width: "100%",
@@ -6090,95 +6052,38 @@ useEffect(() => {
             color: "#334155",
             marginBottom: 8
           }}>
-            Preferred Intake {applicationForm.preferred_intake && <span style={{ color: '#10b981', fontSize: '12px' }}>(Auto-filled from university)</span>}
+            Preferred Intake
           </label>
-          {(() => {
-            // Parse intakes from the preferred_intake field (comma-separated)
-            const intakes = applicationForm.preferred_intake ? applicationForm.preferred_intake.split(',').map(i => i.trim()).filter(Boolean) : [];
-            
-            if (intakes.length > 1) {
-              // Multiple intakes - show dropdown
-              return (
-                <select
-                  value={applicationForm.preferred_intake}
-                  onChange={(e) =>
-                    setApplicationForm({
-                      ...applicationForm,
-                      preferred_intake: e.target.value,
-                    })
-                  }
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: 8,
-                    border: "2px solid #e2e8f0",
-                    fontSize: 15,
-                    outline: "none",
-                    backgroundColor: "#f8fafc",
-                    cursor: "pointer"
-                  }}
-                >
-                  <option value="">Select Intake Month</option>
-                  {intakes.map((intake, idx) => (
-                    <option key={idx} value={intake}>{intake}</option>
-                  ))}
-                </select>
-              );
-            } else if (intakes.length === 1) {
-              // Single intake - show read-only field
-              return (
-                <input
-                  value={applicationForm.preferred_intake}
-                  readOnly
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: 8,
-                    border: "2px solid #e2e8f0",
-                    fontSize: 15,
-                    outline: "none",
-                    backgroundColor: "#f1f5f9",
-                    cursor: "not-allowed",
-                    color: "#64748b"
-                  }}
-                />
-              );
-            } else {
-              // No intakes - allow manual entry
-              return (
-                <input
-                  placeholder="e.g. September 2025"
-                  value={applicationForm.preferred_intake}
-                  onChange={(e) =>
-                    setApplicationForm({
-                      ...applicationForm,
-                      preferred_intake: e.target.value,
-                    })
-                  }
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: 8,
-                    border: "2px solid #e2e8f0",
-                    fontSize: 15,
-                    outline: "none",
-                    background: "#fff",
-                    color: "#0f172a",
-                    transition: "all 0.2s",
-                    boxSizing: "border-box"
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "#667eea";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "#e2e8f0";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
-              );
+          <input
+            placeholder="e.g. September 2025"
+            value={applicationForm.preferred_intake}
+            onChange={(e) =>
+              setApplicationForm({
+                ...applicationForm,
+                preferred_intake: e.target.value,
+              })
             }
-          })()}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: 8,
+              border: "2px solid #e2e8f0",
+              fontSize: 15,
+              outline: "none",
+              background: "#fff",
+              color: "#0f172a",
+              transition: "all 0.2s",
+              boxSizing: "border-box"
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "#667eea";
+              e.target.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.boxShadow = "none";
+            }}
+          />
         </div>
 
         {/* NOTES */}
