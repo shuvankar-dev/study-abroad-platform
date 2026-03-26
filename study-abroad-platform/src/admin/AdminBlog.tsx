@@ -298,9 +298,10 @@ export default function AdminBlog() {
 
   const getImageUrl = (imagePath?: string): string | undefined => {
     if (!imagePath) return undefined;
-    return imagePath.startsWith('http') 
-      ? imagePath 
-      : `${API_BASE}/${imagePath}`;
+    if (imagePath.startsWith('http')) return imagePath;
+    // Images stored at DOCUMENT_ROOT/uploads/blog/ — serve from domain root
+    const base = window.location.hostname === 'localhost' ? 'http://localhost' : '';
+    return `${base}/${imagePath}`;
   };
 
   if (loading && posts.length === 0) {

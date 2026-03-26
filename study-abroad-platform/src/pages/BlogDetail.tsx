@@ -125,9 +125,10 @@ const BlogDetail = () => {
 
   const getImageUrl = (imagePath?: string): string => {
     if (!imagePath) return '/src/assets/blog image/default.png';
-    return imagePath.startsWith('http') 
-      ? imagePath 
-      : `${API_BASE}/${imagePath}`;
+    if (imagePath.startsWith('http')) return imagePath;
+    // Images stored at DOCUMENT_ROOT/uploads/blog/ — serve from domain root
+    const base = window.location.hostname === 'localhost' ? 'http://localhost' : '';
+    return `${base}/${imagePath}`;
   };
 
   const formatDate = (dateString: string) => {
