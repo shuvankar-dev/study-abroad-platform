@@ -1437,13 +1437,14 @@ const submitApplication = async () => {
 
   try {
     const res = await fetch(
-      `${API_BASE}/edupartner/submit_application.php`,
+      `${API_BASE}/edupartner/submit_application_v2.php`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: user.id,
-          student_name: selectedStudent.name, // ✅ NOW CORRECT
+          student_id: selectedStudent.id, // Pass student ID
+          student_name: selectedStudent.name,
           university_name: applicationForm.university,
           course_name: applicationForm.course,
           pref_intake: applicationForm.preferred_intake,
@@ -1455,7 +1456,7 @@ const submitApplication = async () => {
     const data = await res.json();
 
     if (data.success) {
-   
+      alert(`Application created successfully! Application ID: ${data.application_code}`);
       setShowApplicationModal(false);
      resetApplicationForm();
      fetchApplications();
@@ -1476,7 +1477,7 @@ const [recentApplications, setRecentApplications] = useState<any[]>([]);
 const fetchApplications = async () => {
   try {
     const res = await fetch(
-      `${API_BASE}/edupartner/get_applications.php`,
+      `${API_BASE}/edupartner/get_applications_v2.php`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -5585,7 +5586,7 @@ useEffect(() => {
   }}
 >
   
-  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+  <table style={{ width: "100%", minWidth: "1400px", borderCollapse: "collapse" }}>
     <thead>
       <tr
         style={{
@@ -5593,15 +5594,18 @@ useEffect(() => {
           textAlign: "left",
           fontSize: 13,
           color: "#64748b",
+          whiteSpace: "nowrap"
         }}
       >
-        <th style={{ padding: "14px 20px" }}>Student</th>
-        <th style={{ padding: "14px 20px" }}>University</th>
-        <th style={{ padding: "14px 20px" }}>Course</th>
-        <th style={{ padding: "14px 20px" }}>Commission</th>
-        <th style={{ padding: "14px 20px" }}>Preferred Intake</th>
-        <th style={{ padding: "14px 20px" }}>Status</th>
-        <th style={{ padding: "14px 20px", textAlign: "right" }}>Actions</th>
+        <th style={{ padding: "14px 20px", minWidth: "140px" }}>App ID</th>
+        <th style={{ padding: "14px 20px", minWidth: "140px" }}>Student ID</th>
+        <th style={{ padding: "14px 20px", minWidth: "200px" }}>Student</th>
+        <th style={{ padding: "14px 20px", minWidth: "250px" }}>University</th>
+        <th style={{ padding: "14px 20px", minWidth: "250px" }}>Course</th>
+        <th style={{ padding: "14px 20px", minWidth: "120px" }}>Commission</th>
+        <th style={{ padding: "14px 20px", minWidth: "150px" }}>Preferred Intake</th>
+        <th style={{ padding: "14px 20px", minWidth: "120px" }}>Status</th>
+        <th style={{ padding: "14px 20px", minWidth: "100px", textAlign: "right" }}>Actions</th>
       </tr>
     </thead>
 
@@ -5615,8 +5619,40 @@ useEffect(() => {
             color: "#0f172a",
           }}
         >
-          {/* Student */}
+          {/* Application ID */}
           <td style={{ padding: "16px 20px" }}>
+            <div style={{ 
+              fontFamily: "monospace", 
+              fontSize: 13, 
+              fontWeight: 600,
+              color: "#6366f1",
+              background: "#eef2ff",
+              padding: "4px 8px",
+              borderRadius: 6,
+              width: "fit-content"
+            }}>
+              {app.application_code || `#${app.id}`}
+            </div>
+          </td>
+
+          {/* Student ID */}
+          <td style={{ padding: "16px 20px" }}>
+            <div style={{ 
+              fontFamily: "monospace", 
+              fontSize: 12, 
+              fontWeight: 600,
+              color: "#059669",
+              background: "#d1fae5",
+              padding: "4px 8px",
+              borderRadius: 6,
+              width: "fit-content"
+            }}>
+              {app.student_code || 'N/A'}
+            </div>
+          </td>
+
+          {/* Student */}
+          <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <div
                 style={{
@@ -5628,6 +5664,7 @@ useEffect(() => {
                   alignItems: "center",
                   justifyContent: "center",
                   color: "#4f46e5",
+                  flexShrink: 0
                 }}
               >
                 <User size={18} />
@@ -5637,23 +5674,23 @@ useEffect(() => {
           </td>
 
           {/* University */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
+          <td style={{ padding: "16px 20px", color: "#334155", whiteSpace: "nowrap" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <GraduationCap size={16} style={{ color: "#64748b" }} />
-              {app.university_name}
+              <GraduationCap size={16} style={{ color: "#64748b", flexShrink: 0 }} />
+              <span>{app.university_name}</span>
             </span>
           </td>
 
           {/* Course */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
+          <td style={{ padding: "16px 20px", color: "#334155", whiteSpace: "nowrap" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <BookOpen size={16} style={{ color: "#64748b" }} />
-              {app.course_name}
+              <BookOpen size={16} style={{ color: "#64748b", flexShrink: 0 }} />
+              <span>{app.course_name}</span>
             </span>
           </td>
 
           {/* Commission */}
-          <td style={{ padding: "16px 20px" }}>
+          <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>
             {(() => {
               const commInfo = findCommissionInfo(app.university_name);
               if (!commInfo) return <span style={{ color: "#94a3b8", fontSize: 12 }}>N/A</span>;
@@ -5683,15 +5720,15 @@ useEffect(() => {
           </td>
 
           {/* Intake */}
-          <td style={{ padding: "16px 20px", color: "#334155" }}>
+          <td style={{ padding: "16px 20px", color: "#334155", whiteSpace: "nowrap" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <Calendar size={16} style={{ color: "#64748b" }} />
-              {app.pref_intake || "-"}
+              <Calendar size={16} style={{ color: "#64748b", flexShrink: 0 }} />
+              <span>{app.pref_intake || "-"}</span>
             </span>
           </td>
 
           {/* Status */}
-          <td style={{ padding: "16px 20px" }}>
+          <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>
             <span
               style={{
                 padding: "4px 10px",
@@ -5701,6 +5738,7 @@ useEffect(() => {
                 color: "#f97316",
                 border: "1px solid #fed7aa",
                 fontWeight: 500,
+                display: "inline-block"
               }}
             >
               {app.status}
@@ -5712,6 +5750,7 @@ useEffect(() => {
             style={{
               padding: "16px 20px",
               textAlign: "right",
+              whiteSpace: "nowrap"
             }}
           >
             <button

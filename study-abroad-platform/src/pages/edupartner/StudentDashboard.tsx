@@ -14,6 +14,9 @@ import "./studentdashboard.css";
 
 interface Application {
   id: number;
+  application_code?: string;
+  student_id?: number;
+  student_code?: string;
   student_name: string;
   university_name: string;
   course_name: string;
@@ -380,11 +383,12 @@ const StudentDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     try {
-      const res = await fetch(`${API_BASE}/edupartner/submit_application.php`, {
+      const res = await fetch(`${API_BASE}/edupartner/submit_application_v2.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: user.id,
+          student_id: studentId, // Pass the actual student ID
           student_name: applicationForm.student_name,
           university_name: applicationForm.university,
           course_name: applicationForm.course,
@@ -396,6 +400,7 @@ const StudentDashboard = () => {
       const data = await res.json();
 
       if (data.success) {
+        alert(`Application created successfully! Application ID: ${data.application_code}`);
         closeNewAppModal();
         fetchApplications();
       } else {
@@ -809,7 +814,17 @@ const StudentDashboard = () => {
                     {applications.map((app, index) => (
                       <div key={`${app.id}-${index}`} className="application-card" onClick={() => handleViewDetails(app)}>
                         <div className="app-card-header">
-                          <div className="app-id">App ID: #{app.id}</div>
+                          <div className="app-id" style={{ 
+                            fontFamily: "monospace", 
+                            fontSize: 13, 
+                            fontWeight: 600,
+                            color: "#6366f1",
+                            background: "#eef2ff",
+                            padding: "4px 8px",
+                            borderRadius: 6
+                          }}>
+                            {app.application_code || `#${app.id}`}
+                          </div>
                           <div className={getStatusClass(app.status)}>
                             {getStatusIcon(app.status)}
                             {app.status}
@@ -858,7 +873,7 @@ const StudentDashboard = () => {
         <div className="modal-overlay" onClick={() => setSelectedApp(null)}>
           <div className="modal-content application-detail-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Application Details - #{selectedApp.id}</h2>
+              <h2>Application Details - {selectedApp.application_code || `#${selectedApp.id}`}</h2>
               <button className="modal-close" onClick={() => setSelectedApp(null)}>×</button>
             </div>
 
