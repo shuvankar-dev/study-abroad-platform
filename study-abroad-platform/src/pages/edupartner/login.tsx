@@ -187,7 +187,7 @@ const Login = () => {
             </div>
 
             {/* Password Field */}
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: '12px' }}>
               <label style={{ 
                 display: 'block',
                 fontSize: '14px',
@@ -215,6 +215,7 @@ const Login = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
                   style={{
                     width: '100%',
                     padding: '12px 12px 12px 46px',
@@ -235,6 +236,21 @@ const Login = () => {
                   }}
                 />
               </div>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div style={{ textAlign: 'right', marginBottom: '24px' }}>
+              <Link 
+                to="/edupartner/forgot-password"
+                style={{
+                  fontSize: '14px',
+                  color: '#667eea',
+                  fontWeight: '500',
+                  textDecoration: 'none'
+                }}
+              >
+                Forgot Password?
+              </Link>
             </div>
 
             {/* Error Message */}

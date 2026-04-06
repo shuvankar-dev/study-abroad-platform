@@ -7,9 +7,10 @@ import {
   CreditCard, BookOpen, MessageSquare, Shield, User, 
   LogOut, Plus, Search, Filter, Clock,
   TrendingUp, CheckCircle, AlertCircle, Mail, Phone, Globe, 
-  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame, Menu
+  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame, Menu, Key
 } from "lucide-react";
 import { findCommissionInfo, getTierColor } from "../../data/commissionData";
+import ChangePasswordModal from "../../components/ChangePasswordModal";
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
@@ -72,6 +73,7 @@ const Dashboard = () => {
   const initialSection = searchParams.get("section") || "dashboard";
   const [activeSection, setActiveSection] = useState(initialSection);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showAccommodationModal, setShowAccommodationModal] = useState(false);
@@ -2251,7 +2253,7 @@ useEffect(() => {
                         position: "absolute",
                         top: "48px",
                         right: 0,
-                        width: 180,
+                        width: 200,
                         background: "#ffffff",
                         border: "1px solid #e2e8f0",
                         borderRadius: 10,
@@ -2279,6 +2281,24 @@ useEffect(() => {
 
                       {/* <Link to="/signup">Register here</Link> */}
                         <User size={16} /> Profile Settings
+                    </div>
+
+                    <div
+                        style={{
+                        padding: "12px 16px",
+                        fontSize: 14,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        borderTop: "1px solid #e2e8f0",
+                        }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setShowChangePasswordModal(true);
+                        }}
+                    >
+                        <Key size={16} /> Change Password
                     </div>
 
                     <div
@@ -11386,6 +11406,13 @@ useEffect(() => {
 
 
       </main>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+        userId={userId}
+      />
     </div>
   );
 };

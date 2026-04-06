@@ -37,6 +37,8 @@ import EdupartnerAddStudent from './pages/edupartner/AddStudent'
 import EdupartnerStudents from './pages/edupartner/Students'
 import EdupartnerStudentDashboard from './pages/edupartner/StudentDashboard'
 import EdupartnerNewUniversities from './pages/edupartner/NewUniversities'
+import EdupartnerForgotPassword from './pages/edupartner/ForgotPassword'
+import EdupartnerResetPassword from './pages/edupartner/ResetPassword'
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
@@ -131,6 +133,8 @@ function AppContent() {
           {/* Edupartner Routes */}
           <Route path="/edupartner" element={<EdupartnerLogin />} />
           <Route path="/edupartner/login" element={<EdupartnerLogin />} />
+          <Route path="/edupartner/forgot-password" element={<EdupartnerForgotPassword />} />
+          <Route path="/edupartner/reset-password" element={<EdupartnerResetPassword />} />
           <Route path="/edupartner/signup" element={<EdupartnerSignup />} />
           <Route path="/edupartner/dashboard" element={<EdupartnerDashboard />} />
           <Route path="/edupartner/profile-edit" element={<EdupartnerProfileEdit />} />
