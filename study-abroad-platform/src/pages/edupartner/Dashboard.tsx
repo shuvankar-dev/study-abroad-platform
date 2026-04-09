@@ -583,12 +583,12 @@ useEffect(() => {
 const fetchAgents = async () => {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("Fetching agents for admin_id:", user.id);
+    console.log("Fetching agents for admin_id:", user.id, "role:", user.role);
     
     const res = await fetch(`${API_BASE}/edupartner/get_agents.php`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ admin_id: user.id }),
+      body: JSON.stringify({ admin_id: user.id, role: user.role }),
     });
     
     if (!res.ok) {
@@ -636,7 +636,7 @@ const submitAgent = async () => {
 };
 
 useEffect(() => {
-  if (userRole === "Admin") {
+  if (userRole === "Admin" || isSuperAdmin) {
     fetchAgents();
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -644,7 +644,7 @@ useEffect(() => {
 
 // Fetch agents when Agents section is opened
 useEffect(() => {
-  if (activeSection === "agents" && userRole === "Admin") {
+  if (activeSection === "agents" && (userRole === "Admin" || isSuperAdmin)) {
     fetchAgents();
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -655,12 +655,12 @@ useEffect(() => {
 const fetchCounselors = async () => {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("Fetching counselors for agent_id:", user.id);
+    console.log("Fetching counselors for user_id:", user.id, "role:", user.role);
     
     const res = await fetch(`${API_BASE}/edupartner/get_counselors.php`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ agent_id: user.id }),
+      body: JSON.stringify({ agent_id: user.id, role: user.role }),
     });
     
     if (!res.ok) {
@@ -748,7 +748,7 @@ const deleteCounselor = async () => {
 };
 
 useEffect(() => {
-  if (userRole === "Agent") {
+  if (userRole === "Agent" || userRole === "Admin" || isSuperAdmin) {
     fetchCounselors();
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -756,7 +756,7 @@ useEffect(() => {
 
 // Fetch counselors when Counselors section is opened
 useEffect(() => {
-  if (activeSection === "counselors" && userRole === "Agent") {
+  if (activeSection === "counselors" && (userRole === "Agent" || userRole === "Admin" || isSuperAdmin)) {
     fetchCounselors();
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2116,7 +2116,7 @@ useEffect(() => {
             <Users size={18} /> Students
           </li>
 
-          {userRole === "Admin" && !isSuperAdmin && (
+          {(userRole === "Admin" || isSuperAdmin) && (
             <li
               className={activeSection === "agents" ? "active" : ""}
               onClick={() => { setActiveSection("agents"); setSidebarOpen(false); }}
@@ -2134,7 +2134,7 @@ useEffect(() => {
             </li>
           )}
 
-          {userRole === "Agent" && (
+          {(userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
             <li
               className={activeSection === "counselors" ? "active" : ""}
               onClick={() => { setActiveSection("counselors"); setSidebarOpen(false); }}
@@ -5127,19 +5127,25 @@ useEffect(() => {
         )}
 
 
-        {/* ================= AGENTS SECTION (ADMIN ONLY) ================= */}
-        {activeSection === "agents" && userRole === "Admin" && (
+        {/* ================= AGENTS SECTION (ADMIN + SUPER ADMIN) ================= */}
+        {activeSection === "agents" && (userRole === "Admin" || isSuperAdmin) && (
           <div style={{ padding: "24px" }}>
             {/* HEADER */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div>
                 <h1 style={{ marginBottom: 4 }}>Agents</h1>
-                <p style={{ color: "#64748b" }}>Manage your agent accounts ({agents.length} total)</p>
+                <p style={{ color: "#64748b" }}>
+                  {isSuperAdmin 
+                    ? `All agent accounts across all admins (${agents.length} total)` 
+                    : `Manage your agent accounts (${agents.length} total)`}
+                </p>
               </div>
-              <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
-                <Plus size={18} />
-                <span>Add Agent</span>
-              </button>
+              {!isSuperAdmin && (
+                <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
+                  <Plus size={18} />
+                  <span>Add Agent</span>
+                </button>
+              )}
             </div>
 
             {/* AGENTS TABLE */}
@@ -5149,11 +5155,15 @@ useEffect(() => {
                   <UserPlus size={48} style={{ margin: "0 auto" }} />
                 </div>
                 <h3 style={{ marginBottom: 6 }}>No agents found</h3>
-                <p style={{ color: "#64748b", marginBottom: 20 }}>Add your first agent to get started</p>
-                <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
-                  <Plus size={18} />
-                  <span>Add Agent</span>
-                </button>
+                <p style={{ color: "#64748b", marginBottom: 20 }}>
+                  {isSuperAdmin ? "No agents have been created by any admin yet" : "Add your first agent to get started"}
+                </p>
+                {!isSuperAdmin && (
+                  <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
+                    <Plus size={18} />
+                    <span>Add Agent</span>
+                  </button>
+                )}
               </div>
             ) : (
               <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflowX: "auto" }}>
@@ -5164,9 +5174,11 @@ useEffect(() => {
                       <th style={{ padding: "12px 14px" }}>Agent Name</th>
                       <th style={{ padding: "12px 14px" }}>Email</th>
                       <th style={{ padding: "12px 14px" }}>Phone</th>
+                      {isSuperAdmin && <th style={{ padding: "12px 14px" }}>Parent Admin</th>}
+                      <th style={{ padding: "12px 14px" }}>Students</th>
                       <th style={{ padding: "12px 14px" }}>Status</th>
                       <th style={{ padding: "12px 14px" }}>Created</th>
-                      <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>
+                      {!isSuperAdmin && <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -5189,6 +5201,33 @@ useEffect(() => {
                         <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
                           {agent.phone}
                         </td>
+                        {isSuperAdmin && (
+                          <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                            <span style={{ 
+                              padding: "3px 10px", 
+                              borderRadius: 20, 
+                              fontSize: 12, 
+                              fontWeight: 600,
+                              background: "#ede9fe",
+                              color: "#6d28d9"
+                            }}>
+                              {agent.parent_admin_name || "N/A"}
+                            </span>
+                          </td>
+                        )}
+                        <td style={{ padding: "12px 14px" }}>
+                          <span style={{ 
+                            padding: "3px 10px", 
+                            borderRadius: 20, 
+                            fontSize: 12, 
+                            fontWeight: 600,
+                            background: "#fef3c7",
+                            color: "#92400e",
+                            whiteSpace: "nowrap"
+                          }}>
+                            {agent.student_count || 0} Students
+                          </span>
+                        </td>
                         <td style={{ padding: "12px 14px" }}>
                           <span style={{ 
                             padding: "3px 10px", 
@@ -5204,28 +5243,30 @@ useEffect(() => {
                         <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
                           {agent.created_at ? new Date(agent.created_at).toLocaleDateString() : "N/A"}
                         </td>
-                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
-                            <button
-                              onClick={() => {
-                                setEditingAgent(agent);
-                                setShowEditAgentModal(true);
-                              }}
-                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
-                            >
-                              <Edit2 size={15} style={{ color: "#667eea" }} />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setDeletingAgentId(agent.id);
-                                setShowDeleteAgentModal(true);
-                              }}
-                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
-                            >
-                              <Trash2 size={15} style={{ color: "#ef4444" }} />
-                            </button>
-                          </div>
-                        </td>
+                        {!isSuperAdmin && (
+                          <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                            <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                              <button
+                                onClick={() => {
+                                  setEditingAgent(agent);
+                                  setShowEditAgentModal(true);
+                                }}
+                                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
+                              >
+                                <Edit2 size={15} style={{ color: "#667eea" }} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDeletingAgentId(agent.id);
+                                  setShowDeleteAgentModal(true);
+                                }}
+                                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
+                              >
+                                <Trash2 size={15} style={{ color: "#ef4444" }} />
+                              </button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -5274,6 +5315,7 @@ useEffect(() => {
                       <th style={{ padding: "12px 14px" }}>Email</th>
                       <th style={{ padding: "12px 14px" }}>Phone</th>
                       <th style={{ padding: "12px 14px" }}>Agents</th>
+                      <th style={{ padding: "12px 14px" }}>Students</th>
                       <th style={{ padding: "12px 14px" }}>Status</th>
                       <th style={{ padding: "12px 14px" }}>Created</th>
                       <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>
@@ -5310,6 +5352,19 @@ useEffect(() => {
                             whiteSpace: "nowrap"
                           }}>
                             {admin.agent_count} Agents
+                          </span>
+                        </td>
+                        <td style={{ padding: "12px 14px" }}>
+                          <span style={{ 
+                            padding: "3px 10px", 
+                            borderRadius: 20, 
+                            fontSize: 12, 
+                            fontWeight: 600,
+                            background: "#fef3c7",
+                            color: "#92400e",
+                            whiteSpace: "nowrap"
+                          }}>
+                            {admin.student_count || 0} Students
                           </span>
                         </td>
                         <td style={{ padding: "12px 14px" }}>
@@ -5359,19 +5414,27 @@ useEffect(() => {
         )}
 
 
-        {/* ================= COUNSELORS SECTION (AGENT ONLY) ================= */}
-        {activeSection === "counselors" && userRole === "Agent" && (
+        {/* ================= COUNSELORS SECTION (AGENT + ADMIN + SUPER ADMIN) ================= */}
+        {activeSection === "counselors" && (userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
           <div style={{ padding: "24px" }}>
             {/* HEADER */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div>
                 <h1 style={{ marginBottom: 4 }}>Counselors</h1>
-                <p style={{ color: "#64748b" }}>Manage your counselor accounts ({counselors.length} total)</p>
+                <p style={{ color: "#64748b" }}>
+                  {isSuperAdmin 
+                    ? `All counselor accounts across all agents (${counselors.length} total)`
+                    : userRole === "Admin"
+                    ? `Counselors under your agents (${counselors.length} total)`
+                    : `Manage your counselor accounts (${counselors.length} total)`}
+                </p>
               </div>
-              <button className="add-student-btn" onClick={() => setShowAddCounselorModal(true)}>
-                <Plus size={18} />
-                <span>Add Counselor</span>
-              </button>
+              {userRole === "Agent" && (
+                <button className="add-student-btn" onClick={() => setShowAddCounselorModal(true)}>
+                  <Plus size={18} />
+                  <span>Add Counselor</span>
+                </button>
+              )}
             </div>
 
             {/* COUNSELORS TABLE - check for overflow hidden */}
@@ -5381,11 +5444,19 @@ useEffect(() => {
                   <UserPlus size={48} style={{ margin: "0 auto" }} />
                 </div>
                 <h3 style={{ marginBottom: 6 }}>No counselors found</h3>
-                <p style={{ color: "#64748b", marginBottom: 20 }}>Add your first counselor to get started</p>
-                <button className="add-student-btn" onClick={() => setShowAddCounselorModal(true)}>
-                  <Plus size={18} />
-                  <span>Add Counselor</span>
-                </button>
+                <p style={{ color: "#64748b", marginBottom: 20 }}>
+                  {isSuperAdmin 
+                    ? "No counselors have been created by any agent yet"
+                    : userRole === "Admin"
+                    ? "No counselors have been created by your agents yet"
+                    : "Add your first counselor to get started"}
+                </p>
+                {userRole === "Agent" && (
+                  <button className="add-student-btn" onClick={() => setShowAddCounselorModal(true)}>
+                    <Plus size={18} />
+                    <span>Add Counselor</span>
+                  </button>
+                )}
               </div>
             ) : (
               <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflowX: "auto" }}>
@@ -5396,9 +5467,11 @@ useEffect(() => {
                       <th style={{ padding: "12px 14px" }}>Counselor Name</th>
                       <th style={{ padding: "12px 14px" }}>Email</th>
                       <th style={{ padding: "12px 14px" }}>Phone</th>
+                      {(isSuperAdmin || userRole === "Admin") && <th style={{ padding: "12px 14px" }}>Parent Agent</th>}
+                      <th style={{ padding: "12px 14px" }}>Students</th>
                       <th style={{ padding: "12px 14px" }}>Status</th>
                       <th style={{ padding: "12px 14px" }}>Created</th>
-                      <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>
+                      {userRole === "Agent" && <th style={{ padding: "12px 14px", textAlign: "right" }}>Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -5421,6 +5494,33 @@ useEffect(() => {
                         <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
                           {counselor.phone}
                         </td>
+                        {(isSuperAdmin || userRole === "Admin") && (
+                          <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                            <span style={{ 
+                              padding: "3px 10px", 
+                              borderRadius: 20, 
+                              fontSize: 12, 
+                              fontWeight: 600,
+                              background: "#e0e7ff",
+                              color: "#4f46e5"
+                            }}>
+                              {counselor.parent_agent_name || "N/A"}
+                            </span>
+                          </td>
+                        )}
+                        <td style={{ padding: "12px 14px" }}>
+                          <span style={{ 
+                            padding: "3px 10px", 
+                            borderRadius: 20, 
+                            fontSize: 12, 
+                            fontWeight: 600,
+                            background: "#fef3c7",
+                            color: "#92400e",
+                            whiteSpace: "nowrap"
+                          }}>
+                            {counselor.student_count || 0} Students
+                          </span>
+                        </td>
                         <td style={{ padding: "12px 14px" }}>
                           <span style={{ 
                             padding: "3px 10px", 
@@ -5436,28 +5536,30 @@ useEffect(() => {
                         <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
                           {counselor.created_at ? new Date(counselor.created_at).toLocaleDateString() : "N/A"}
                         </td>
-                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
-                            <button
-                              onClick={() => {
-                                setEditingCounselor(counselor);
-                                setShowEditCounselorModal(true);
-                              }}
-                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
-                            >
-                              <Edit2 size={15} style={{ color: "#10b981" }} />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setDeletingCounselorId(counselor.id);
-                                setShowDeleteCounselorModal(true);
-                              }}
-                              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
-                            >
-                              <Trash2 size={15} style={{ color: "#ef4444" }} />
-                            </button>
-                          </div>
-                        </td>
+                        {userRole === "Agent" && (
+                          <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                            <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                              <button
+                                onClick={() => {
+                                  setEditingCounselor(counselor);
+                                  setShowEditCounselorModal(true);
+                                }}
+                                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
+                              >
+                                <Edit2 size={15} style={{ color: "#10b981" }} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDeletingCounselorId(counselor.id);
+                                  setShowDeleteCounselorModal(true);
+                                }}
+                                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #fee2e2", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
+                              >
+                                <Trash2 size={15} style={{ color: "#ef4444" }} />
+                              </button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>

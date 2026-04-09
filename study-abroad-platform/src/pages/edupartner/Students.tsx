@@ -326,7 +326,7 @@ const Students = () => {
             <Users size={18} /> Students
           </li>
 
-          {userRole === "Admin" && !isSuperAdmin && (
+          {(userRole === "Admin" || isSuperAdmin) && (
             <li onClick={() => handleSidebarNavigation("agents")}>
               <UserPlus size={18} /> Agents
             </li>
@@ -338,7 +338,7 @@ const Students = () => {
             </li>
           )}
 
-          {userRole === "Agent" && (
+          {(userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
             <li onClick={() => handleSidebarNavigation("counselors")}>
               <UserPlus size={18} /> Counselors
             </li>
