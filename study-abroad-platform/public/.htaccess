@@ -12,6 +12,7 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/studyabroadplatform-api
+RewriteCond %{REQUEST_URI} !^/uploads/
 RewriteRule . /index.html [L]
 
 # Security headers
