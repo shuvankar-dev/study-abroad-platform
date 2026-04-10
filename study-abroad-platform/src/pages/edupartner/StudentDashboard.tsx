@@ -695,18 +695,13 @@ const StudentDashboard = () => {
                           </div>
                         </div>
                         <div className="doc-card-actions">
-                          {(doc.file_name.toLowerCase().endsWith('.pdf') || 
-                            doc.file_name.toLowerCase().endsWith('.jpg') || 
-                            doc.file_name.toLowerCase().endsWith('.jpeg') || 
-                            doc.file_name.toLowerCase().endsWith('.png')) && (
-                            <button
-                              onClick={() => handleViewDocument(doc.id)}
-                              className="doc-action-btn view"
-                              title="View"
-                            >
-                              <Eye size={16} />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => handleViewDocument(doc.id)}
+                            className="doc-action-btn view"
+                            title="View"
+                          >
+                            <Eye size={16} />
+                          </button>
                           <a
                             href={`${API_BASE}/edupartner/download_document.php?document_id=${doc.id}`}
                             className="doc-action-btn download"

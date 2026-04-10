@@ -178,9 +178,10 @@ export default function AdminAuthors() {
 
   const getImageUrl = (imagePath?: string): string => {
     if (!imagePath) return '';
-    return imagePath.startsWith('http') 
-      ? imagePath 
-      : `${API_BASE}/${imagePath}`;
+    if (imagePath.startsWith('http')) return imagePath;
+    // Images stored at DOCUMENT_ROOT/uploads/ (outside API folder) — serve from domain root
+    const base = window.location.hostname === 'localhost' ? 'http://localhost' : '';
+    return `${base}/${imagePath}`;
   };
 
   const logout = () => {
