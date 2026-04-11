@@ -22,7 +22,6 @@ const NotificationCenter = ({ userId, userRole }: NotificationCenterProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost/studyabroadplatform-api'
@@ -127,12 +126,7 @@ const NotificationCenter = ({ userId, userRole }: NotificationCenterProps) => {
             </div>
 
             <div className="notification-list">
-              {loading ? (
-                <div className="notification-loading">
-                  <div className="spinner" />
-                  <p>Loading notifications...</p>
-                </div>
-              ) : notifications.length === 0 ? (
+              {notifications.length === 0 ? (
                 <div className="notification-empty">
                   <Bell size={48} />
                   <p>No notifications yet</p>

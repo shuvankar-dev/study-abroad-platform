@@ -2250,227 +2250,482 @@ useEffect(() => {
       </aside>
 
       {/* MAIN */}
-      <main className="main-content" style={{ paddingTop: "20px" }}>
+      <main className="main-content" style={{ paddingTop: "0" }}>
 
-        {/* HEADER STRIP */}
-        <div className="header-strip">
-          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu size={22} />
-          </button>
-          <h2 className="header-title">
-            {{
-                dashboard: "Dashboard",
-                universities: "Universities",
-                students: "Students",
-                applications: "Applications",
-                commissions: "Commissions",
-                accommodation: "Accommodation",
-                loan: "Loan Services",
-                testprep: "Test Prep",
-                teamchat: "Team Chat",
-                permissions: "Permissions",
-            }[activeSection] || ""}
-          </h2>
+        {/* HEADER STRIP - Only show for non-dashboard sections */}
+        {activeSection !== "dashboard" && (
+          <div className="header-strip">
+            <button className="mobile-menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <Menu size={22} />
+            </button>
+            <h2 className="header-title">
+              {{
+                  universities: "Universities",
+                  students: "Students",
+                  applications: "Applications",
+                  commissions: "Commissions",
+                  accommodation: "Accommodation",
+                  loan: "Loan Services",
+                  testprep: "Test Prep",
+                  teamchat: "Team Chat",
+                  permissions: "Permissions",
+              }[activeSection] || ""}
+            </h2>
 
-          <div className="header-right">
-            {/* <div className="notify">
-              🔔
-              <span className="notify-badge">3</span>
-            </div> */}
+            <div className="header-right">
+              <div
+                  className="header-user"
+                  style={{ position: "relative", cursor: "pointer" }}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  >
+                  <div className="header-avatar">{avatarLetter}</div>
+                  <span>{userName}</span>
 
-            <div
-                className="header-user"
-                style={{ position: "relative", cursor: "pointer" }}
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                >
-                <div className="header-avatar">{avatarLetter}</div>
-                <span>{userName}</span>
+                  
 
-                
+                  {showUserMenu && (
+                      <div
+                      style={{
+                          position: "absolute",
+                          top: "48px",
+                          right: 0,
+                          width: 200,
+                          background: "#ffffff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: 10,
+                          boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+                          zIndex: 100,
+                          overflow: "hidden",
+                      }}
+                      >
+                      <div
+                          style={{
+                          padding: "12px 16px",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          }}
+                      onClick={() => setActiveSection("userprofile")}
+                      >
+                          <User size={16} /> Profile Settings
+                      </div>
 
-                {showUserMenu && (
-                    <div
-                    style={{
-                        position: "absolute",
-                        top: "48px",
-                        right: 0,
-                        width: 200,
-                        background: "#ffffff",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: 10,
-                        boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-                        zIndex: 100,
-                        overflow: "hidden",
-                    }}
-                    >
-                    <div
-                        style={{
-                        padding: "12px 16px",
-                        fontSize: 14,
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        }}
+                      <div
+                          style={{
+                          padding: "12px 16px",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          borderTop: "1px solid #e2e8f0",
+                          }}
+                          onClick={() => {
+                            setShowUserMenu(false);
+                            setShowChangePasswordModal(true);
+                          }}
+                      >
+                          <Key size={16} /> Change Password
+                      </div>
 
-                    //      onClick={() => {
-                    // navigate("/dashboard/profile_edit");
-                    // }}
-
-                    onClick={() => setActiveSection("userprofile")}
-                    >
-
-                      {/* <Link to="/signup">Register here</Link> */}
-                        <User size={16} /> Profile Settings
-                    </div>
-
-                    <div
-                        style={{
-                        padding: "12px 16px",
-                        fontSize: 14,
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        borderTop: "1px solid #e2e8f0",
-                        }}
-                        onClick={() => {
-                          setShowUserMenu(false);
-                          setShowChangePasswordModal(true);
-                        }}
-                    >
-                        <Key size={16} /> Change Password
-                    </div>
-
-                    <div
-                    style={{
-                        padding: "12px 16px",
-                        fontSize: 14,
-                        cursor: "pointer",
-                        color: "#dc2626",
-                        borderTop: "1px solid #e2e8f0",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                    }}
-                    onClick={() => {
-                    localStorage.removeItem("user");
-                    navigate("/edupartner/login");
-                    }}
-                    >
-                    <LogOut size={16} /> Logout
-                    </div>
-                    
-                    </div>
-                )}
-                </div>
-
-
+                      <div
+                      style={{
+                          padding: "12px 16px",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          color: "#dc2626",
+                          borderTop: "1px solid #e2e8f0",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                      }}
+                      onClick={() => {
+                      localStorage.removeItem("user");
+                      navigate("/edupartner/login");
+                      }}
+                      >
+                      <LogOut size={16} /> Logout
+                      </div>
+                      
+                      </div>
+                  )}
+                  </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ================= DASHBOARD SECTION (UNCHANGED) ================= */}
         {activeSection === "dashboard" && (
           <>
-            {/* TOP BAR */}
-            <div className="topbar" style={{ 
-              padding: "24px", 
-              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-              borderRadius: "12px",
-              marginBottom: "24px",
-              border: "1px solid #e2e8f0"
+            {/* TOP NAVBAR */}
+            <div style={{ 
+              padding: "20px 32px", 
+              background: "white",
+              borderBottom: "1px solid #e2e8f0",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
             }}>
-              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>Dashboard</h2>
+              {/* Left - Title and Date */}
+              <div>
+                <h1 style={{ 
+                  margin: 0, 
+                  fontSize: "24px", 
+                  fontWeight: 700, 
+                  color: "#1e293b",
+                  marginBottom: "4px"
+                }}>
+                  Dashboard
+                </h1>
+                <p style={{ 
+                  margin: 0, 
+                  fontSize: "13px", 
+                  color: "#64748b",
+                  fontWeight: 500
+                }}>
+                  {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+              </div>
 
-              <div className="top-actions" style={{ display: "flex", gap: "12px" }}>
+              {/* Right Side Actions */}
+              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                {/* Search Input */}
+                <div style={{ position: "relative" }}>
+                  <Search size={18} style={{ 
+                    position: "absolute", 
+                    left: "14px", 
+                    top: "50%", 
+                    transform: "translateY(-50%)",
+                    color: "#94a3b8"
+                  }} />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    style={{
+                      padding: "10px 16px 10px 44px",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      width: "240px",
+                      outline: "none",
+                      transition: "all 0.2s"
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "#667eea";
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  />
+                </div>
+
+                {/* Browse Universities Button */}
                 <button 
-                  className="outline-btn" 
                   onClick={() => setActiveSection("universities")}
                   style={{
-                    padding: "11px 20px",
+                    padding: "10px 18px",
                     borderRadius: "10px",
-                    border: "2px solid #e2e8f0",
-                    background: "#fff",
+                    border: "1px solid #e2e8f0",
+                    background: "white",
                     cursor: "pointer",
                     fontWeight: 600,
                     fontSize: "14px",
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
-                    transition: "all 0.2s"
+                    color: "#475569",
+                    transition: "all 0.2s",
+                    whiteSpace: "nowrap"
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = "#667eea";
                     e.currentTarget.style.background = "#f8fafc";
+                    e.currentTarget.style.color = "#667eea";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = "#e2e8f0";
-                    e.currentTarget.style.background = "#fff";
+                    e.currentTarget.style.background = "white";
+                    e.currentTarget.style.color = "#475569";
                   }}
                 >
-                  <Search size={16} /> Browse Universities
+                  <GraduationCap size={18} /> Browse Universities
                 </button>
-                {userRole === "Admin" ? (
-                  <button className="add-student-btn" onClick={() => setShowAddAgentModal(true)}>
-                  <Plus size={18} />
-                  <span>Add Agent</span>
-                  </button>
-                ) : (
-                  <button className="add-student-btn" onClick={() => navigate("/edupartner/students")}>
-                  <Plus size={18} />
-                  <span>Add Student</span>
-                  </button>
-                )}
-              </div>
-            </div>
 
-            {/* HEADER */}
-            <div className="welcome" style={{ 
-              marginBottom: "28px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start"
-            }}>
-              <div>
-                <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 700, marginBottom: "8px" }}>Welcome back, {userName}!</h1>
-                <p style={{ color: "#64748b", fontSize: "16px", margin: 0 }}>Here's what's happening with your students today.</p>
-              </div>
-              
-              {/* Notification Center */}
-              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                <NotificationCenter userId={user.id} userRole={userRole} />
-                {isSuperAdmin && (
-                  <button
-                    onClick={() => setShowNotificationManager(true)}
+                {/* Add Student/Agent Button */}
+                {userRole === "Admin" ? (
+                  <button 
+                    onClick={() => setShowAddAgentModal(true)}
                     style={{
+                      padding: "10px 20px",
+                      borderRadius: "10px",
+                      border: "none",
+                      background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                      color: "white",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "14px",
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
-                      padding: "12px 20px",
-                      background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "12px",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.3s",
-                      boxShadow: "0 4px 15px rgba(16, 185, 129, 0.3)"
+                      transition: "all 0.2s",
+                      boxShadow: "0 2px 8px rgba(59, 130, 246, 0.3)",
+                      whiteSpace: "nowrap"
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow = "0 6px 20px rgba(16, 185, 129, 0.4)";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.4)";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "0 4px 15px rgba(16, 185, 129, 0.3)";
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(59, 130, 246, 0.3)";
                     }}
                   >
-                    <Bell size={18} />
-                    Create Notification
+                    <Plus size={18} /> Add Agent
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => navigate("/edupartner/students")}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "10px",
+                      border: "none",
+                      background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                      color: "white",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.2s",
+                      boxShadow: "0 2px 8px rgba(59, 130, 246, 0.3)",
+                      whiteSpace: "nowrap"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(59, 130, 246, 0.3)";
+                    }}
+                  >
+                    <Plus size={18} /> Add Student
                   </button>
                 )}
+
+                {/* Notification Bell */}
+                <NotificationCenter userId={user.id} userRole={userRole} />
+
+                {/* User Profile Dropdown */}
+                <div
+                  style={{ position: "relative", cursor: "pointer" }}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "8px 12px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    background: "white",
+                    transition: "all 0.2s"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#f8fafc";
+                    e.currentTarget.style.borderColor = "#cbd5e1";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "white";
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                  }}
+                  >
+                    <div style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontWeight: 600,
+                      fontSize: "14px"
+                    }}>
+                      {avatarLetter}
+                    </div>
+                    <span style={{ 
+                      fontSize: "14px", 
+                      fontWeight: 600, 
+                      color: "#1e293b",
+                      maxWidth: "120px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
+                    }}>
+                      {userName}
+                    </span>
+                  </div>
+
+                  {showUserMenu && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 8px)",
+                        right: 0,
+                        width: 220,
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: 12,
+                        boxShadow: "0 10px 40px rgba(0,0,0,0.12)",
+                        zIndex: 100,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: "12px 16px",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          transition: "all 0.2s"
+                        }}
+                        onClick={() => setActiveSection("userprofile")}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#f8fafc";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "white";
+                        }}
+                      >
+                        <User size={16} color="#64748b" /> 
+                        <span style={{ fontWeight: 500, color: "#1e293b" }}>Profile Settings</span>
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "12px 16px",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          borderTop: "1px solid #f1f5f9",
+                          transition: "all 0.2s"
+                        }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setShowChangePasswordModal(true);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#f8fafc";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "white";
+                        }}
+                      >
+                        <Key size={16} color="#64748b" /> 
+                        <span style={{ fontWeight: 500, color: "#1e293b" }}>Change Password</span>
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "12px 16px",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          borderTop: "1px solid #f1f5f9",
+                          transition: "all 0.2s"
+                        }}
+                        onClick={() => {
+                          localStorage.removeItem("user");
+                          navigate("/edupartner/login");
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#fef2f2";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "white";
+                        }}
+                      >
+                        <LogOut size={16} color="#dc2626" /> 
+                        <span style={{ fontWeight: 500, color: "#dc2626" }}>Logout</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
+            </div>
+
+            {/* WELCOME SECTION - Separate from navbar */}
+            <div style={{ 
+              padding: "32px", 
+              background: "#f8fafc",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div>
+                <h2 style={{ 
+                  margin: 0, 
+                  fontSize: "28px", 
+                  fontWeight: 700, 
+                  color: "#0f172a",
+                  marginBottom: "6px"
+                }}>
+                  Welcome back, {userName}
+                </h2>
+                <p style={{ 
+                  margin: 0, 
+                  fontSize: "15px", 
+                  color: "#64748b"
+                }}>
+                  Here's a summary of your platform activity today.
+                </p>
+              </div>
+
+              {/* Create Notification Button (Super Admin Only) */}
+              {isSuperAdmin && (
+                <button
+                  onClick={() => setShowNotificationManager(true)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "12px 20px",
+                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    boxShadow: "0 2px 8px rgba(16, 185, 129, 0.3)",
+                    whiteSpace: "nowrap"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(16, 185, 129, 0.3)";
+                  }}
+                >
+                  <Bell size={18} />
+                  Create Notification
+                </button>
+              )}
             </div>
 
             {/* STATS */}

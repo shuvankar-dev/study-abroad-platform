@@ -333,7 +333,6 @@ const NewUniversities = () => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = user.user_name || "";
   const userRole = user.role;
-  const userId = user.id;
   const companyName = user.company_name || "";
   const avatarLetter = userName ? userName.charAt(0).toUpperCase() : "U";
 
