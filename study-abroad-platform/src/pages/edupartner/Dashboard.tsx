@@ -7,10 +7,12 @@ import {
   CreditCard, BookOpen, MessageSquare, Shield, User, 
   LogOut, Plus, Search, Filter, Clock,
   TrendingUp, CheckCircle, AlertCircle, Mail, Phone, Globe, 
-  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame, Menu, Key, Eye
+  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame, Menu, Key, Eye, ChevronRight, Bell
 } from "lucide-react";
 import { findCommissionInfo, getTierColor } from "../../data/commissionData";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
+import NotificationCenter from "../../components/NotificationCenter";
+import NotificationManager from "../../components/NotificationManager";
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
@@ -129,6 +131,9 @@ const Dashboard = () => {
   const [isSubmittingAdmin, setIsSubmittingAdmin] = useState(false);
 
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Notification States
+  const [showNotificationManager, setShowNotificationManager] = useState(false);
   
   // University Detail - Expandable Row
   const [expandedUniversityId, setExpandedUniversityId] = useState<number | null>(null);
@@ -2088,123 +2093,159 @@ useEffect(() => {
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-brand">
-          <GraduationCap size={24} /> <span>EduPartner</span>
+          <div className="brand-icon">
+            <GraduationCap size={24} />
+          </div>
+          <div className="brand-text-wrapper">
+            <span className="brand-name">EduPartner</span>
+            <span className="brand-tagline">{userRole}</span>
+          </div>
           <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
             <X size={20} />
           </button>
         </div>
 
-        <ul className="menu">
-          <li
-            className={activeSection === "dashboard" ? "active" : ""}
-            onClick={() => { setActiveSection("dashboard"); setSidebarOpen(false); }}
-          >
-            <Home size={18} /> Dashboard
-          </li>
-
-          <li
-            className={activeSection === "universities" ? "active" : ""}
-            onClick={() => { navigate("/edupartner/new-universities"); setSidebarOpen(false); }}
-          >
-            <GraduationCap size={18} /> Universities
-          </li>
-
-          <li
-            className={activeSection === "students" ? "active" : ""}
-            onClick={() => { navigate("/edupartner/students"); setSidebarOpen(false); }}
-            >
-            <Users size={18} /> Students
-          </li>
-
-          {(userRole === "Admin" || isSuperAdmin) && (
+        <div className="menu-group">
+          <div className="menu-group-title">Overview</div>
+          <ul className="menu">
             <li
-              className={activeSection === "agents" ? "active" : ""}
-              onClick={() => { setActiveSection("agents"); setSidebarOpen(false); }}
+              className={activeSection === "dashboard" ? "active" : ""}
+              onClick={() => { setActiveSection("dashboard"); setSidebarOpen(false); }}
             >
-              <UserPlus size={18} /> Agents
+              <Home size={18} className="menu-icon" />
+              <span className="menu-text">Dashboard</span>
+              <ChevronRight size={14} className="menu-chevron" />
             </li>
-          )}
+          </ul>
+        </div>
 
-          {isSuperAdmin && (
+        <div className="menu-group">
+          <div className="menu-group-title">Management</div>
+          <ul className="menu">
             <li
-              className={activeSection === "admins" ? "active" : ""}
-              onClick={() => { setActiveSection("admins"); setSidebarOpen(false); }}
+              className={activeSection === "universities" ? "active" : ""}
+              onClick={() => { navigate("/edupartner/new-universities"); setSidebarOpen(false); }}
             >
-              <Shield size={18} /> Admins
-            </li>
-          )}
-
-          {(userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
-            <li
-              className={activeSection === "counselors" ? "active" : ""}
-              onClick={() => { setActiveSection("counselors"); setSidebarOpen(false); }}
-            >
-              <UserPlus size={18} /> Counselors
-            </li>
-          )}
-
-          <li
-            className={activeSection === "applications" ? "active" : ""}
-            onClick={() => { setActiveSection("applications"); setSidebarOpen(false); }}
-            >
-            <FileText size={18} /> Applications
+              <GraduationCap size={18} className="menu-icon" />
+              <span className="menu-text">Universities</span>
             </li>
 
-          {userRole !== "Counselor" && (
             <li
-              className={activeSection === "commissions" ? "active" : ""}
-              onClick={() => { setActiveSection("commissions"); setSidebarOpen(false); }}
+              className={activeSection === "students" ? "active" : ""}
+              onClick={() => { navigate("/edupartner/students"); setSidebarOpen(false); }}
+            >
+              <Users size={18} className="menu-icon" />
+              <span className="menu-text">Students</span>
+            </li>
+
+            {(userRole === "Admin" || isSuperAdmin) && (
+              <li
+                className={activeSection === "agents" ? "active" : ""}
+                onClick={() => { setActiveSection("agents"); setSidebarOpen(false); }}
               >
-              <DollarSign size={18} /> Commissions
+                <UserPlus size={18} className="menu-icon" />
+                <span className="menu-text">Agents</span>
               </li>
-          )}
+            )}
 
-           <li
-                className={activeSection === "accommodation" ? "active" : ""}
-                onClick={() => { setActiveSection("accommodation"); setSidebarOpen(false); }}
+            {isSuperAdmin && (
+              <li
+                className={activeSection === "admins" ? "active" : ""}
+                onClick={() => { setActiveSection("admins"); setSidebarOpen(false); }}
+              >
+                <Shield size={18} className="menu-icon" />
+                <span className="menu-text">Admins</span>
+              </li>
+            )}
+
+            {(userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
+              <li
+                className={activeSection === "counselors" ? "active" : ""}
+                onClick={() => { setActiveSection("counselors"); setSidebarOpen(false); }}
+              >
+                <User size={18} className="menu-icon" />
+                <span className="menu-text">Counselors</span>
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div className="menu-group">
+          <div className="menu-group-title">Operations</div>
+          <ul className="menu">
+            <li
+              className={activeSection === "applications" ? "active" : ""}
+              onClick={() => { setActiveSection("applications"); setSidebarOpen(false); }}
             >
-                <Building2 size={18} /> Accommodation
+              <FileText size={18} className="menu-icon" />
+              <span className="menu-text">Applications</span>
+              {applications.length > 0 && <span className="menu-badge">{applications.length}</span>}
+            </li>
+
+            {userRole !== "Counselor" && (
+              <li
+                className={activeSection === "commissions" ? "active" : ""}
+                onClick={() => { setActiveSection("commissions"); setSidebarOpen(false); }}
+              >
+                <DollarSign size={18} className="menu-icon" />
+                <span className="menu-text">Commissions</span>
+              </li>
+            )}
+
+            <li
+              className={activeSection === "accommodation" ? "active" : ""}
+              onClick={() => { setActiveSection("accommodation"); setSidebarOpen(false); }}
+            >
+              <Building2 size={18} className="menu-icon" />
+              <span className="menu-text">Accommodation</span>
             </li>
 
             <li
-                className={activeSection === "loan" ? "active" : ""}
-                onClick={() => { setActiveSection("loan"); setSidebarOpen(false); }}
+              className={activeSection === "loan" ? "active" : ""}
+              onClick={() => { setActiveSection("loan"); setSidebarOpen(false); }}
             >
-                <CreditCard size={18} /> Loan Services
+              <CreditCard size={18} className="menu-icon" />
+              <span className="menu-text">Loan Services</span>
             </li>
+          </ul>
+        </div>
 
+        <div className="menu-group">
+          <div className="menu-group-title">Resources</div>
+          <ul className="menu">
             <li
-                className={activeSection === "testprep" ? "active" : ""}
-                onClick={() => { setActiveSection("testprep"); setSidebarOpen(false); }}
+              className={activeSection === "testprep" ? "active" : ""}
+              onClick={() => { setActiveSection("testprep"); setSidebarOpen(false); }}
             >
-                <BookOpen size={18} /> Test Prep
+              <BookOpen size={18} className="menu-icon" />
+              <span className="menu-text">Test Prep</span>
             </li>
-          <li 
-          className={activeSection === "teamchat" ? "active" : ""}
-          onClick={() => { setActiveSection("teamchat"); setSidebarOpen(false); }}
-          >
-            <MessageSquare size={18} /> Team Chat
+            <li 
+              className={activeSection === "teamchat" ? "active" : ""}
+              onClick={() => { setActiveSection("teamchat"); setSidebarOpen(false); }}
+            >
+              <MessageSquare size={18} className="menu-icon" />
+              <span className="menu-text">Team Chat</span>
             </li>
             {userRole === "Admin" && (
-            <>
-                <li
+              <li
                 className={activeSection === "permissions" ? "active" : ""}
                 onClick={() => { setActiveSection("permissions"); setSidebarOpen(false); }}
-                >
-                <Shield size={18} /> Permissions
-            </li>
-           </>
+              >
+                <Shield size={18} className="menu-icon" />
+                <span className="menu-text">Permissions</span>
+              </li>
             )}
-        </ul>
+          </ul>
+        </div>
 
         <div className="sidebar-footer">
-        <div className="avatar">{avatarLetter}</div>
-        <div>
-            <strong>{userName}</strong>
-            <p>{companyName}</p>
-            {/* <p>{userId}</p> */}
-         
-        </div>
+          <div className="footer-avatar">{avatarLetter}</div>
+          <div className="footer-info">
+            <div className="footer-name">{userName}</div>
+            <div className="footer-role">{companyName}</div>
+          </div>
+          <ChevronRight size={14} className="footer-chevron" />
         </div>
       </aside>
 
@@ -2384,9 +2425,52 @@ useEffect(() => {
             </div>
 
             {/* HEADER */}
-            <div className="welcome" style={{ marginBottom: "28px" }}>
-              <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 700, marginBottom: "8px" }}>Welcome back, {userName}!</h1>
-              <p style={{ color: "#64748b", fontSize: "16px", margin: 0 }}>Here's what's happening with your students today.</p>
+            <div className="welcome" style={{ 
+              marginBottom: "28px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start"
+            }}>
+              <div>
+                <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 700, marginBottom: "8px" }}>Welcome back, {userName}!</h1>
+                <p style={{ color: "#64748b", fontSize: "16px", margin: 0 }}>Here's what's happening with your students today.</p>
+              </div>
+              
+              {/* Notification Center */}
+              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <NotificationCenter userId={user.id} userRole={userRole} />
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => setShowNotificationManager(true)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "12px 20px",
+                      background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      transition: "all 0.3s",
+                      boxShadow: "0 4px 15px rgba(16, 185, 129, 0.3)"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 6px 20px rgba(16, 185, 129, 0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 15px rgba(16, 185, 129, 0.3)";
+                    }}
+                  >
+                    <Bell size={18} />
+                    Create Notification
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* STATS */}
@@ -5484,6 +5568,7 @@ useEffect(() => {
                       <th style={{ padding: "12px 14px" }}>Email</th>
                       <th style={{ padding: "12px 14px" }}>Phone</th>
                       {(isSuperAdmin || userRole === "Admin") && <th style={{ padding: "12px 14px" }}>Parent Agent</th>}
+                      {(isSuperAdmin || userRole === "Admin") && <th style={{ padding: "12px 14px" }}>Parent Admin</th>}
                       <th style={{ padding: "12px 14px" }}>Students</th>
                       <th style={{ padding: "12px 14px" }}>Status</th>
                       <th style={{ padding: "12px 14px" }}>Created</th>
@@ -5521,6 +5606,20 @@ useEffect(() => {
                               color: "#4f46e5"
                             }}>
                               {counselor.parent_agent_name || "N/A"}
+                            </span>
+                          </td>
+                        )}
+                        {(isSuperAdmin || userRole === "Admin") && (
+                          <td style={{ padding: "12px 14px", color: "#334155", whiteSpace: "nowrap" }}>
+                            <span style={{ 
+                              padding: "3px 10px", 
+                              borderRadius: 20, 
+                              fontSize: 12, 
+                              fontWeight: 600,
+                              background: "#f3e8ff",
+                              color: "#7c3aed"
+                            }}>
+                              {counselor.parent_admin_name || "N/A"}
                             </span>
                           </td>
                         )}
@@ -11579,6 +11678,18 @@ useEffect(() => {
         onClose={() => setShowChangePasswordModal(false)}
         userId={userId}
       />
+
+      {/* Notification Manager Modal (Super Admin Only) */}
+      {showNotificationManager && isSuperAdmin && (
+        <NotificationManager
+          userId={user.id}
+          onClose={() => setShowNotificationManager(false)}
+          onSuccess={() => {
+            // Optionally refresh notifications or show success message
+            console.log('Notification sent successfully');
+          }}
+        />
+      )}
     </div>
   );
 };

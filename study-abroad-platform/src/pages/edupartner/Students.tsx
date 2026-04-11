@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Search, UserPlus, Eye, Edit, FileText as FileTextIcon, Download,
   Home, GraduationCap, Users, FileText, DollarSign, Building2, 
-  CreditCard, BookOpen, MessageSquare, Shield, Menu, X
+  CreditCard, BookOpen, MessageSquare, Shield, Menu, X, ChevronRight
 } from "lucide-react";
 import "./students.css";
 
@@ -40,14 +40,42 @@ const Students = () => {
 
   // Get user info from localStorage
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userName = user.name || "User";
-  const companyName = user.company_name || "Company";
-  const userRole = user.role || "User";
-  const isSuperAdmin = user.role === "Super Admin";
-  const avatarLetter = userName.charAt(0).toUpperCase();
+  const userName = user.user_name || "";
+  const userRole = user.role;
+  const userId = user.id;
+  const companyName = user.company_name || "";
+  const avatarLetter = userName ? userName.charAt(0).toUpperCase() : "U";
+
+  // Check if Super Admin (parent_admin_id is null, 0, or undefined)
+  // AND email must be the Super Admin email for extra security
+  const isSuperAdmin = (user.parent_admin_id === null || 
+                       user.parent_admin_id === 0 || 
+                       user.parent_admin_id === undefined ||
+                       user.parent_admin_id === '0') &&
+                       user.email === 'info@codescholaroverseas.com';
+
+
+  // Application count for sidebar badge
+  const [applicationCount, setApplicationCount] = useState(0);
 
   useEffect(() => {
     fetchStudents();
+    // Fetch application count for sidebar badge
+    const fetchAppCount = async () => {
+      try {
+        const API_BASE = window.location.hostname === 'localhost'
+          ? 'http://localhost/studyabroadplatform-api'
+          : '/studyabroadplatform-api';
+        const res = await fetch(`${API_BASE}/edupartner/get_applications_v2.php`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id, role: user.role }),
+        });
+        const data = await res.json();
+        if (data.success) setApplicationCount(data.applications?.length || 0);
+      } catch (e) { /* silent */ }
+    };
+    fetchAppCount();
   }, []);
 
   useEffect(() => {
@@ -309,80 +337,122 @@ const Students = () => {
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-brand">
-          <GraduationCap size={24} /> <span>EduPartner</span>
-          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
+          <div className="brand-icon">
+            <GraduationCap size={24} />
+          </div>
+          <div className="brand-text-wrapper">
+            <span className="brand-name">EduPartner</span>
+            <span className="brand-tagline">{userRole}</span>
+          </div>
+          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
+            <X size={20} />
+          </button>
         </div>
 
-        <ul className="menu">
-          <li onClick={() => handleSidebarNavigation("dashboard")}>
-            <Home size={18} /> Dashboard
-          </li>
-
-          <li onClick={() => handleSidebarNavigation("universities")}>
-            <GraduationCap size={18} /> Universities
-          </li>
-
-          <li className="active">
-            <Users size={18} /> Students
-          </li>
-
-          {(userRole === "Admin" || isSuperAdmin) && (
-            <li onClick={() => handleSidebarNavigation("agents")}>
-              <UserPlus size={18} /> Agents
+        <div className="menu-group">
+          <div className="menu-group-title">Overview</div>
+          <ul className="menu">
+            <li onClick={() => handleSidebarNavigation("dashboard")}>
+              <Home size={18} className="menu-icon" />
+              <span className="menu-text">Dashboard</span>
+              <ChevronRight size={14} className="menu-chevron" />
             </li>
-          )}
+          </ul>
+        </div>
 
-          {isSuperAdmin && (
-            <li onClick={() => handleSidebarNavigation("admins")}>
-              <Shield size={18} /> Admins
+        <div className="menu-group">
+          <div className="menu-group-title">Management</div>
+          <ul className="menu">
+            <li onClick={() => handleSidebarNavigation("universities")}>
+              <GraduationCap size={18} className="menu-icon" />
+              <span className="menu-text">Universities</span>
             </li>
-          )}
 
-          {(userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
-            <li onClick={() => handleSidebarNavigation("counselors")}>
-              <UserPlus size={18} /> Counselors
+            <li className="active">
+              <Users size={18} className="menu-icon" />
+              <span className="menu-text">Students</span>
             </li>
-          )}
 
-          <li onClick={() => handleSidebarNavigation("applications")}>
-            <FileText size={18} /> Applications
-          </li>
+            {(userRole === "Admin" || isSuperAdmin) && (
+              <li onClick={() => handleSidebarNavigation("agents")}>
+                <UserPlus size={18} className="menu-icon" />
+                <span className="menu-text">Agents</span>
+              </li>
+            )}
 
-          {userRole !== "Counselor" && (
-            <li onClick={() => handleSidebarNavigation("commissions")}>
-              <DollarSign size={18} /> Commissions
+            {isSuperAdmin && (
+              <li onClick={() => handleSidebarNavigation("admins")}>
+                <Shield size={18} className="menu-icon" />
+                <span className="menu-text">Admins</span>
+              </li>
+            )}
+
+            {(userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
+              <li onClick={() => handleSidebarNavigation("counselors")}>
+                <BookOpen size={18} className="menu-icon" />
+                <span className="menu-text">Counselors</span>
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div className="menu-group">
+          <div className="menu-group-title">Operations</div>
+          <ul className="menu">
+            <li onClick={() => handleSidebarNavigation("applications")}>
+              <FileText size={18} className="menu-icon" />
+              <span className="menu-text">Applications</span>
+              {applicationCount > 0 && <span className="menu-badge">{applicationCount}</span>}
             </li>
-          )}
 
-          <li onClick={() => handleSidebarNavigation("accommodation")}>
-            <Building2 size={18} /> Accommodation
-          </li>
+            {userRole !== "Counselor" && (
+              <li onClick={() => handleSidebarNavigation("commissions")}>
+                <DollarSign size={18} className="menu-icon" />
+                <span className="menu-text">Commissions</span>
+              </li>
+            )}
 
-          <li onClick={() => handleSidebarNavigation("loan")}>
-            <CreditCard size={18} /> Loan Services
-          </li>
-
-          <li onClick={() => handleSidebarNavigation("testprep")}>
-            <BookOpen size={18} /> Test Prep
-          </li>
-
-          <li onClick={() => handleSidebarNavigation("teamchat")}>
-            <MessageSquare size={18} /> Team Chat
-          </li>
-
-          {userRole === "Admin" && (
-            <li onClick={() => handleSidebarNavigation("permissions")}>
-              <Shield size={18} /> Permissions
+            <li onClick={() => handleSidebarNavigation("accommodation")}>
+              <Building2 size={18} className="menu-icon" />
+              <span className="menu-text">Accommodation</span>
             </li>
-          )}
-        </ul>
+
+            <li onClick={() => handleSidebarNavigation("loan")}>
+              <CreditCard size={18} className="menu-icon" />
+              <span className="menu-text">Loan Services</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="menu-group">
+          <div className="menu-group-title">Resources</div>
+          <ul className="menu">
+            <li onClick={() => handleSidebarNavigation("testprep")}>
+              <BookOpen size={18} className="menu-icon" />
+              <span className="menu-text">Test Prep</span>
+            </li>
+
+            <li onClick={() => handleSidebarNavigation("teamchat")}>
+              <MessageSquare size={18} className="menu-icon" />
+              <span className="menu-text">Team Chat</span>
+            </li>
+
+            {userRole === "Admin" && (
+              <li onClick={() => handleSidebarNavigation("permissions")}>
+                <Shield size={18} className="menu-icon" />
+                <span className="menu-text">Permissions</span>
+              </li>
+            )}
+          </ul>
+        </div>
 
         <div className="sidebar-footer">
-          <div className="avatar">{avatarLetter}</div>
-          <div>
-            <strong>{userName}</strong>
-            <p>{companyName}</p>
+          <div className="footer-avatar">{avatarLetter}</div>
+          <div className="footer-info">
+            <div className="footer-name">{userName}</div>
+            <div className="footer-role">{companyName}</div>
           </div>
+          <ChevronRight size={14} className="footer-chevron" />
         </div>
       </aside>
 

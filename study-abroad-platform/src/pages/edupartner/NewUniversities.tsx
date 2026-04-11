@@ -5,7 +5,7 @@ import {
   Building2, CreditCard, BookOpen, MessageSquare, Shield,
   ExternalLink, Heart, MapPin, Clock, DollarSign, Award,
   Globe, Zap, CheckCircle, ChevronDown, ChevronUp, X,
-  Gift, FileCheck, Languages, BarChart3, Flame, Calendar, UserPlus, Menu
+  Gift, FileCheck, Languages, BarChart3, Flame, Calendar, UserPlus, Menu, ChevronRight
 } from "lucide-react";
 import { findCommissionInfo, getTierColor } from "../../data/commissionData";
 import "./newuniversities.css";
@@ -331,14 +331,42 @@ const NewUniversities = () => {
 
   // Get user info
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userName = user.name || "User";
-  const companyName = user.company_name || "Company";
-  const userRole = user.role || "User";
-  const isSuperAdmin = user.role === "Super Admin";
-  const avatarLetter = userName.charAt(0).toUpperCase();
+  const userName = user.user_name || "";
+  const userRole = user.role;
+  const userId = user.id;
+  const companyName = user.company_name || "";
+  const avatarLetter = userName ? userName.charAt(0).toUpperCase() : "U";
+
+  // Check if Super Admin (parent_admin_id is null, 0, or undefined)
+  // AND email must be the Super Admin email for extra security
+  const isSuperAdmin = (user.parent_admin_id === null || 
+                       user.parent_admin_id === 0 || 
+                       user.parent_admin_id === undefined ||
+                       user.parent_admin_id === '0') &&
+                       user.email === 'info@codescholaroverseas.com';
+
+
+  // Application count for sidebar badge
+  const [applicationCount, setApplicationCount] = useState(0);
 
   useEffect(() => {
     fetchUniversities();
+    // Fetch application count for sidebar badge
+    const fetchAppCount = async () => {
+      try {
+        const API_BASE = window.location.hostname === 'localhost'
+          ? 'http://localhost/studyabroadplatform-api'
+          : '/studyabroadplatform-api';
+        const res = await fetch(`${API_BASE}/edupartner/get_applications_v2.php`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id, role: user.role }),
+        });
+        const data = await res.json();
+        if (data.success) setApplicationCount(data.applications?.length || 0);
+      } catch (e) { /* silent */ }
+    };
+    fetchAppCount();
   }, []);
 
   useEffect(() => {
@@ -629,86 +657,128 @@ const NewUniversities = () => {
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-brand">
-          <GraduationCap size={24} /> <span>EduPartner</span>
+          <div className="brand-icon">
+            <GraduationCap size={24} />
+          </div>
+          <div className="brand-text-wrapper">
+            <span className="brand-name">EduPartner</span>
+            <span className="brand-tagline">{userRole}</span>
+          </div>
           <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
             <X size={20} />
           </button>
         </div>
 
-        <ul className="menu">
-          <li onClick={() => { navigate("/edupartner/dashboard"); setSidebarOpen(false); }}>
-            <Home size={18} /> Dashboard
-          </li>
-
-          <li className="active" onClick={() => setSidebarOpen(false)}>
-            <GraduationCap size={18} /> Universities
-          </li>
-
-          <li onClick={() => { navigate("/edupartner/students"); setSidebarOpen(false); }}>
-            <Users size={18} /> Students
-          </li>
-
-          {userRole === "Admin" && !isSuperAdmin && (
-            <li onClick={() => { navigate("/edupartner/dashboard?section=agents"); setSidebarOpen(false); }}>
-              <UserPlus size={18} /> Agents
+        <div className="menu-group">
+          <div className="menu-group-title">Overview</div>
+          <ul className="menu">
+            <li onClick={() => { navigate("/edupartner/dashboard?section=dashboard"); setSidebarOpen(false); }}>
+              <Home size={18} className="menu-icon" />
+              <span className="menu-text">Dashboard</span>
+              <ChevronRight size={14} className="menu-chevron" />
             </li>
-          )}
-
-          {isSuperAdmin && (
-            <li onClick={() => { navigate("/edupartner/dashboard?section=admins"); setSidebarOpen(false); }}>
-              <Shield size={18} /> Admins
-            </li>
-          )}
-
-          {userRole === "Agent" && (
-            <li onClick={() => { navigate("/edupartner/dashboard?section=counselors"); setSidebarOpen(false); }}>
-              <UserPlus size={18} /> Counselors
-            </li>
-          )}
-
-          <li onClick={() => { navigate("/edupartner/dashboard?section=applications"); setSidebarOpen(false); }}>
-            <FileText size={18} /> Applications
-          </li>
-
-          {userRole !== "Counselor" && (
-            <li onClick={() => { navigate("/edupartner/dashboard?section=commissions"); setSidebarOpen(false); }}>
-              <DollarSign size={18} /> Commissions
-            </li>
-          )}
-
-          <li onClick={() => { navigate("/edupartner/dashboard?section=accommodation"); setSidebarOpen(false); }}>
-            <Building2 size={18} /> Accommodation
-          </li>
-
-          <li onClick={() => { navigate("/edupartner/dashboard?section=loan"); setSidebarOpen(false); }}>
-            <CreditCard size={18} /> Loan Services
-          </li>
-
-          <li onClick={() => { navigate("/edupartner/dashboard?section=testprep"); setSidebarOpen(false); }}>
-            <BookOpen size={18} /> Test Prep
-          </li>
-
-          <li onClick={() => { navigate("/edupartner/dashboard?section=teamchat"); setSidebarOpen(false); }}>
-            <MessageSquare size={18} /> Team Chat
-          </li>
-
-          {userRole === "Admin" && (
-            <li onClick={() => { navigate("/edupartner/dashboard?section=permissions"); setSidebarOpen(false); }}>
-              <Shield size={18} /> Permissions
-          </li>
-        )}
-      </ul>
-
-      <div className="sidebar-footer">
-        <div className="avatar">{avatarLetter}</div>
-        <div>
-          <strong>{userName}</strong>
-          <p>{companyName}</p>
+          </ul>
         </div>
-      </div>
-    </aside>
+
+        <div className="menu-group">
+          <div className="menu-group-title">Management</div>
+          <ul className="menu">
+            <li className="active" onClick={() => setSidebarOpen(false)}>
+              <GraduationCap size={18} className="menu-icon" />
+              <span className="menu-text">Universities</span>
+            </li>
+
+            <li onClick={() => { navigate("/edupartner/students"); setSidebarOpen(false); }}>
+              <Users size={18} className="menu-icon" />
+              <span className="menu-text">Students</span>
+            </li>
+
+            {(userRole === "Admin" || isSuperAdmin) && (
+              <li onClick={() => { navigate("/edupartner/dashboard?section=agents"); setSidebarOpen(false); }}>
+                <UserPlus size={18} className="menu-icon" />
+                <span className="menu-text">Agents</span>
+              </li>
+            )}
+
+            {isSuperAdmin && (
+              <li onClick={() => { navigate("/edupartner/dashboard?section=admins"); setSidebarOpen(false); }}>
+                <Shield size={18} className="menu-icon" />
+                <span className="menu-text">Admins</span>
+              </li>
+            )}
+
+            {(userRole === "Agent" || userRole === "Admin" || isSuperAdmin) && (
+              <li onClick={() => { navigate("/edupartner/dashboard?section=counselors"); setSidebarOpen(false); }}>
+                <BookOpen size={18} className="menu-icon" />
+                <span className="menu-text">Counselors</span>
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div className="menu-group">
+          <div className="menu-group-title">Operations</div>
+          <ul className="menu">
+            <li onClick={() => { navigate("/edupartner/dashboard?section=applications"); setSidebarOpen(false); }}>
+              <FileText size={18} className="menu-icon" />
+              <span className="menu-text">Applications</span>
+              {applicationCount > 0 && <span className="menu-badge">{applicationCount}</span>}
+            </li>
+
+            {userRole !== "Counselor" && (
+              <li onClick={() => { navigate("/edupartner/dashboard?section=commissions"); setSidebarOpen(false); }}>
+                <DollarSign size={18} className="menu-icon" />
+                <span className="menu-text">Commissions</span>
+              </li>
+            )}
+
+            <li onClick={() => { navigate("/edupartner/dashboard?section=accommodation"); setSidebarOpen(false); }}>
+              <Building2 size={18} className="menu-icon" />
+              <span className="menu-text">Accommodation</span>
+            </li>
+
+            <li onClick={() => { navigate("/edupartner/dashboard?section=loan"); setSidebarOpen(false); }}>
+              <CreditCard size={18} className="menu-icon" />
+              <span className="menu-text">Loan Services</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="menu-group">
+          <div className="menu-group-title">Resources</div>
+          <ul className="menu">
+            <li onClick={() => { navigate("/edupartner/dashboard?section=testprep"); setSidebarOpen(false); }}>
+              <BookOpen size={18} className="menu-icon" />
+              <span className="menu-text">Test Prep</span>
+            </li>
+
+            <li onClick={() => { navigate("/edupartner/dashboard?section=teamchat"); setSidebarOpen(false); }}>
+              <MessageSquare size={18} className="menu-icon" />
+              <span className="menu-text">Team Chat</span>
+            </li>
+
+            {userRole === "Admin" && (
+              <li onClick={() => { navigate("/edupartner/dashboard?section=permissions"); setSidebarOpen(false); }}>
+                <Shield size={18} className="menu-icon" />
+                <span className="menu-text">Permissions</span>
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div className="sidebar-footer">
+          <div className="footer-avatar">{avatarLetter}</div>
+          <div className="footer-info">
+            <div className="footer-name">{userName}</div>
+            <div className="footer-role">{companyName}</div>
+          </div>
+          <ChevronRight size={14} className="footer-chevron" />
+        </div>
+      </aside>
     </>
   );
+
+
 
   // ---------- DETAIL VIEW ----------
   if (selectedUniversity) {
