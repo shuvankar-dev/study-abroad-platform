@@ -1714,6 +1714,28 @@
   transition: all 0.2s;
 }
 
+/* Advanced Filters - Blue gradient */
+.nu-filter-chip-advanced {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: 1px solid #2563eb;
+}
+
+.nu-filter-chip-advanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+/* Eligibility Filters - Purple/Violet gradient */
+.nu-filter-chip-eligibility {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border: 1px solid #7c3aed;
+}
+
+.nu-filter-chip-eligibility:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
 .nu-filter-chip:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -1726,6 +1748,33 @@
 
 .nu-filter-chip svg:hover {
   transform: scale(1.2);
+}
+
+/* Eligibility Count Badge */
+.nu-eligibility-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 8px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* Responsive Design */
@@ -1773,6 +1822,7 @@
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  position: relative;
 }
 
 .nu-eligibility-btn:hover {

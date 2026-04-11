@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Edit, Trash2, Calendar, User, FileText, Search, Filter } from 'lucide-react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost/studyabroadplatform-api'
@@ -34,6 +34,7 @@ export default function AdminBlog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
@@ -53,6 +54,29 @@ export default function AdminBlog() {
     featured_image: '',
     status: 'draft' as 'draft' | 'published'
   });
+
+  // React Quill toolbar configuration
+  const quillModules = useMemo(() => ({
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'align': [] }],
+      ['link', 'blockquote', 'code-block'],
+      [{ 'color': [] }, { 'background': [] }],
+      ['clean']
+    ],
+  }), []);
+
+  const quillFormats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'indent',
+    'align',
+    'link', 'blockquote', 'code-block',
+    'color', 'background'
+  ];
 
   useEffect(() => {
     fetchPosts();
@@ -129,14 +153,23 @@ export default function AdminBlog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    setSaving(true);
     setModalError(null);
 
-    // Client-side validation for file upload mode
-    if (uploadType === 'file' && !selectedFile && !formData.featured_image) {
-      setModalError('Please select an image file to upload');
-      setLoading(false);
+    // Validation
+    if (!formData.title.trim()) {
+      setModalError('Title is required');
+      setSaving(false);
+      return;
+    }
+    if (!formData.content.trim() || formData.content === '<p><br></p>') {
+      setModalError('Content is required');
+      setSaving(false);
+      return;
+    }
+    if (!formData.author_id) {
+      setModalError('Please select an author');
+      setSaving(false);
       return;
     }
 
@@ -147,6 +180,7 @@ export default function AdminBlog() {
       
       let response;
 
+      // If user selected a new file to upload, use FormData (multipart)
       if (uploadType === 'file' && selectedFile) {
         const formDataToSend = new FormData();
         formDataToSend.append('title', formData.title);
@@ -166,9 +200,20 @@ export default function AdminBlog() {
           body: formDataToSend
         });
       } else {
-        const payload = editingPost 
-          ? { ...formData, id: editingPost.id, author_id: parseInt(formData.author_id) }
-          : { ...formData, author_id: parseInt(formData.author_id) };
+        // Send as JSON — no file upload
+        const payload: any = {
+          title: formData.title,
+          h1_section: formData.h1_section,
+          h2_section: formData.h2_section,
+          content: formData.content,
+          author_id: parseInt(formData.author_id),
+          status: formData.status,
+          featured_image: formData.featured_image
+        };
+
+        if (editingPost) {
+          payload.id = editingPost.id;
+        }
 
         response = await fetch(url, {
           method: 'POST',
@@ -179,12 +224,12 @@ export default function AdminBlog() {
         });
       }
 
-      // Handle non-JSON responses (server errors)
+      // Handle non-JSON responses (server errors like 413, 500)
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
         console.error('Server returned non-JSON response:', text.substring(0, 500));
-        setModalError('Server error during upload. Please try again or use a smaller image.');
+        setModalError('Server error. Please try again or use a smaller image.');
         return;
       }
 
@@ -192,45 +237,28 @@ export default function AdminBlog() {
       
       if (response.ok && data?.success) {
         await fetchPosts();
-        if (filePreview) {
-          URL.revokeObjectURL(filePreview);
-          setFilePreview(null);
-        }
-        setIsModalOpen(false);
-        setEditingPost(null);
-        setFormData({
-          title: '',
-          h1_section: '',
-          h2_section: '',
-          content: '',
-          author_id: '',
-          featured_image: '',
-          status: 'draft'
-        });
-        setSelectedFile(null);
-        setUploadType('url');
-        setModalError(null);
+        closeModal();
       } else {
-        setModalError(data?.message || 'Operation failed. Please check image and try again.');
+        setModalError(data?.message || 'Operation failed. Please try again.');
       }
     } catch (err: any) {
-      console.error('Upload error:', err);
-      setModalError(err.message || 'Upload failed. Please check your connection and try again.');
+      console.error('Save error:', err);
+      setModalError(err.message || 'Failed to save. Please check your connection.');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
     setFormData({
-      title: post.title,
-      h1_section: post.h1_section,
-      h2_section: post.h2_section,
-      content: post.content,
-      author_id: post.author_id.toString(),
+      title: post.title || '',
+      h1_section: post.h1_section || '',
+      h2_section: post.h2_section || '',
+      content: post.content || '',
+      author_id: post.author_id ? post.author_id.toString() : '',
       featured_image: post.featured_image || '',
-      status: post.status
+      status: post.status || 'draft'
     });
     setSelectedFile(null);
     setUploadType('url');
@@ -288,6 +316,27 @@ export default function AdminBlog() {
       setFilePreview(null);
     }
     setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+      setFilePreview(null);
+    }
+    setIsModalOpen(false);
+    setEditingPost(null);
+    setSelectedFile(null);
+    setUploadType('url');
+    setModalError(null);
+    setFormData({
+      title: '',
+      h1_section: '',
+      h2_section: '',
+      content: '',
+      author_id: '',
+      featured_image: '',
+      status: 'draft'
+    });
   };
 
   const logout = () => {
@@ -477,7 +526,7 @@ export default function AdminBlog() {
                 {editingPost ? 'Edit Blog Post' : 'Add New Blog Post'}
               </h3>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeModal}
                 className="text-gray-400 hover:text-gray-600 text-2xl"
               >
                 ×
@@ -560,11 +609,11 @@ export default function AdminBlog() {
                     </label>
 
                     {/* Current image preview */}
-                    {formData.featured_image && (
+                    {(formData.featured_image || filePreview) && (
                       <div className="mb-3 relative inline-block">
                         <img
-                          src={getImageUrl(formData.featured_image)}
-                          alt="Current featured"
+                          src={filePreview || getImageUrl(formData.featured_image)}
+                          alt="Featured preview"
                           className="h-24 w-full object-cover rounded-lg border border-gray-200"
                           onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
@@ -573,12 +622,23 @@ export default function AdminBlog() {
                           onClick={() => {
                             setFormData({ ...formData, featured_image: '' });
                             setSelectedFile(null);
+                            if (filePreview) {
+                              URL.revokeObjectURL(filePreview);
+                              setFilePreview(null);
+                            }
                           }}
                           className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded hover:bg-red-700"
                         >
                           ✕ Clear
                         </button>
-                        <p className="text-xs text-gray-500 mt-1 truncate">{formData.featured_image}</p>
+                        {formData.featured_image && !filePreview && (
+                          <p className="text-xs text-gray-500 mt-1 truncate">{formData.featured_image}</p>
+                        )}
+                        {selectedFile && (
+                          <p className="text-xs text-green-600 mt-1">
+                            ✓ New: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                          </p>
+                        )}
                       </div>
                     )}
                     
@@ -626,18 +686,6 @@ export default function AdminBlog() {
                         <p className="text-xs text-gray-500 mt-1">
                           Accepted formats: JPG, PNG (Max 5MB)
                         </p>
-                        {filePreview && selectedFile && (
-                          <div className="mt-2">
-                            <img
-                              src={filePreview}
-                              alt="Selected file preview"
-                              className="h-20 max-w-full object-cover rounded border border-gray-200"
-                            />
-                            <p className="text-xs text-green-600 mt-1">
-                              ✓ {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                            </p>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -667,50 +715,37 @@ export default function AdminBlog() {
                 </div>
               </div>
               
-              {/* CKEditor 5 Rich Text Editor for Content */}
+              {/* React Quill Rich Text Editor for Content */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Content * <span className="text-xs text-gray-500">(Use toolbar for formatting)</span>
                 </label>
-                <div className="border border-gray-300 rounded-lg overflow-hidden" style={{ minHeight: '450px' }}>
-                  <CKEditor
-                    editor={ClassicEditor as any}
-                    data={formData.content}
-                    onChange={(_event: any, editor: any) => {
-                      const data = editor.getData();
-                      setFormData(prev => ({ ...prev, content: data }));
-                    }}
-                    config={{
-                      toolbar: [
-                        'heading', '|',
-                        'bold', 'italic', 'underline', 'strikethrough', '|',
-                        'bulletedList', 'numberedList', '|',
-                        'indent', 'outdent', '|',
-                        'link', 'blockQuote', '|',
-                        'undo', 'redo'
-                      ],
-                      placeholder: 'Write your blog post content here...'
-                    }}
+                <div style={{ minHeight: '350px' }}>
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.content}
+                    onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+                    modules={quillModules}
+                    formats={quillFormats}
+                    placeholder="Write your blog post content here..."
+                    style={{ height: '300px', marginBottom: '42px' }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  Tip: Use the toolbar to format text, add headings, lists, links, and images.
-                </p>
               </div>
               
               <div className="flex items-center gap-3 pt-4 border-t mt-4">
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={saving}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50"
                 >
-                  {loading 
+                  {saving 
                     ? (uploadType === 'file' && selectedFile ? 'Uploading Image...' : 'Saving...') 
                     : (editingPost ? 'Update Post' : 'Create Post')}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={closeModal}
                   className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-50"
                 >
                   Cancel

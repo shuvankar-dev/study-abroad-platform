@@ -315,6 +315,13 @@ const NewUniversities = () => {
     gradingScheme: "",
     englishExamStatus: ""
   });
+  const [appliedEligibilityFilters, setAppliedEligibilityFilters] = useState({
+    nationality: "",
+    educationCountry: "",
+    lastLevelOfStudy: "",
+    gradingScheme: "",
+    englishExamStatus: ""
+  });
   const [selectedUniversity, setSelectedUniversity] = useState<University | null>(null);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   // Track logo loading stage per uni: 0=clearbit, 1=google-favicon, 2=fallback
@@ -336,7 +343,7 @@ const NewUniversities = () => {
 
   useEffect(() => {
     filterUniversities();
-  }, [searchTerm, filterCountry, filterStudyLevel, filterScholarship, filterAppFee, filterWaiver, filterTuitionRange, filterIntake, filterPunjabHaryana, universities]);
+  }, [searchTerm, filterCountry, filterStudyLevel, filterScholarship, filterAppFee, filterWaiver, filterTuitionRange, filterIntake, filterPunjabHaryana, appliedEligibilityFilters, universities]);
 
   const fetchUniversities = async () => {
     try {
@@ -397,11 +404,15 @@ const NewUniversities = () => {
     }
 
     if (filterWaiver === 'yes') {
-      filtered = filtered.filter(uni => 
-        uni.English_Proficiency_Exam_Waiver && 
-        uni.English_Proficiency_Exam_Waiver !== 'N/A' && 
-        uni.English_Proficiency_Exam_Waiver.toLowerCase() !== 'no'
-      );
+      filtered = filtered.filter(uni => {
+        const waiver = uni.English_Proficiency_Exam_Waiver;
+        if (!waiver || waiver === 'N/A' || waiver.toLowerCase() === 'no' || waiver.toLowerCase() === 'not available') {
+          return false;
+        }
+        // Check if waiver text contains meaningful content (more than just whitespace)
+        const cleanWaiver = waiver.trim();
+        return cleanWaiver.length > 3; // Must have actual waiver information
+      });
     }
 
     if (filterTuitionRange) {
@@ -427,9 +438,42 @@ const NewUniversities = () => {
 
     if (filterPunjabHaryana === 'exclude') {
       filtered = filtered.filter(uni => 
-        uni.Remarks && 
-        (uni.Remarks.toLowerCase().includes('punjab') || uni.Remarks.toLowerCase().includes('haryana'))
+        !uni.Remarks || 
+        (!uni.Remarks.toLowerCase().includes('punjab') && !uni.Remarks.toLowerCase().includes('haryana'))
       );
+    }
+
+    // Apply Eligibility Filters
+    if (appliedEligibilityFilters.lastLevelOfStudy) {
+      // Map lastLevelOfStudy to Study_Level
+      const levelMapping: Record<string, string[]> = {
+        "12th Grade": ["Foundation", "Diploma", "Undergraduate"],
+        "Diploma": ["Undergraduate", "Postgraduate"],
+        "Graduation/Bachelor's": ["Postgraduate", "Masters", "MBA", "MSc"],
+        "Post Graduation/Master's": ["Doctorate", "PhD", "Research"]
+      };
+      
+      const allowedLevels = levelMapping[appliedEligibilityFilters.lastLevelOfStudy] || [];
+      if (allowedLevels.length > 0) {
+        filtered = filtered.filter(uni => 
+          allowedLevels.some(level => 
+            uni.Study_Level?.toLowerCase().includes(level.toLowerCase())
+          )
+        );
+      }
+    }
+
+    if (appliedEligibilityFilters.englishExamStatus === 'No Test') {
+      // Show only programs with English Exam Waiver
+      filtered = filtered.filter(uni => {
+        const waiver = uni.English_Proficiency_Exam_Waiver;
+        if (!waiver || waiver === 'N/A' || waiver.toLowerCase() === 'no' || waiver.toLowerCase() === 'not available') {
+          return false;
+        }
+        // Check if waiver text contains meaningful content (more than just whitespace)
+        const cleanWaiver = waiver.trim();
+        return cleanWaiver.length > 3; // Must have actual waiver information
+      });
     }
 
     setFilteredUniversities(filtered);
@@ -1113,6 +1157,20 @@ const NewUniversities = () => {
                   setFilterTuitionRange("");
                   setFilterIntake("");
                   setFilterPunjabHaryana("");
+                  setAppliedEligibilityFilters({
+                    nationality: "",
+                    educationCountry: "",
+                    lastLevelOfStudy: "",
+                    gradingScheme: "",
+                    englishExamStatus: ""
+                  });
+                  setEligibilityFilters({
+                    nationality: "",
+                    educationCountry: "",
+                    lastLevelOfStudy: "",
+                    gradingScheme: "",
+                    englishExamStatus: ""
+                  });
                   setSearchTerm(""); 
                   setVisibleCount(20); 
                 }}>
@@ -1146,7 +1204,29 @@ const NewUniversities = () => {
                   <select 
                     className="nu-filter-select" 
                     value={filterStudyLevel} 
-                    onChange={(e) => { setFilterStudyLevel(e.target.value); setVisibleCount(20); }}
+                    onChange={(e) => { 
+                      setFilterStudyLevel(e.target.value); 
+                      setVisibleCount(20);
+                      // Sync with eligibility filters
+                      if (e.target.value) {
+                        const levelToEligibilityMapping: Record<string, string> = {
+                          "Foundation": "12th Grade",
+                          "Diploma": "12th Grade",
+                          "Undergraduate": "12th Grade",
+                          "Postgraduate": "Graduation/Bachelor's",
+                          "Masters": "Graduation/Bachelor's",
+                          "MBA": "Graduation/Bachelor's",
+                          "MSc": "Graduation/Bachelor's",
+                          "Doctorate": "Post Graduation/Master's",
+                          "PhD": "Post Graduation/Master's"
+                        };
+                        const eligibilityLevel = levelToEligibilityMapping[e.target.value];
+                        if (eligibilityLevel) {
+                          setAppliedEligibilityFilters({...appliedEligibilityFilters, lastLevelOfStudy: eligibilityLevel});
+                          setEligibilityFilters({...eligibilityFilters, lastLevelOfStudy: eligibilityLevel});
+                        }
+                      }
+                    }}
                   >
                     <option value="">All Levels</option>
                     {uniqueLevels.map(l => <option key={l} value={l}>{l}</option>)}
@@ -1222,7 +1302,15 @@ const NewUniversities = () => {
                   <select 
                     className="nu-filter-select" 
                     value={filterWaiver} 
-                    onChange={(e) => { setFilterWaiver(e.target.value); setVisibleCount(20); }}
+                    onChange={(e) => { 
+                      setFilterWaiver(e.target.value); 
+                      setVisibleCount(20);
+                      // Sync with eligibility filters
+                      if (e.target.value === 'yes') {
+                        setAppliedEligibilityFilters({...appliedEligibilityFilters, englishExamStatus: "No Test"});
+                        setEligibilityFilters({...eligibilityFilters, englishExamStatus: "No Test"});
+                      }
+                    }}
                   >
                     <option value="">All Programs</option>
                     <option value="yes">Waiver Available</option>
@@ -1265,20 +1353,28 @@ const NewUniversities = () => {
               </div>
 
               <div className="nu-active-filters">
-                {(filterCountry || filterStudyLevel || filterScholarship || filterAppFee || filterWaiver || filterTuitionRange || filterIntake || filterPunjabHaryana) && (
+                {(filterCountry || filterStudyLevel || filterScholarship || filterAppFee || filterWaiver || filterTuitionRange || filterIntake || filterPunjabHaryana || appliedEligibilityFilters.lastLevelOfStudy || appliedEligibilityFilters.englishExamStatus) && (
                   <div className="nu-active-filters-list">
                     <span className="nu-active-label">Active Filters:</span>
-                    {filterCountry && <span className="nu-filter-chip">{filterCountry} <X size={14} onClick={() => setFilterCountry("")} /></span>}
-                    {filterStudyLevel && <span className="nu-filter-chip">{filterStudyLevel} <X size={14} onClick={() => setFilterStudyLevel("")} /></span>}
-                    {filterIntake && <span className="nu-filter-chip">{filterIntake} <X size={14} onClick={() => setFilterIntake("")} /></span>}
-                    {filterScholarship && <span className="nu-filter-chip">Scholarship <X size={14} onClick={() => setFilterScholarship("")} /></span>}
-                    {filterAppFee && <span className="nu-filter-chip">Free App <X size={14} onClick={() => setFilterAppFee("")} /></span>}
-                    {filterWaiver && <span className="nu-filter-chip">Waiver <X size={14} onClick={() => setFilterWaiver("")} /></span>}
-                    {filterTuitionRange && <span className="nu-filter-chip">
+                    {/* Advanced Filters - Blue color */}
+                    {filterCountry && <span className="nu-filter-chip nu-filter-chip-advanced">{filterCountry} <X size={14} onClick={() => setFilterCountry("")} /></span>}
+                    {filterStudyLevel && <span className="nu-filter-chip nu-filter-chip-advanced">{filterStudyLevel} <X size={14} onClick={() => setFilterStudyLevel("")} /></span>}
+                    {filterIntake && <span className="nu-filter-chip nu-filter-chip-advanced">{filterIntake} <X size={14} onClick={() => setFilterIntake("")} /></span>}
+                    {filterScholarship && <span className="nu-filter-chip nu-filter-chip-advanced">Scholarship <X size={14} onClick={() => setFilterScholarship("")} /></span>}
+                    {filterAppFee && <span className="nu-filter-chip nu-filter-chip-advanced">Free App <X size={14} onClick={() => setFilterAppFee("")} /></span>}
+                    {filterWaiver && <span className="nu-filter-chip nu-filter-chip-advanced">Waiver <X size={14} onClick={() => setFilterWaiver("")} /></span>}
+                    {filterTuitionRange && <span className="nu-filter-chip nu-filter-chip-advanced">
                       {filterTuitionRange === 'low' ? 'Under $10K' : filterTuitionRange === 'medium' ? '$10K-$20K' : 'Above $20K'}
                       <X size={14} onClick={() => setFilterTuitionRange("")} />
                     </span>}
-                    {filterPunjabHaryana && <span className="nu-filter-chip">No Punjab/Haryana <X size={14} onClick={() => setFilterPunjabHaryana("")} /></span>}
+                    {filterPunjabHaryana && <span className="nu-filter-chip nu-filter-chip-advanced">No Punjab/Haryana <X size={14} onClick={() => setFilterPunjabHaryana("")} /></span>}
+                    
+                    {/* Eligibility Filters - Purple/Violet color */}
+                    {appliedEligibilityFilters.lastLevelOfStudy && <span className="nu-filter-chip nu-filter-chip-eligibility">{appliedEligibilityFilters.lastLevelOfStudy} <X size={14} onClick={() => setAppliedEligibilityFilters({...appliedEligibilityFilters, lastLevelOfStudy: ""})} /></span>}
+                    {appliedEligibilityFilters.englishExamStatus && <span className="nu-filter-chip nu-filter-chip-eligibility">{appliedEligibilityFilters.englishExamStatus} <X size={14} onClick={() => setAppliedEligibilityFilters({...appliedEligibilityFilters, englishExamStatus: ""})} /></span>}
+                    {appliedEligibilityFilters.nationality && <span className="nu-filter-chip nu-filter-chip-eligibility">Nationality: {appliedEligibilityFilters.nationality} <X size={14} onClick={() => setAppliedEligibilityFilters({...appliedEligibilityFilters, nationality: ""})} /></span>}
+                    {appliedEligibilityFilters.educationCountry && <span className="nu-filter-chip nu-filter-chip-eligibility">Education: {appliedEligibilityFilters.educationCountry} <X size={14} onClick={() => setAppliedEligibilityFilters({...appliedEligibilityFilters, educationCountry: ""})} /></span>}
+                    {appliedEligibilityFilters.gradingScheme && <span className="nu-filter-chip nu-filter-chip-eligibility">{appliedEligibilityFilters.gradingScheme} <X size={14} onClick={() => setAppliedEligibilityFilters({...appliedEligibilityFilters, gradingScheme: ""})} /></span>}
                   </div>
                 )}
               </div>
@@ -1299,6 +1395,19 @@ const NewUniversities = () => {
                 <button className="nu-eligibility-btn" onClick={() => setShowEligibilityModal(true)}>
                   <UserPlus size={18} />
                   Candidate Eligibility Filters
+                  {(() => {
+                    const eligibilityCount = [
+                      appliedEligibilityFilters.nationality,
+                      appliedEligibilityFilters.educationCountry,
+                      appliedEligibilityFilters.lastLevelOfStudy,
+                      appliedEligibilityFilters.gradingScheme,
+                      appliedEligibilityFilters.englishExamStatus
+                    ].filter(Boolean).length;
+                    
+                    return eligibilityCount > 0 ? (
+                      <span className="nu-eligibility-count-badge">{eligibilityCount}</span>
+                    ) : null;
+                  })()}
                 </button>
               </div>
 
@@ -1516,7 +1625,20 @@ const NewUniversities = () => {
                 <label>Last Level Of Study <span className="nu-required">*</span></label>
                 <select 
                   value={eligibilityFilters.lastLevelOfStudy}
-                  onChange={(e) => setEligibilityFilters({...eligibilityFilters, lastLevelOfStudy: e.target.value})}
+                  onChange={(e) => {
+                    setEligibilityFilters({...eligibilityFilters, lastLevelOfStudy: e.target.value});
+                    // Sync with advanced filters - map to first matching study level
+                    const eligibilityToLevelMapping: Record<string, string> = {
+                      "12th Grade": "Undergraduate",
+                      "Diploma": "Undergraduate",
+                      "Graduation/Bachelor's": "Postgraduate",
+                      "Post Graduation/Master's": "Doctorate"
+                    };
+                    const studyLevel = eligibilityToLevelMapping[e.target.value];
+                    if (studyLevel) {
+                      setFilterStudyLevel(studyLevel);
+                    }
+                  }}
                 >
                   <option value="">Select</option>
                   <option value="12th Grade">12th Grade</option>
@@ -1550,7 +1672,13 @@ const NewUniversities = () => {
                 <label>English Exam Status <span className="nu-required">*</span></label>
                 <select 
                   value={eligibilityFilters.englishExamStatus}
-                  onChange={(e) => setEligibilityFilters({...eligibilityFilters, englishExamStatus: e.target.value})}
+                  onChange={(e) => {
+                    setEligibilityFilters({...eligibilityFilters, englishExamStatus: e.target.value});
+                    // Sync with advanced filters
+                    if (e.target.value === 'No Test') {
+                      setFilterWaiver('yes');
+                    }
+                  }}
                 >
                   <option value="">I have valid proof of English language proficiency</option>
                   <option value="IELTS">IELTS</option>
@@ -1567,8 +1695,10 @@ const NewUniversities = () => {
                 Close
               </button>
               <button className="nu-modal-btn-primary" onClick={() => {
-                // Apply filters logic here
+                // Apply eligibility filters
+                setAppliedEligibilityFilters({...eligibilityFilters});
                 setShowEligibilityModal(false);
+                setVisibleCount(20);
               }}>
                 Apply Filters
               </button>

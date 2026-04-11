@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { 
   ArrowLeft, User, FileText, Edit, CheckCircle, 
   Clock, AlertCircle, XCircle, Calendar, Building2,
@@ -84,6 +84,7 @@ interface StudentData {
 const StudentDashboard = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [applications, setApplications] = useState<Application[]>([]);
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [studentDocuments, setStudentDocuments] = useState<StudentDocument[]>([]);
@@ -130,8 +131,22 @@ const StudentDashboard = () => {
     const loadData = async () => {
       setLoading(true);
       await fetchStudentData();
-      await Promise.all([fetchApplications(), fetchDocuments(), fetchStudentStatusHistory()]);
+      const [appsResult] = await Promise.all([fetchApplications(), fetchDocuments(), fetchStudentStatusHistory()]);
       setLoading(false);
+
+      // Auto-open a specific application if applicationId is in the URL
+      const applicationId = searchParams.get("applicationId");
+      if (applicationId && appsResult) {
+        setActiveTab('applications');
+        const targetApp = appsResult.find((app: Application) => String(app.id) === applicationId);
+        if (targetApp) {
+          handleViewDetails(targetApp);
+        }
+        // Clean up the URL parameter
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete("applicationId");
+        setSearchParams(newParams, { replace: true });
+      }
     };
     loadData();
   }, [studentId]);
@@ -148,16 +163,18 @@ const StudentDashboard = () => {
     }
   };
 
-  const fetchApplications = async () => {
+  const fetchApplications = async (): Promise<Application[] | null> => {
     try {
       const res = await fetch(`${API_BASE}/edupartner/get_student_applications.php?student_id=${studentId}`);
       const data = await res.json();
       if (data.success) {
         setApplications(data.applications);
+        return data.applications;
       }
     } catch (err) {
       console.error("Failed to fetch applications", err);
     }
+    return null;
   };
 
   const fetchDocuments = async () => {

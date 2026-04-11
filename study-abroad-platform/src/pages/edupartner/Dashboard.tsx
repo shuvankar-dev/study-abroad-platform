@@ -7,7 +7,7 @@ import {
   CreditCard, BookOpen, MessageSquare, Shield, User, 
   LogOut, Plus, Search, Filter, Clock,
   TrendingUp, CheckCircle, AlertCircle, Mail, Phone, Globe, 
-  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame, Menu, Key
+  Calendar, Edit2, Trash2, X, UserPlus, Gift, Zap, Award, FileCheck, Languages, BarChart3, Flame, Menu, Key, Eye
 } from "lucide-react";
 import { findCommissionInfo, getTierColor } from "../../data/commissionData";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
@@ -2705,8 +2705,24 @@ useEffect(() => {
                         border: '1px solid #e2e8f0',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}>
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onClick={() => {
+                        if (app.student_id) {
+                          navigate(`/edupartner/student/${app.student_id}?applicationId=${app.id}`);
+                        }
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#eef2ff';
+                        e.currentTarget.style.borderColor = '#c7d2fe';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#f8fafc';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                      }}
+                      >
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '14px', color: '#1e293b', marginBottom: '4px' }}>
                             {app.student_name}
@@ -5739,6 +5755,19 @@ useEffect(() => {
             borderTop: "1px solid #e2e8f0",
             fontSize: 14,
             color: "#0f172a",
+            cursor: "pointer",
+            transition: "background 0.15s",
+          }}
+          onClick={() => {
+            if (app.student_id) {
+              navigate(`/edupartner/student/${app.student_id}?applicationId=${app.id}`);
+            }
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#f8fafc";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "";
           }}
         >
           {/* Application ID */}
@@ -5876,6 +5905,36 @@ useEffect(() => {
             }}
           >
             <button
+              title="View Student Profile & Application"
+              style={{
+                padding: "8px",
+                cursor: "pointer",
+                border: "none",
+                background: "#f0fdf4",
+                borderRadius: "6px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: "8px",
+                transition: "all 0.2s"
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (app.student_id) {
+                  navigate(`/edupartner/student/${app.student_id}?applicationId=${app.id}`);
+                }
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#dcfce7";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#f0fdf4";
+              }}
+            >
+              <Eye size={16} style={{ color: "#16a34a" }} />
+            </button>
+            <button
+              title="Edit Application"
               style={{
                 padding: "8px",
                 cursor: "pointer",
@@ -5888,7 +5947,10 @@ useEffect(() => {
                 marginRight: "8px",
                 transition: "all 0.2s"
               }}
-              onClick={() => handleEditApplication(app)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditApplication(app);
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "#dbeafe";
               }}
@@ -5899,6 +5961,7 @@ useEffect(() => {
               <Edit2 size={16} style={{ color: "#3b82f6" }} />
             </button>
             <button
+              title="Delete Application"
               style={{
                 padding: "8px",
                 cursor: "pointer",
@@ -5910,7 +5973,8 @@ useEffect(() => {
                 justifyContent: "center",
                 transition: "all 0.2s"
               }}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setDeleteApplicationId(app.id);
                 setShowDeleteApplicationConfirm(true);
               }}
